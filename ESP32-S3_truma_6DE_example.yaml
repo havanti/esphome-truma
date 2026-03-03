@@ -51,7 +51,7 @@ wifi:
       password: !secret wifi_Home_password
   fast_connect: false
   output_power: 17dB
-  power_save_mode: none
+  power_save_mode: light
   reboot_timeout: 0s
   on_connect:
     - logger.log: "WiFi CONNECTED"
