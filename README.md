@@ -1,5 +1,7 @@
 # ESPHome & Truma CP Plus — smart heating and more for the open road 🚐
 
+🇬🇧 English | [🇩🇪 Deutsch](README.de.md)
+
 ESPHome component to remote control Truma CP Plus Heater by simulating a Truma iNet box.
 
 See [1](https://github.com/danielfett/inetbox.py) and [2](https://github.com/mc0110/inetbox2mqtt) for great documentation about how to connect an CP Plus to an ESP32 or RP2040.
