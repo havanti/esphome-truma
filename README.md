@@ -325,7 +325,7 @@ bug reports, or suggestions for improvement. Every report helps make this projec
 
 ## Trademark Notice
 
-TRUMA is a registered trademark (Registration #4140922) owned by Truma Gerätetechnik GmbH & Co. KG, a Putzbrunn-based entity. This project is an independent, community-driven open-source effort and is neither affiliated with, endorsed by, nor supported by Truma Gerätetechnik GmbH & Co. KG. The use of the name "Truma" in this repository is solely for the purpose of technical identification and compatibility description.
+TRUMA is a registered trademark owned by Truma Gerätetechnik GmbH & Co. KG, a Putzbrunn-based entity. This project is an independent, community-driven open-source effort and is neither affiliated with, endorsed by, nor supported by Truma Gerätetechnik GmbH & Co. KG. The use of the name "Truma" in this repository is solely for the purpose of technical identification and compatibility description.
 
 ## Disclaimer
 

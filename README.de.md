@@ -320,7 +320,7 @@ Bitte mit dem eigenen Setup testen und mitteilen, wie es läuft — ob alles rei
 
 ## Markenhinweis
 
-TRUMA ist eine eingetragene Marke (Registrierungsnummer #4140922) der Truma Gerätetechnik GmbH & Co. KG mit Sitz in Putzbrunn. Dieses Projekt ist eine unabhängige, von der Community getriebene Open-Source-Initiative und steht in keiner Verbindung zur Truma Gerätetechnik GmbH & Co. KG, wird von ihr weder empfohlen noch unterstützt. Die Verwendung des Namens „Truma" in diesem Repository dient ausschließlich der technischen Identifikation und Kompatibilitätsbeschreibung.
+TRUMA ist eine eingetragene Marke der Truma Gerätetechnik GmbH & Co. KG mit Sitz in Putzbrunn. Dieses Projekt ist eine unabhängige, von der Community getriebene Open-Source-Initiative und steht in keiner Verbindung zur Truma Gerätetechnik GmbH & Co. KG, wird von ihr weder empfohlen noch unterstützt. Die Verwendung des Namens „Truma" in diesem Repository dient ausschließlich der technischen Identifikation und Kompatibilitätsbeschreibung.
 
 ## Haftungsausschluss
 
