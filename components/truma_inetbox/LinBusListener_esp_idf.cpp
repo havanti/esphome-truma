@@ -82,6 +82,13 @@ void LinBusListener::uartEventTask_(void *args) {
       if (event.type == UART_DATA && instance->available() > 0) {
         instance->onReceive_();
       } else if (event.type == UART_BREAK) {
+        // Drain any bytes still in the FIFO before processing the BREAK.
+        // The CRC byte of the current frame may arrive in the FIFO at the same time as
+        // the BREAK event is queued; without draining, it gets misread as the BREAK byte
+        // of the next frame and the frame appears incomplete (partial data warning).
+        if (instance->available() > 0) {
+          instance->onReceive_();
+        }
         // If the break is valid the `onReceive` is called first and the break is handeld. Therfore the expectation is
         // that the state should be in waiting for `SYNC`.
         if (instance->current_state_ != READ_STATE_SYNC) {
