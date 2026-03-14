@@ -174,14 +174,45 @@ void LinBusListener::read_lin_frame_() {
           if (this->current_PID_order_answered_) {
             // Expectation is that I can see an echo of my data from the lin driver chip.
             log_msg.type = QUEUE_LOG_MSG_TYPE::ERROR_READ_LIN_FRAME_UNABLE_TO_ANSWER;
+            TRUMA_LOGE_ISR(log_msg);
           } else {
-            log_msg.type = QUEUE_LOG_MSG_TYPE::ERROR_READ_LIN_FRAME_LOST_MSG;
-            for (uint8_t i = 0; i < this->current_data_count_; i++) {
-              log_msg.data[i] = this->current_data_[i];
+            // Check if the received bytes form a valid complete shorter LIN frame.
+            // LIN allows 1-8 data bytes; a frame shorter than 8 bytes is not necessarily an error.
+            bool crc_valid = false;
+            if (this->current_data_count_ > 1) {
+              uint8_t data_length = this->current_data_count_ - 1;
+              uint8_t recv_crc = this->current_data_[this->current_data_count_ - 1];
+              if (this->lin_checksum_ == LIN_CHECKSUM::LIN_CHECKSUM_VERSION_1 ||
+                  (this->current_PID_ == DIAGNOSTIC_FRAME_MASTER || this->current_PID_ == DIAGNOSTIC_FRAME_SLAVE)) {
+                crc_valid = (recv_crc == data_checksum(this->current_data_, data_length, 0));
+              } else {
+                crc_valid = (recv_crc == data_checksum(this->current_data_, data_length, this->current_PID_) ||
+                             recv_crc == data_checksum(this->current_data_, data_length, this->current_PID_with_parity_));
+              }
             }
-            log_msg.len = this->current_data_count_;
+            if (crc_valid) {
+              // Valid complete frame with a shorter-than-8-byte payload - log at verbose only.
+#ifdef ESPHOME_LOG_HAS_VERBOSE
+              log_msg.type = QUEUE_LOG_MSG_TYPE::VERBOSE_READ_LIN_FRAME_MSG;
+              for (uint8_t i = 0; i < this->current_data_count_; i++) {
+                log_msg.data[i] = this->current_data_[i];
+              }
+              log_msg.len = this->current_data_count_;
+              log_msg.current_data_valid = true;
+              log_msg.message_source_know = false;
+              log_msg.message_from_master = false;
+              TRUMA_LOGV_ISR(log_msg);
+#endif  // ESPHOME_LOG_HAS_VERBOSE
+            } else {
+              // Truly partial frame - data was cut off before the frame completed.
+              log_msg.type = QUEUE_LOG_MSG_TYPE::ERROR_READ_LIN_FRAME_LOST_MSG;
+              for (uint8_t i = 0; i < this->current_data_count_; i++) {
+                log_msg.data[i] = this->current_data_[i];
+              }
+              log_msg.len = this->current_data_count_;
+              TRUMA_LOGE_ISR(log_msg);
+            }
           }
-          TRUMA_LOGE_ISR(log_msg);
         }
       }
 
