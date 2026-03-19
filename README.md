@@ -102,16 +102,23 @@ Neustart-Schaltfläche — Eine Ein-Klick-ESP-Neustart-Schaltfläche ist in Home
 
 ## Beispielkonfigurationen
 
-Dieses Repository stellt vier gebrauchsfertige Beispielkonfigurationen für die Truma Combi 4 und 6DE bereit.
-Die Gas-Varianten sind für Combi 4 und 6DE ausgelegt; die Diesel-Varianten (6DE) enthalten zusätzlich die Diesel-„Entkokung"/Rückstandsverbrennung.
+Dieses Repository stellt vier gebrauchsfertige Beispielkonfigurationen für die Truma Combi-Heizgerätefamilie bereit.
 Alle verwenden das ESP-IDF-Framework und beziehen die Komponente direkt aus diesem Repository.
 Erfordert ESPHome >= 2026.3.0.
 
-> **Hinweis zur Kompatibilität:** Entwickelt und getestet mit einer Truma Combi 6DE (Baujahr 2018, Eberspächer-Brenner). Ob neuere Truma-Generationen — insbesondere Diesel-Varianten mit einem von Truma selbst entwickelten Brenner (ohne Eberspächer) — sowie die Truma Combi 4 ebenfalls kompatibel sind, ist nicht sichergestellt. Rückmeldungen dazu sind sehr willkommen — bitte ein [GitHub Issue](https://github.com/havanti/esphome-truma/issues) öffnen.
+**Unterstützte Modelle:**
+
+| Modell | Brennstoff | Anmerkung |
+|---|---|---|
+| Combi 4 / Combi 6 | Gas | Flüssiggas-Warmluftheizung mit 10-Liter-Warmwasserboiler |
+| Combi 4E / Combi 6E | Gas + Elektro | Wie oben, zusätzlich Elektro-Heizstäbe (230 V); reiner Gas-, reiner Elektro- oder Mischbetrieb möglich |
+| Combi D / Combi DE | Diesel (+ optional Elektro) | Diesel-Warmluftheizung aus dem Fahrzeugtank; DE-Variante mit zusätzlichen Elektro-Heizstäben |
+
+> **Hinweis zur Kompatibilität:** Entwickelt und getestet mit einer Truma Combi 6DE (Baujahr 2018, Eberspächer-Brenner). Ob andere Modelle und insbesondere neuere Diesel-Generationen mit einem von Truma selbst entwickelten Brenner (ohne Eberspächer) ebenfalls kompatibel sind, ist nicht sichergestellt. Rückmeldungen dazu sind sehr willkommen — bitte ein [GitHub Issue](https://github.com/havanti/esphome-truma/issues) öffnen.
 
 ### Schritt 1: Energiemix-Variante wählen
 
-Die Truma Combi 4 und 6DE können mit **Gas** betrieben werden; die 6DE zusätzlich mit **Diesel**. Je nach Fahrzeugausstattung die passende Variante wählen:
+Je nach Fahrzeugausstattung die passende Variante wählen. Die **E-Varianten** (4E / 6E / DE) unterstützen zusätzlich Elektrobetrieb — die entsprechenden Entitäten (`HEATER_ELECTRICITY`, `ELECTRIC_POWER_LEVEL`) sind in beiden Beispielkonfigurationen bereits enthalten.
 
 | Variante | ESP32 | ESP32-S3 |
 |---|---|---|

@@ -102,16 +102,23 @@ Restart button — A one-click ESP restart button is exposed in Home Assistant f
 
 ## Example configurations
 
-This repository provides four ready-to-use example configurations for the Truma Combi 4 and 6DE.
-The gas variants target both the Combi 4 and 6DE; the diesel variants (6DE) additionally include the diesel "de-coking" / residue combustion script.
+This repository provides four ready-to-use example configurations for the Truma Combi heater family.
 All use the ESP-IDF framework and pull the component directly from this repository.
 Requires ESPHome >= 2026.3.0.
 
-> **Compatibility note:** Developed and tested with a Truma Combi 6DE (2018 model year, Eberspächer burner). Whether newer Truma generations — in particular diesel variants with a burner developed by Truma themselves (without Eberspächer) — as well as the Truma Combi 4 are also compatible has not been verified. Feedback on this is very welcome — please open a [GitHub Issue](https://github.com/havanti/esphome-truma/issues).
+**Supported models:**
+
+| Model | Fuel | Notes |
+|---|---|---|
+| Combi 4 / Combi 6 | Gas | Liquid gas warm-air heater with 10-litre hot water boiler |
+| Combi 4E / Combi 6E | Gas + Electric | As above, with additional electric heating elements (230 V); pure gas, pure electric or mixed operation |
+| Combi D / Combi DE | Diesel (+ optional Electric) | Diesel warm-air heater fuelled from the vehicle tank; DE variant adds electric heating elements |
+
+> **Compatibility note:** Developed and tested with a Truma Combi 6DE (2018 model year, Eberspächer burner). Whether other models — in particular newer diesel generations with a burner developed by Truma themselves (without Eberspächer) — are also compatible has not been verified. Feedback on this is very welcome — please open a [GitHub Issue](https://github.com/havanti/esphome-truma/issues).
 
 ### Step 1: Choose the energy mix variant
 
-The Truma Combi 4 and 6DE can be operated with **gas**; the 6DE additionally with **diesel**. Choose the variant that matches your vehicle:
+Choose the variant that matches your vehicle. The **E variants** (4E / 6E / DE) additionally support electric operation — the relevant entities (`HEATER_ELECTRICITY`, `ELECTRIC_POWER_LEVEL`) are already included in both example configurations.
 
 | Variant | ESP32 | ESP32-S3 |
 |---|---|---|
