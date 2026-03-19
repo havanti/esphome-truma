@@ -47,7 +47,7 @@ In Home Assistant werden zwei Schaltflächen bereitgestellt:
 | Schaltfläche | Funktion |
 |---|---|
 | Start Diesel De-coking | Startet den 45-minütigen Entkokungszyklus |
-| Abort Diesel De-coking | Bricht den Zyklus sofort ab und schaltet das Heizgerät aus |
+| Abort Diesel De-coking | Bricht den Zyklus ab und schaltet das Heizgerät aus |
 
 Ein Template-Sensor (Diesel De-coking Remaining Time, Einheit: min) zeigt die verbleibende Zeit an und ist im Home-Assistant-Dashboard sowie in der integrierten Web-UI sichtbar.
 

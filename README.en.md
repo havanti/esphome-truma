@@ -28,7 +28,7 @@ To adapt this for your own sensors, replace the four MAC addresses in the `on_bl
 
 > Note: BLE scanning and the Truma LIN bus operate in parallel on the same chip. On an ESP32-S3 with OctalSPI PSRAM the BLE stack can be offloaded to PSRAM, which significantly reduces the risk of memory conflicts. The provided PSRAM `sdkconfig_options` in `ESP32-S3_truma_6DE_example.yaml` are already configured for this.
 
-### Diesel De-coking (Entkokung)
+### Diesel "De-coking" / Residue Combustion
 
 When a Truma Combi is operated on diesel for extended periods, carbon deposits can build up in the combustion chamber and burner nozzle. Recommended maintenance:
 
@@ -47,7 +47,7 @@ Two buttons are exposed in Home Assistant:
 | Button | Function |
 |---|---|
 | Start Diesel De-coking | Starts the 45-minute de-coking cycle |
-| Abort Diesel De-coking | Aborts the cycle immediately and turns off the heater |
+| Abort Diesel De-coking | Aborts the cycle and turns off the heater |
 
 A template sensor (Diesel De-coking Remaining Time, unit: min) counts down the remaining time and is visible in the Home Assistant dashboard and the built-in web UI.
 
@@ -124,7 +124,7 @@ The variant determines which ESPHome entities are enabled:
 |---|---|---|
 | Binary sensor (fuel) | `HEATER_GAS` | `HEATER_DIESEL` |
 | Energy mix select | `HEATER_ENERGY_MIX_GAS` | `HEATER_ENERGY_MIX_DIESEL` |
-| Diesel de-coking (ESP32-S3 only) | not included | included |
+| Diesel "de-coking" / residue combustion (ESP32-S3 only) | not included | included |
 
 > Note: Use only **one** energy mix select entity per configuration — either gas or diesel, not both at the same time.
 
@@ -140,7 +140,7 @@ The variant determines which ESPHome entities are enabled:
 | LIN UART RX pin | GPIO16 | GPIO8 (avoids PSRAM pin conflict) |
 | Minimum chip revision | optional (`CONFIG_ESP32_REV_MIN`, commented out) | no restriction |
 | Onboard RGB LED | not available | WS2812, GPIO38, LIN bus status indicator |
-| Diesel de-coking | not included | included (diesel variant only) |
+| Diesel "de-coking" / residue combustion | not included | included (diesel variant only) |
 | Log level | `DEBUG` | `DEBUG` |
 
 Use the ESP32 variant if you have a standard ESP32 (WROOM-32, DevKit etc.) without PSRAM.
