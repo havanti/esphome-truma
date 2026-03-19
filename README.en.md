@@ -115,7 +115,7 @@ The Truma Combi 6DE can be operated with either **gas** or **diesel**. Choose th
 
 | Variant | ESP32 | ESP32-S3 |
 |---|---|---|
-| **Gas** | [`ESP32_truma_6DE_Gas_example.yaml`](ESP32_truma_6DE_Gas_example.yaml) | [`ESP32-S3_truma_6DE_Gas_example.yaml`](ESP32-S3_truma_6DE_Gas_example.yaml) |
+| **Gas** | [`ESP32_truma_6DE_Gas_example.yaml`](ESP32_truma_6DE_Gas_example.yaml) | [`ESP32-S3_truma_6_Gas_example.yaml`](ESP32-S3_truma_6_Gas_example.yaml) |
 | **Diesel** | [`ESP32_truma_6DE_Diesel_example.yaml`](ESP32_truma_6DE_Diesel_example.yaml) | [`ESP32-S3_truma_6DE_Diesel_example.yaml`](ESP32-S3_truma_6DE_Diesel_example.yaml) |
 
 The variant determines which ESPHome entities are enabled:

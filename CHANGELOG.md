@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-#### `ESP32_truma_6DE_Gas_example.yaml` / `ESP32-S3_truma_6DE_Gas_example.yaml` (new)
+#### `ESP32_truma_6DE_Gas_example.yaml` / `ESP32-S3_truma_6_Gas_example.yaml` (new)
 - Gas variant of the example configurations using `HEATER_GAS` and `HEATER_ENERGY_MIX_GAS`
 - Diesel-„Entkokung"/Rückstandsverbrennung script, sensor and buttons omitted (gas-only operation)
 
