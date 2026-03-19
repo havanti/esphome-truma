@@ -2,13 +2,9 @@
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 English
 
-ESPHome component to remote control Truma CP Plus Heater by simulating a Truma iNet box.
-
-See [1](https://github.com/danielfett/inetbox.py) and [2](https://github.com/mc0110/inetbox2mqtt) for great documentation about how to connect an CP Plus to an ESP32 or RP2040.
-
 ## Acknowledgements
 
-A huge and heartfelt thank you goes to **[Fabian Schmidt](https://github.com/Fabian-Schmidt)**, whose outstanding work on the original [esphome-truma_inetbox](https://github.com/Fabian-Schmidt/esphome-truma_inetbox) repository made all of this possible in the first place. This project is a fork of his work, and without his dedication and expertise none of this would exist. Thank you, Fabian!
+A heartfelt thank you goes to **[Fabian Schmidt](https://github.com/Fabian-Schmidt)**, whose outstanding work on the original [esphome-truma_inetbox](https://github.com/Fabian-Schmidt/esphome-truma_inetbox) repository made all of this possible in the first place. This project is a fork of his work, and without his dedication and expertise none of this would exist. Thank you, Fabian!
 
 This project also builds on the incredible groundwork laid by the [WomoLIN project](https://github.com/muccc/WomoLIN) and [Daniel Fett's inetbox.py](https://github.com/danielfett/inetbox.py), as well as [mc0110's inetbox2mqtt](https://github.com/mc0110/inetbox2mqtt) — their protocol research, log files and documentation have been invaluable.
 
@@ -20,7 +16,7 @@ This fork extends the original component with several real-world features develo
 
 ### TPMS — Tire Pressure Monitoring via Bluetooth Proxy
 
-The ESP32 doubles as a Bluetooth Low Energy (BLE) receiver for aftermarket TPMS sensors, eliminating the need for a separate gateway. Four sensors are monitored simultaneously (front-left, front-right, rear-right, rear-left), each reporting:
+The ESP32 doubles as a Bluetooth Low Energy (BLE) receiver for aftermarket TPMS sensors, eliminating the need for a separate gateway. Four sensors are monitored simultaneously (FL, FR, RR, RL), each reporting:
 
 - Tire pressure in bar
 - Tire temperature in °C
@@ -32,9 +28,9 @@ To adapt this for your own sensors, replace the four MAC addresses in the `on_bl
 
 > Note: BLE scanning and the Truma LIN bus operate in parallel on the same chip. On an ESP32-S3 with OctalSPI PSRAM the BLE stack can be offloaded to PSRAM, which significantly reduces the risk of memory conflicts. The provided PSRAM `sdkconfig_options` in `ESP32-S3_truma_6DE_example.yaml` are already configured for this.
 
-### Diesel De-coking (Entkokung) — confirmed by Truma Support upon inquiry
+### Diesel De-coking (Entkokung)
 
-When a Truma Combi is operated on diesel for extended periods, carbon deposits can build up in the combustion chamber and burner nozzle. Upon direct inquiry, Truma Support confirmed the following recommendations to keep the heater in good condition:
+When a Truma Combi is operated on diesel for extended periods, carbon deposits can build up in the combustion chamber and burner nozzle. Recommended maintenance:
 
 - Run a monthly de-coking cycle (automated by this configuration, see below).
 - Use high-quality diesel fuel, or add a cetane-boosting additive to the tank — a higher cetane number leads to cleaner combustion and reduces deposit buildup.
@@ -43,7 +39,7 @@ The built-in `script_diesel_decoking` automates this procedure:
 
 1. Switches the energy mix to Diesel
 2. Sets the room heater to 30 °C / HIGH mode for 45 minutes
-3. Shuts the heater off cleanly afterwards
+3. Shuts the heater off afterwards
 4. (open doors and windows ;-) )
 
 Two buttons are exposed in Home Assistant:
@@ -106,13 +102,35 @@ Restart button — A one-click ESP restart button is exposed in Home Assistant f
 
 ## Example configurations
 
-This repository provides two ready-to-use example configurations for the Truma Combi 6DE heater.
-Both use the ESP-IDF framework and pull the component directly from this repository.
+This repository provides four ready-to-use example configurations for the Truma Combi 6DE heater.
+The configurations should also work with the Truma Combi 4, as both devices use the same LIN bus protocol via the CP Plus.
+All use the ESP-IDF framework and pull the component directly from this repository.
 Requires ESPHome >= 2026.3.0.
 
-### Choosing the right file
+> **Compatibility note:** Developed and tested with a Truma Combi 6DE (2018 model year, Eberspächer burner). Whether newer Truma generations — in particular diesel variants with a burner developed by Truma themselves (without Eberspächer) — as well as the Truma Combi 4 are also compatible has not been verified. Feedback on this is very welcome — please open a [GitHub Issue](https://github.com/havanti/esphome-truma/issues).
 
-| Feature | [`ESP32_truma_6DE_example.yaml`](ESP32_truma_6DE_example.yaml) | [`ESP32-S3_truma_6DE_example.yaml`](ESP32-S3_truma_6DE_example.yaml) |
+### Step 1: Choose the energy mix variant
+
+The Truma Combi 6DE can be operated with either **gas** or **diesel**. Choose the variant that matches your vehicle:
+
+| Variant | ESP32 | ESP32-S3 |
+|---|---|---|
+| **Gas** | [`ESP32_truma_6DE_Gas_example.yaml`](ESP32_truma_6DE_Gas_example.yaml) | [`ESP32-S3_truma_6DE_Gas_example.yaml`](ESP32-S3_truma_6DE_Gas_example.yaml) |
+| **Diesel** | [`ESP32_truma_6DE_Diesel_example.yaml`](ESP32_truma_6DE_Diesel_example.yaml) | [`ESP32-S3_truma_6DE_Diesel_example.yaml`](ESP32-S3_truma_6DE_Diesel_example.yaml) |
+
+The variant determines which ESPHome entities are enabled:
+
+| | Gas variant | Diesel variant |
+|---|---|---|
+| Binary sensor (fuel) | `HEATER_GAS` | `HEATER_DIESEL` |
+| Energy mix select | `HEATER_ENERGY_MIX_GAS` | `HEATER_ENERGY_MIX_DIESEL` |
+| Diesel de-coking (ESP32-S3 only) | not included | included |
+
+> Note: Use only **one** energy mix select entity per configuration — either gas or diesel, not both at the same time.
+
+### Step 2: Choose the hardware variant
+
+| Feature | ESP32 | ESP32-S3 |
 |---|---|---|
 | Target chip | ESP32 (classic, rev ≥ 3) | ESP32-S3 |
 | Board | `esp32dev` | `esp32-s3-devkitc-1` |
@@ -122,18 +140,19 @@ Requires ESPHome >= 2026.3.0.
 | LIN UART RX pin | GPIO16 | GPIO8 (avoids PSRAM pin conflict) |
 | Minimum chip revision | optional (`CONFIG_ESP32_REV_MIN`, commented out) | no restriction |
 | Onboard RGB LED | not available | WS2812, GPIO38, LIN bus status indicator |
+| Diesel de-coking | not included | included (diesel variant only) |
 | Log level | `DEBUG` | `DEBUG` |
 
-Use the ESP32 file if you have a standard ESP32 (WROOM-32, DevKit etc.) without PSRAM.
+Use the ESP32 variant if you have a standard ESP32 (WROOM-32, DevKit etc.) without PSRAM.
 Uncommenting `CONFIG_ESP32_REV_MIN: "3"` and `version: recommended` can reduce binary size on older toolchains.
 
-Use the ESP32-S3 file if you have an ESP32-S3 module with OctalSPI PSRAM (e.g. N16R8).
+Use the ESP32-S3 variant if you have an ESP32-S3 module with OctalSPI PSRAM (e.g. N16R8).
 The PSRAM configuration (OCT mode, 80 MHz) is required for this module variant.
 The UART pins have been moved away from GPIO16/17, which are reserved for PSRAM on S3 boards.
 
 ### Prerequisites
 
-Both configurations use `secrets.yaml` for WiFi credentials. Create a `secrets.yaml` in the
+All configurations use `secrets.yaml` for WiFi credentials. Create a `secrets.yaml` in the
 same directory with:
 
 ```yaml
