@@ -108,11 +108,12 @@ Erfordert ESPHome >= 2026.3.0.
 
 **Unterstützte Modelle:**
 
-| Modell | Brennstoff | Anmerkung |
-|---|---|---|
-| Combi 4 / Combi 6 | Gas | Flüssiggas-Warmluftheizung mit 10-Liter-Warmwasserboiler |
-| Combi 4E / Combi 6E | Gas + Elektro | Wie oben, zusätzlich Elektro-Heizstäbe (230 V); reiner Gas-, reiner Elektro- oder Mischbetrieb möglich |
-| Combi D / Combi DE | Diesel (+ optional Elektro) | Diesel-Warmluftheizung aus dem Fahrzeugtank; DE-Variante mit zusätzlichen Elektro-Heizstäben |
+| Modell         | Brennstoff       | Anmerkung                                                                                  |
+| -------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| Combi 4 / 6    | Gas              | Flüssiggas-Warmluftheizung mit 10-Liter-Boiler; Heizen/Wasser parallel oder separat.      |
+| Combi 4E / 6E  | Gas + Elektro    | Wie oben + 230-V-Heizstäbe; Modi: Gas, Elektro oder Hybrid (schnelleres Aufheizen).       |
+| Combi Diesel   | Diesel           | Diesel aus Tank + 12 V; Boiler integriert.                                                 |
+| Combi Diesel E | Diesel + Elektro | Wie oben + 230-V-Heizstäbe für Hybridbetrieb.                                             |
 
 > **Hinweis zur Kompatibilität:** Entwickelt und getestet mit einer Truma Combi 6DE (Baujahr 2018, Eberspächer-Brenner). Ob andere Modelle und insbesondere neuere Diesel-Generationen mit einem von Truma selbst entwickelten Brenner (ohne Eberspächer) ebenfalls kompatibel sind, ist nicht sichergestellt. Rückmeldungen dazu sind sehr willkommen — bitte ein [GitHub Issue](https://github.com/havanti/esphome-truma/issues) öffnen.
 
