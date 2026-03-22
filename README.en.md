@@ -12,7 +12,7 @@ This project also builds on the incredible groundwork laid by the [WomoLIN proje
 
 ## What this fork adds
 
-This fork extends the original component with several real-world features developed during daily use in a motorhome with a Truma Combi 6DE and an ESP32-S3 board. The full working configuration is provided in [`ESP32-S3_truma_6DE_example.yaml`](ESP32-S3_truma_6DE_example.yaml).
+This fork extends the original component with several real-world features developed during daily use in a motorhome with a Truma Combi 6DE and an ESP32-S3 board. The full working configuration is provided in [`ESP32-S3_truma_6DE_Diesel_example.yaml`](ESP32-S3_truma_6DE_Diesel_example.yaml).
 
 ### TPMS — Tire Pressure Monitoring via Bluetooth Proxy
 
@@ -26,7 +26,7 @@ The integration uses `esp32_ble_tracker` with passive scanning and parses the ma
 
 To adapt this for your own sensors, replace the four MAC addresses in the `on_ble_advertise` blocks with those of your TPMS sensors. The payload decoding logic (pressure offset, scaling) may need adjustment depending on your sensor brand.
 
-> Note: BLE scanning and the Truma LIN bus operate in parallel on the same chip. On an ESP32-S3 with OctalSPI PSRAM the BLE stack can be offloaded to PSRAM, which significantly reduces the risk of memory conflicts. The provided PSRAM `sdkconfig_options` in `ESP32-S3_truma_6DE_example.yaml` are already configured for this.
+> Note: BLE scanning and the Truma LIN bus operate in parallel on the same chip. On an ESP32-S3 with OctalSPI PSRAM the BLE stack can be offloaded to PSRAM, which significantly reduces the risk of memory conflicts. The provided PSRAM `sdkconfig_options` in `ESP32-S3_truma_6DE_Diesel_example.yaml` are already configured for this.
 
 ### Diesel "De-coking" / Residue Combustion
 
