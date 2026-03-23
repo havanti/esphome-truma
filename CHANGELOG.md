@@ -26,7 +26,7 @@ Getestet mit:
 
 ---
 
-## [1.4.0] — 2026-03-23 — Fehlerbehebungen
+## [1.0.4] — 2026-03-23 — Fehlerbehebungen
 
 ### Behoben
 
@@ -38,7 +38,7 @@ Getestet mit:
 
 ---
 
-## [1.3.0] — 2026-03-22 — OTA, Aufräumen
+## [1.0.3] — 2026-03-22 — OTA, Aufräumen
 
 ### Hinzugefügt
 
@@ -56,7 +56,7 @@ Getestet mit:
 
 ---
 
-## [1.2.0] — 2026-03-19 — Beispielkonfigurationen und Dokumentation
+## [1.0.2] — 2026-03-19 — Beispielkonfigurationen und Dokumentation
 
 ### Hinzugefügt
 
@@ -85,7 +85,7 @@ Getestet mit:
 
 ---
 
-## [1.1.0] — 2026-03-14 — ESPHome 2026.6 Kompatibilität (Deprecation-Nachfolge)
+## [1.0.1] — 2026-03-14 — ESPHome 2026.6 Kompatibilität (Deprecation-Nachfolge)
 
 ### Geändert
 
