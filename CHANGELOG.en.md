@@ -19,10 +19,10 @@ ESP-IDF builds. Additional breaking changes in ESP-IDF 5.x (ESP32 toolchain) and
 ESPHome 2026.x API changes were also resolved.
 
 Tested against:
-- ESPHome **2025.9.3** — Arduino + ESP-IDF ✅
-- ESPHome **2026.2.2** — Arduino + ESP-IDF ✅
-- ESPHome **2026.3.0** — Arduino + ESP-IDF ✅
 - ESPHome **2026.3.1** — Arduino + ESP-IDF ✅
+- ESPHome **2026.3.0** — Arduino + ESP-IDF ✅
+- ESPHome **2026.2.2** — Arduino + ESP-IDF ✅
+- ESPHome **2025.9.3** — Arduino + ESP-IDF ✅
 
 ---
 
