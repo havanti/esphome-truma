@@ -30,7 +30,7 @@ To adapt this for your own sensors, replace the four MAC addresses in the `on_bl
 
 ### Diesel "De-coking" / Residue Combustion
 
-When a Truma Combi is operated on diesel for extended periods, carbon deposits can build up in the combustion chamber and burner nozzle. Recommended maintenance:
+When a Truma Combi is operated on diesel for extended periods, carbon deposits can build up on and in the wick burner (sintered stainless steel) and on the glow plug screen. Recommended maintenance:
 
 - Run a monthly de-coking cycle (automated by this configuration, see below).
 - Use high-quality diesel fuel, or add a cetane-boosting additive to the tank — a higher cetane number leads to cleaner combustion and reduces deposit buildup.
