@@ -8,6 +8,24 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unveröffentlicht] — ESPHome 2025.8+ / 2026.3.x Kompatibilität
+
+### Zusammenfassung
+
+Dieses Release stellt die Kompatibilität mit ESPHome 2025.8 bis 2026.3.x wieder her.
+Hauptursache war die Entfernung von `get_uart_event_queue()` aus der upstream
+`IDFUARTComponent` in ESPHome 2025.8, wodurch die LIN-Bus-BREAK-Erkennung bei
+ESP-IDF-Builds nicht mehr funktionierte. Zusätzliche Breaking Changes in ESP-IDF 5.x
+(ESP32-Toolchain) und ESPHome 2026.x API-Änderungen wurden ebenfalls behoben.
+
+Getestet mit:
+- ESPHome **2025.9.3** — Arduino + ESP-IDF ✅
+- ESPHome **2026.2.2** — Arduino + ESP-IDF ✅
+- ESPHome **2026.3.0** — Arduino + ESP-IDF ✅
+- ESPHome **2026.3.1** — Arduino + ESP-IDF ✅
+
+---
+
 ## [Unveröffentlicht] — Fehlerbehebungen
 
 ### Behoben
@@ -94,23 +112,7 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unveröffentlicht] — ESPHome 2025.8+ / 2026.3.x Kompatibilität
-
-### Zusammenfassung
-
-Dieses Release stellt die Kompatibilität mit ESPHome 2025.8 bis 2026.3.x wieder her.
-Hauptursache war die Entfernung von `get_uart_event_queue()` aus der upstream
-`IDFUARTComponent` in ESPHome 2025.8, wodurch die LIN-Bus-BREAK-Erkennung bei
-ESP-IDF-Builds nicht mehr funktionierte. Zusätzliche Breaking Changes in ESP-IDF 5.x
-(ESP32-Toolchain) und ESPHome 2026.x API-Änderungen wurden ebenfalls behoben.
-
-Getestet mit:
-- ESPHome **2025.9.3** — Arduino + ESP-IDF ✅
-- ESPHome **2026.2.2** — Arduino + ESP-IDF ✅
-- ESPHome **2026.3.0** — Arduino + ESP-IDF ✅
-- ESPHome **2026.3.1** — Arduino + ESP-IDF ✅
-
----
+## [Unveröffentlicht] — ESPHome 2025.8+ / 2026.3.x Kompatibilität — Details
 
 ### Geändert — `components/uart/`
 
