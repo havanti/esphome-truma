@@ -30,7 +30,7 @@ Um dies für eigene Sensoren anzupassen, sind die vier MAC-Adressen in den `on_b
 
 ### Diesel-„Entkokung" bzw. Rückstandsverbrennung
 
-Wenn eine Truma Combi längere Zeit mit Diesel betrieben wird, können sich Rußablagerungen am bzw. im Fließbrenner (Edelstahlsintermaterial) und am Glühstiftsieb ansammeln. Empfohlene Pflegemaßnahmen:
+Wenn eine Truma Combi längere Zeit mit Diesel betrieben wird, können sich Rußablagerungen am bzw. im Brennervlies (Edelstahlsintermaterial) und am Glühstiftsieb ansammeln. Empfohlene Pflegemaßnahmen:
 
 - Monatlichen Entkokungszyklus durchführen (durch diese Konfiguration automatisiert, siehe unten).
 - Möglichst hochwertigen Dieselkraftstoff verwenden oder einen cetanzahlerhöhenden Kraftstoffzusatz in den Tank geben — eine höhere Cetanzahl führt zu saubererer Verbrennung und reduziert Ablagerungen.
