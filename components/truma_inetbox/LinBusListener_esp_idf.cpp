@@ -75,6 +75,12 @@ void LinBusListener::uartEventTask_(void *args) {
   auto uartComp = static_cast<ESPHOME_UART *>(instance->parent_);
   auto uart_num = uartComp->get_hw_serial_number();
   auto uartEventQueue = uartComp->get_uart_event_queue();
+  // Wait for UART event queue to be initialized.
+  // On dual-core ESP32 the task may start on core 0 before core 1 has finished
+  // calling uart_driver_install(), leaving the queue handle momentarily NULL.
+  while (*uartEventQueue == nullptr) {
+    vTaskDelay(pdMS_TO_TICKS(1));
+  }
   uart_event_t event;
   for (;;) {
     // Waiting for UART event.
