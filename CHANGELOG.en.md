@@ -1,6 +1,6 @@
 # Changelog
 
-[🇩🇪 Deutsch](CHANGELOG.md) | 🇬🇧 English
+[🇩🇪 Deutsch](CHANGELOG.md) | 🇬🇧 English | [🇫🇷 Français](CHANGELOG.fr.md)
 
 All notable changes to this project will be documented in this file.
 

@@ -1,6 +1,6 @@
 # Changelog
 
-🇩🇪 Deutsch | [🇬🇧 English](CHANGELOG.en.md)
+🇩🇪 Deutsch | [🇬🇧 English](CHANGELOG.en.md) | [🇫🇷 Français](CHANGELOG.fr.md)
 
 Alle wesentlichen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
