@@ -26,6 +26,16 @@ Tested against:
 
 ---
 
+## [1.0.5] — 2026-03-27 — Improvements
+
+### Changed
+
+#### Example YAMLs (all four)
+- `refresh` in `external_components` changed from `0s` to `24h` — ESPHome checks for updates once a day
+- Added two commented-out alternatives: `refresh: always` (for development) and `refresh: 0s` (no automatic updates)
+
+---
+
 ## [1.0.4] — 2026-03-23 — Bugfixes
 
 ### Fixed

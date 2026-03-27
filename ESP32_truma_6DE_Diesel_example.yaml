@@ -12,8 +12,11 @@ external_components:
       type: git
       url: https://github.com/havanti/esphome-truma.git
     components: [truma_inetbox, uart]
-    refresh: 0s
-     
+    refresh: 24h     # check for updates once a day (recommended)
+    # refresh: always  # always download latest (slower builds, use during development)
+    # refresh: 0s      # never re-download (fastest builds, no automatic updates)
+
+
 esp32:
   board: esp32dev
   framework:
