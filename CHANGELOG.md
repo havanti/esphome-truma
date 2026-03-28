@@ -26,6 +26,17 @@ Getestet mit:
 
 ---
 
+## [1.0.7] — 2026-03-28 — Kleinere Verbesserungen
+
+### Behoben
+- Log-Level für „LIN CRC error on SID" von WARN auf VERBOSE gesenkt — kein echter Fehler, nur eine zu langsame Truma-Antwort
+
+### Dokumentation
+- `min_version: 2026.3.1` in allen Beispiel-YAMLs ergänzt
+- CONTRIBUTING-Dateien (DE/EN/FR) hinzugefügt
+
+---
+
 ## [1.0.6] — 2026-03-27 — Robustheit
 
 ### Behoben
