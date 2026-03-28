@@ -410,7 +410,7 @@ void LinBusListener::process_log_queue(TickType_t xTicksToWait) {
         ESP_LOGVV(TAG, "0x%02X Expected SYNC not found.", current_PID);
         break;
       case QUEUE_LOG_MSG_TYPE::WARN_READ_LIN_FRAME_SID_CRC:
-        ESP_LOGW(TAG, "0x%02X LIN CRC error on SID.", current_PID);
+        ESP_LOGV(TAG, "0x%02X LIN CRC error on SID.", current_PID);
         break;
       case QUEUE_LOG_MSG_TYPE::WARN_READ_LIN_FRAME_LINv1_CRC:
         ESP_LOGW(TAG, "LIN v1 CRC error");
