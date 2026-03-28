@@ -2,6 +2,8 @@
 
 [🇩🇪 Deutsch](README.md) | 🇬🇧 English | [🇫🇷 Français](README.fr.md)
 
+> Contributions welcome — please [open an issue](../../issues) before submitting a PR. See [CONTRIBUTING.en.md](CONTRIBUTING.en.md).
+
 ## Acknowledgements
 
 A heartfelt thank you goes to **[Fabian Schmidt](https://github.com/Fabian-Schmidt)**, whose outstanding work on the original [esphome-truma_inetbox](https://github.com/Fabian-Schmidt/esphome-truma_inetbox) repository made all of this possible in the first place. This project is a fork of his work, and without his dedication and expertise none of this would exist. Thank you, Fabian!
