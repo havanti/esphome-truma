@@ -30,7 +30,7 @@ Testé avec :
 ## [1.0.7] — 2026-03-28 — Améliorations mineures
 
 ### Corrigé
-- Niveau de log pour « LIN CRC error on SID » abaissé de WARN à VERBOSE — pas une vraie erreur, juste une réponse trop lente de la Truma
+- Niveau de log pour « LIN CRC error on SID » abaissé de WARN à VERBOSE — pas une vraie erreur, juste une réponse trop lente de la Truma (suggéré par @kamahat)
 
 ### Documentation
 - `min_version: 2026.3.1` ajouté dans tous les YAMLs d'exemple
