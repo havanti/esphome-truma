@@ -59,8 +59,7 @@ uint32_t LinBusListener::onSerialEvent() {
 
     if ((receive_status_register & UART_UARTRSR_BE_BITS) == UART_UARTRSR_BE_BITS) {
       ESP_LOGVV(TAG, "UART%d RX break.", this->uart_number_);
-      // If the break is valid the `onReceive` is called first and the break is handeld. Therfore the expectation is
-      // that the state should be in waiting for `SYNC`.
+      // If break is valid, onReceive is called first and handled — state should be waiting for SYNC.
       if (this->current_state_ != READ_STATE_BREAK || this->current_state_ != READ_STATE_SYNC) {
         this->current_state_ = READ_STATE_SYNC;
       }

@@ -27,19 +27,7 @@ static const uint32_t UART_TICK_APB_CLOCK = 1 << 27;
 uint32_t ESP32ArduinoUARTComponent::get_config() {
   uint32_t config = 0;
 
-  /*
-   * All bits numbers below come from
-   * framework-arduinoespressif32/cores/esp32/esp32-hal-uart.h
-   * And more specifically conf0 union in uart_dev_t.
-   *
-   * Below is bit used from conf0 union.
-   * <name>:<bits position>  <values>
-   * parity:0                0:even 1:odd
-   * parity_en:1             Set this bit to enable uart parity check.
-   * bit_num:2-4             0:5bits 1:6bits 2:7bits 3:8bits
-   * stop_bit_num:4-6        stop bit. 1:1bit  2:1.5bits  3:2bits
-   * tick_ref_always_on:27   select the clock.1：apb clock：ref_tick
-   */
+  // Build conf0 register value (see esp32-hal-uart.h, uart_dev_t.conf0)
 
   if (this->parity_ == UART_CONFIG_PARITY_EVEN) {
     config |= UART_PARITY_EVEN | UART_PARITY_ENABLE;

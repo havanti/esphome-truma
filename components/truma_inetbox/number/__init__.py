@@ -37,7 +37,7 @@ CONF_SUPPORTED_TYPE = {
         CONF_ICON: ICON_THERMOMETER,
         CONF_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
         CONF_MAX_VALUE: 30,
-        # Values between 0 and 5 are handeld as off.
+        # Values between 0 and 5 are handled as off.
         CONF_MIN_VALUE: 0,
         CONF_STEP: 1,
     },
@@ -48,7 +48,7 @@ CONF_SUPPORTED_TYPE = {
         CONF_ICON: ICON_THERMOMETER,
         CONF_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
         CONF_MAX_VALUE: 80,
-        # Values between 0 and 40 are handeld as off.
+        # Values between 0 and 40 are handled as off.
         CONF_MIN_VALUE: 0,
         CONF_STEP: 20,
     },
@@ -70,7 +70,7 @@ CONF_SUPPORTED_TYPE = {
         CONF_ICON: ICON_THERMOMETER,
         CONF_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
         CONF_MAX_VALUE: 31,
-        # Values between 0 and 16 are handeld as off.
+        # Values between 0 and 16 are handled as off.
         CONF_MIN_VALUE: 15,
         CONF_STEP: 1,
     },

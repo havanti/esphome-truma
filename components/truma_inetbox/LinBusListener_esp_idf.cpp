@@ -36,9 +36,9 @@ void LinBusListener::setup_framework() {
   uart_intr.intr_enable_mask =
       UART_RXFIFO_FULL_INT_ENA_M | UART_RXFIFO_TOUT_INT_ENA_M;  // only these IRQs - no BREAK, PARITY or OVERFLOW
   uart_intr.rxfifo_full_thresh =
-      1;  // UART_FULL_THRESH_DEFAULT,  //120 default!! aghh! need receive 120 chars before we see them
+      1;  // 1 byte threshold (default 120 would delay first byte significantly)
   uart_intr.rx_timeout_thresh =
-      10;  // UART_TOUT_THRESH_DEFAULT,  //10 works well for my short messages I need send/receive
+      10;  // 10 tick timeout (sufficient for short LIN frames)
   uart_intr.txfifo_empty_intr_thresh = 10;  // UART_EMPTY_THRESH_DEFAULT
   uart_intr_config((uart_port_t) uart_num, &uart_intr);
 
@@ -101,8 +101,7 @@ void LinBusListener::uartEventTask_(void *args) {
         if (instance->available() > 0) {
           instance->onReceive_();
         }
-        // If the break is valid the `onReceive` is called first and the break is handeld. Therfore the expectation is
-        // that the state should be in waiting for `SYNC`.
+        // If break is valid, onReceive is called first and handled — state should be waiting for SYNC.
         if (instance->current_state_ != READ_STATE_SYNC) {
           instance->current_state_ = READ_STATE_BREAK;
         }
