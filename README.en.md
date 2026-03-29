@@ -16,10 +16,13 @@ This project also builds on the incredible groundwork laid by the [WomoLIN proje
 You need a [LIN to UART Transceiver](./docs/linUART.webp) for connecting the ESP32 to the LIN bus.
 
 The connections between ESP32 and LIN trasnceiver :
+
  * **TX** connects to GPIO UART RX on ESP (RX).
  * **RX** connects to GPIO UART TX on ESP (TX).
  * **GND** connects to a GND ESP.
+
 The connections between LIN trasnceiver and truma :
+
  * **12V** connects to a 12V power supply that also powers the Combi and CP Plus.
  * **LIN** connects to the RJ12 connector (see below), Pin 3. 
  * **GND** connects to the RJ12 connector (see below), Pin 5.
