@@ -41,9 +41,9 @@ void TrumaiNetBoxAppTimer::create_update_data(StatusFrame *response, uint8_t *re
   response->timerResponse.timer_heating_mode = this->update_status_.timer_heating_mode;
   response->timerResponse.timer_target_temp_water = this->update_status_.timer_target_temp_water;
   response->timerResponse.timer_energy_mix_a = this->update_status_.timer_energy_mix_a;
-  response->timerResponse.timer_energy_mix_b = this->update_status_.timer_energy_mix_a;
+  response->timerResponse.timer_energy_mix_b = this->update_status_.timer_energy_mix_b;
   response->timerResponse.timer_el_power_level_a = this->update_status_.timer_el_power_level_a;
-  response->timerResponse.timer_el_power_level_b = this->update_status_.timer_el_power_level_a;
+  response->timerResponse.timer_el_power_level_b = this->update_status_.timer_el_power_level_b;
   response->timerResponse.timer_resp_active = this->update_status_.timer_resp_active;
   response->timerResponse.timer_resp_start_hours = this->update_status_.timer_resp_start_hours;
   response->timerResponse.timer_resp_start_minutes = this->update_status_.timer_resp_start_minutes;

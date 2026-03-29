@@ -37,9 +37,9 @@ void TrumaiNetBoxAppHeater::create_update_data(StatusFrame *response, uint8_t *r
   response->heaterResponse.heating_mode = this->update_status_.heating_mode;
   response->heaterResponse.target_temp_water = this->update_status_.target_temp_water;
   response->heaterResponse.energy_mix_a = this->update_status_.energy_mix_a;
-  response->heaterResponse.energy_mix_b = this->update_status_.energy_mix_a;
+  response->heaterResponse.energy_mix_b = this->update_status_.energy_mix_b;
   response->heaterResponse.el_power_level_a = this->update_status_.el_power_level_a;
-  response->heaterResponse.el_power_level_b = this->update_status_.el_power_level_a;
+  response->heaterResponse.el_power_level_b = this->update_status_.el_power_level_b;
 
   status_frame_calculate_checksum(response);
   (*response_len) = sizeof(StatusFrameHeader) + sizeof(StatusFrameHeaterResponse);
