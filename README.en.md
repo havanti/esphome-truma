@@ -30,6 +30,8 @@ To adapt this for your own sensors, replace the four MAC addresses in the `on_bl
 
 > Note: BLE scanning and the Truma LIN bus operate in parallel on the same chip. On an ESP32-S3 with OctalSPI PSRAM the BLE stack can be offloaded to PSRAM, which significantly reduces the risk of memory conflicts. The provided PSRAM `sdkconfig_options` in `ESP32-S3_truma_6DE_Diesel_example.yaml` are already configured for this.
 
+> **Modular TPMS variant:** [@kamahat](https://github.com/kamahat) has extracted the TPMS logic into a standalone `tpms.yaml` package and a C++ helper function. If you prefer a cleanly separated package structure, check out his [fork](https://github.com/kamahat/esphome-truma).
+
 ### Diesel "De-coking" / Residue Combustion
 
 When a Truma Combi is operated on diesel for extended periods, carbon deposits can build up on and in the burner fleece (sintered stainless steel) and on the glow plug screen. Recommended maintenance:
