@@ -1,0 +1,5 @@
+# Cosmetic commits — ignored by git blame
+# See: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# refactor: clean up informal comments and fix typos
+499444e606b60b5452c263ee2cdf9050fbafa948
