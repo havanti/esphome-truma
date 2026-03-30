@@ -27,6 +27,21 @@ Testé avec :
 
 ---
 
+## [1.0.8] — 2026-03-30 — Qualité du code
+
+### Corrigé
+- Assignations incorrectes des champs dans les trames de réponse pour le mix énergétique et le niveau de puissance électrique corrigées
+
+### Modifié
+- Fautes de frappe nettoyées dans l'ensemble du codebase
+- Commentaires obsolètes et résolus supprimés
+- Commentaires du code révisés et harmonisés
+
+### Documentation
+- Référence à @kamahat et son fork ajoutée dans tous les READMEs
+
+---
+
 ## [1.0.7] — 2026-03-28 — Améliorations mineures
 
 ### Corrigé

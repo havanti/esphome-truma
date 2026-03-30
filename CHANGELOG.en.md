@@ -26,6 +26,21 @@ Tested against:
 
 ---
 
+## [1.0.8] — 2026-03-30 — Code quality
+
+### Fixed
+- Corrected wrong field assignments in response frames for energy mix and electric power level
+
+### Changed
+- Cleaned up typos throughout the codebase
+- Removed outdated and resolved comments
+- Revised and unified code comments
+
+### Documentation
+- Added reference to @kamahat and their fork in all READMEs
+
+---
+
 ## [1.0.7] — 2026-03-28 — Minor improvements
 
 ### Fixed
