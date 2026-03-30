@@ -20,7 +20,6 @@ namespace truma_inetbox {
 #define STATUS_FRAME_RESPONSE_ACK 0x0D
 #define STATUS_FRAME_CLOCK_RESPONSE (STATUS_FRAME_CLOCK - 1)
 #define STATUS_FRAME_CLOCK 0x15
-// TODO: Documentation and testing of config response.
 #define STATUS_FRAME_CONFIG_RESPONSE (STATUS_FRAME_CONFIG - 1)
 #define STATUS_FRAME_CONFIG 0x17
 #define STATUS_FRAME_HEATER_RESPONSE (STATUS_FRAME_HEATER - 1)
@@ -180,7 +179,6 @@ struct StatusFrameDevice {  // NOLINT(altera-struct-pack-align)
 } __attribute__((packed));
 
 // Length 18 (0x12)
-// TODO
 struct StatusFrameAirconManual {  // NOLINT(altera-struct-pack-align)
   AirconMode mode;
   // 0x00
@@ -216,7 +214,6 @@ struct StatusFrameAirconManualResponse {  // NOLINT(altera-struct-pack-align)
 } __attribute__((packed));
 
 // Length 22 (0x16)
-// TODO
 struct StatusFrameAirconManualInit {  // NOLINT(altera-struct-pack-align)
   uint8_t unknown_01;                // 0x00
   uint8_t unknown_02;                // 0x00
@@ -243,7 +240,6 @@ struct StatusFrameAirconManualInit {  // NOLINT(altera-struct-pack-align)
 } __attribute__((packed));
 
 // Length 18 (0x12)
-// TODO
 struct StatusFrameAirconAuto {  // NOLINT(altera-struct-pack-align)
   EnergyMix energy_mix_a;
   uint8_t unknown_02;  // 0x00
@@ -260,7 +256,6 @@ struct StatusFrameAirconAuto {  // NOLINT(altera-struct-pack-align)
   TargetTemp target_temp;
 } __attribute__((packed));
 
-// TODO
 struct StatusFrameAirconAutoResponse {  // NOLINT(altera-struct-pack-align)
   EnergyMix energy_mix_a;
   uint8_t unknown_02;  // 0x00
@@ -276,7 +271,6 @@ struct StatusFrameAirconAutoResponse {  // NOLINT(altera-struct-pack-align)
 } __attribute__((packed));
 
 // Length 20 (0x14)
-// TODO
 struct StatusFrameAirconAutoInit {  // NOLINT(altera-struct-pack-align)
   EnergyMix energy_mix_a;
   uint8_t unknown_02;  // 0x00
