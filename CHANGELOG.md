@@ -26,6 +26,21 @@ Getestet mit:
 
 ---
 
+## [1.0.8] — 2026-03-30 — Codequalität
+
+### Behoben
+- Falsche Feldzuweisungen in den Antwort-Frames für Energiemix und elektrische Leistungsstufe behoben
+
+### Geändert
+- Tippfehler im gesamten Codebase bereinigt
+- Veraltete und erledigte Kommentare entfernt
+- Codekommentare überarbeitet und vereinheitlicht
+
+### Dokumentation
+- READMEs um Hinweis auf @kamahat und dessen Fork ergänzt
+
+---
+
 ## [1.0.7] — 2026-03-28 — Kleinere Verbesserungen
 
 ### Behoben
