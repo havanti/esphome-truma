@@ -37,7 +37,7 @@ class TrumaStausFrameResponseStorage : public TrumaStausFrameStorage<T>, public 
 
   // Prepared means `update_status_` was copied from `data_`.
   bool update_status_prepared_ = false;
-  // Prepared means an update is already awating fetch from CP plus.
+  // Prepared means an update is already awaiting fetch from CP plus.
   bool update_status_unsubmitted_ = false;
   // I have submitted my update request to CP plus, but I have not received an update with new heater values from CP
   // plus.
