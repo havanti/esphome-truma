@@ -9,6 +9,10 @@ namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.TrumaiNetBoxApp";
 
+static constexpr uint32_t CLOCK_SYNC_DELAY_US = 30 * 1000 * 1000;   // 30 seconds after init before syncing time
+static constexpr uint32_t INIT_RETRY_DELAY_US = 5 * 1000 * 1000;    // 5 seconds before retrying init request
+static constexpr uint32_t UPDATE_RETRY_DELAY_US = 5 * 1000 * 1000;  // 5 seconds before retrying update notification
+
 TrumaiNetBoxApp::TrumaiNetBoxApp() {
   this->airconAuto_.set_parent(this);
   this->airconManual_.set_parent(this);
@@ -38,7 +42,7 @@ void TrumaiNetBoxApp::update() {
   // - Update was not done
   // - 30 seconds after init data received
   if (this->time_ != nullptr && !this->update_status_clock_done && this->init_received_ > 0) {
-    if (micros() > ((30 * 1000 * 1000) + this->init_received_ /* 30 seconds after init received */)) {
+    if (micros() > (CLOCK_SYNC_DELAY_US + this->init_received_)) {
       this->update_status_clock_done = true;
       this->clock_.action_write_time();
     }
@@ -380,7 +384,7 @@ bool TrumaiNetBoxApp::has_update_to_submit_() {
   } else if (this->init_received_ == 0) {
     auto init_wait_time = micros() - this->init_requested_;
     // it has been 5 seconds and i am still awaiting the init data.
-    if (init_wait_time > 1000 * 1000 * 5) {
+    if (init_wait_time > INIT_RETRY_DELAY_US) {
       // ESP_LOGD(TAG, "Requesting initial data again.");
       this->init_requested_ = micros();
       return true;
@@ -393,7 +397,7 @@ bool TrumaiNetBoxApp::has_update_to_submit_() {
       return true;
     }
     auto update_wait_time = micros() - this->update_time_;
-    if (update_wait_time > 1000 * 1000 * 5) {
+    if (update_wait_time > UPDATE_RETRY_DELAY_US) {
       // ESP_LOGD(TAG, "Notify CP Plus again I still got updates.");
       this->update_time_ = micros();
       return true;
