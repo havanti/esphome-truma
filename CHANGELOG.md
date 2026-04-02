@@ -27,6 +27,14 @@ Getestet mit:
 
 ---
 
+## [1.0.9] — 2026-04-02 — Aufräumen
+
+### Geändert
+- Magic-Number-Timeouts durch benannte `constexpr`-Konstanten ersetzt
+- `const` für lokale Variable `lin_identifier` ergänzt
+
+---
+
 ## [1.0.8] — 2026-03-30 — Codequalität
 
 ### Behoben

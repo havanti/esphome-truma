@@ -28,6 +28,14 @@ Testé avec :
 
 ---
 
+## [1.0.9] — 2026-04-02 — Nettoyage
+
+### Modifié
+- Timeouts codés en dur remplacés par des constantes `constexpr` nommées
+- `const` ajouté à la variable locale `lin_identifier`
+
+---
+
 ## [1.0.8] — 2026-03-30 — Qualité du code
 
 ### Corrigé
