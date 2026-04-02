@@ -105,7 +105,7 @@ bool TrumaiNetBoxApp::answer_lin_order_(const uint8_t pid) {
 
 bool TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) {
   if (identifier == 0x00 /* LIN Product Identification */) {
-    auto lin_identifier = this->lin_identifier();
+    const auto lin_identifier = this->lin_identifier();
     (*response)[0] = lin_identifier[0];
     (*response)[1] = lin_identifier[1];
     (*response)[2] = lin_identifier[2];
@@ -113,7 +113,7 @@ bool TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::arr
     (*response)[4] = 0x01;  // Variant
     return true;
   } else if (identifier == 0x20 /* Product details to display in CP plus */) {
-    auto lin_identifier = this->lin_identifier();
+    const auto lin_identifier = this->lin_identifier();
     // Only the first three parts are displayed.
     (*response)[0] = lin_identifier[0];
     (*response)[1] = lin_identifier[1];
