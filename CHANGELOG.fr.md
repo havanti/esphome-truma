@@ -20,6 +20,7 @@ cassants supplémentaires liés à ESP-IDF 5.x (chaîne d'outils ESP32) et aux
 modifications d'API ESPHome 2026.x ont également été corrigés.
 
 Testé avec :
+- ESPHome **2026.3.3** — ESP-IDF ✅
 - ESPHome **2026.3.2** — ESP-IDF ✅
 - ESPHome **2026.3.1** — ESP-IDF ✅
 - ESPHome **2026.3.0** — ESP-IDF ✅
