@@ -34,6 +34,8 @@ Testé avec :
 ### Modifié
 - Définitions de macros dupliquées `DIAGNOSTIC_FRAME_MASTER` / `DIAGNOSTIC_FRAME_SLAVE` supprimées de deux fichiers `.cpp` et regroupées en une seule `constexpr` dans `LinBusListener.h`
 - Constante magique `1440` remplacée par la constante nommée `MINUTES_PER_DAY`
+- `dump_data()` implémenté dans le module heater : journalise les températures cibles, le mode de chauffage, le mix énergétique, le niveau de puissance et le statut de fonctionnement au niveau DEBUG ; journalise les codes d'erreur au niveau WARN
+- Commentaire trompeur corrigé dans le garde de cohérence de `action_heater_energy_mix()`
 
 ---
 

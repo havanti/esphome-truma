@@ -33,6 +33,8 @@ Getestet mit:
 ### Geändert
 - Doppelte Makro-Definitionen `DIAGNOSTIC_FRAME_MASTER` / `DIAGNOSTIC_FRAME_SLAVE` aus zwei `.cpp`-Dateien entfernt und als einmalige `constexpr` in `LinBusListener.h` zusammengeführt
 - Magic Number `1440` durch benannte Konstante `MINUTES_PER_DAY` ersetzt
+- `dump_data()` im Heater-Modul implementiert: loggt Soll-Temperaturen, Heizmodus, Energiemix, Leistungsstufe und Betriebsstatus auf DEBUG-Ebene; Fehlercodes auf WARN-Ebene
+- Irreführenden Kommentar im Konsistenz-Guard von `action_heater_energy_mix()` korrigiert
 
 ---
 
