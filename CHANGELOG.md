@@ -35,6 +35,8 @@ Getestet mit:
 - Magic Number `1440` durch benannte Konstante `MINUTES_PER_DAY` ersetzt
 - `dump_data()` im Heater-Modul implementiert: loggt Soll-Temperaturen, Heizmodus, Energiemix, Leistungsstufe und Betriebsstatus auf DEBUG-Ebene; Fehlercodes auf WARN-Ebene
 - Irreführenden Kommentar im Konsistenz-Guard von `action_heater_energy_mix()` korrigiert
+- Falschen Label `"Truma Climate"` in `TrumaWaterClimate::dump_config()` auf `"Truma Water Climate"` korrigiert
+- Auskommentierten Preset-Code und toten Optionen-Loop entfernt
 
 ---
 

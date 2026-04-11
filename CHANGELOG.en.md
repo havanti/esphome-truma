@@ -35,6 +35,8 @@ Tested against:
 - Replaced magic number `1440` with named constant `MINUTES_PER_DAY`
 - Implemented `dump_data()` in the heater module: logs target temperatures, heating mode, energy mix, power level, and operating status at DEBUG level; logs error codes at WARN level
 - Corrected misleading comment on the consistency guard in `action_heater_energy_mix()`
+- Fixed wrong label `"Truma Climate"` in `TrumaWaterClimate::dump_config()` to `"Truma Water Climate"`
+- Removed commented-out preset code and dead options loop
 
 ---
 

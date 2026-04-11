@@ -26,21 +26,6 @@ void TrumaRoomClimate::setup() {
         this->fan_mode = climate::CLIMATE_FAN_OFF;
         break;
     }
-
-    // switch (status_heater->heating_mode) {
-    //   case HeatingMode::HEATING_MODE_ECO:
-    //     this->preset = climate::CLIMATE_PRESET_ECO;
-    //     break;
-    //   case HeatingMode::HEATING_MODE_HIGH:
-    //     this->preset = climate::CLIMATE_PRESET_COMFORT;
-    //     break;
-    //   case HeatingMode::HEATING_MODE_BOOST:
-    //     this->preset = climate::CLIMATE_PRESET_BOOST;
-    //     break;
-    //   default:
-    //     this->preset = climate::CLIMATE_PRESET_NONE;
-    //     break;
-    // }
     this->publish_state();
   });
 }
@@ -103,28 +88,6 @@ void TrumaRoomClimate::control(const climate::ClimateCall &call) {
     }
   }
 
-  // if (call.get_preset().has_value()) {
-  //   climate::ClimatePreset pres = *call.get_preset();
-  //   auto status_heater = this->parent_->get_heater()->get_status();
-  //   auto current_target_temp = temp_code_to_decimal(status_heater->target_temp_room);
-  //   if (call.get_target_temperature().has_value()) {
-  //     current_target_temp = *call.get_target_temperature();
-  //   }
-  //   switch (pres) {
-  //     case climate::CLIMATE_PRESET_ECO:
-  //       this->parent_->get_heater()->action_heater_room(current_target_temp, HeatingMode::HEATING_MODE_ECO);
-  //       break;
-  //     case climate::CLIMATE_PRESET_COMFORT:
-  //       this->parent_->get_heater()->action_heater_room(current_target_temp, HeatingMode::HEATING_MODE_HIGH);
-  //       break;
-  //     case climate::CLIMATE_PRESET_BOOST:
-  //       this->parent_->get_heater()->action_heater_room(current_target_temp, HeatingMode::HEATING_MODE_BOOST);
-  //       break;
-  //     default:
-  //       this->parent_->get_heater()->action_heater_room(0);
-  //       break;
-  //   }
-  // }
 }
 
 climate::ClimateTraits TrumaRoomClimate::traits() {
@@ -138,12 +101,6 @@ climate::ClimateTraits TrumaRoomClimate::traits() {
       climate::CLIMATE_FAN_MEDIUM,
       climate::CLIMATE_FAN_HIGH,
   }});
-  // traits.set_supported_presets({{
-  //     climate::CLIMATE_PRESET_NONE,
-  //     climate::CLIMATE_PRESET_ECO,
-  //     climate::CLIMATE_PRESET_COMFORT,
-  //     climate::CLIMATE_PRESET_BOOST,
-  // }});
   traits.set_visual_min_temperature(5);
   traits.set_visual_max_temperature(30);
   traits.set_visual_temperature_step(1);

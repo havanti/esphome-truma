@@ -152,11 +152,6 @@ void TrumaHeaterSelect::control(const std::string &value) {
 void TrumaHeaterSelect::dump_config() {
   LOG_SELECT("", "Truma Heater Select", this);
   ESP_LOGCONFIG(TAG, "  Type '%s'", enum_to_c_str(this->type_));
-  ESP_LOGCONFIG(TAG, "  Options are:");
-  // auto options = this->traits.get_options();
-  // for (auto i = 0; i < this->mappings_.size(); i++) {
-  //   ESP_LOGCONFIG(TAG, "    %i: %s", this->mappings_.at(i), options.at(i).c_str());
-  // }
 }
 }  // namespace truma_inetbox
 }  // namespace esphome

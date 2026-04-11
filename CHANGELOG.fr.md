@@ -36,6 +36,8 @@ Testé avec :
 - Constante magique `1440` remplacée par la constante nommée `MINUTES_PER_DAY`
 - `dump_data()` implémenté dans le module heater : journalise les températures cibles, le mode de chauffage, le mix énergétique, le niveau de puissance et le statut de fonctionnement au niveau DEBUG ; journalise les codes d'erreur au niveau WARN
 - Commentaire trompeur corrigé dans le garde de cohérence de `action_heater_energy_mix()`
+- Label incorrect `"Truma Climate"` corrigé en `"Truma Water Climate"` dans `TrumaWaterClimate::dump_config()`
+- Code preset commenté et boucle d'options morte supprimés
 
 ---
 

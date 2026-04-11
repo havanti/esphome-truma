@@ -17,7 +17,7 @@ void TrumaWaterClimate::setup() {
   });
 }
 
-void TrumaWaterClimate::dump_config() { LOG_CLIMATE(TAG, "Truma Climate", this); }
+void TrumaWaterClimate::dump_config() { LOG_CLIMATE(TAG, "Truma Water Climate", this); }
 
 void TrumaWaterClimate::control(const climate::ClimateCall &call) {
   if (call.get_target_temperature().has_value()) {
