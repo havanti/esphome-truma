@@ -47,7 +47,16 @@ void TrumaiNetBoxAppHeater::create_update_data(StatusFrame *response, uint8_t *r
   TrumaStausFrameResponseStorage<StatusFrameHeater, StatusFrameHeaterResponse>::update_submitted();
 }
 
-void TrumaiNetBoxAppHeater::dump_data() const {}
+void TrumaiNetBoxAppHeater::dump_data() const {
+  ESP_LOGD(TAG, "StatusFrameHeater room: %.1f°C mode: %u water: %.1f°C energy_mix: %u el_power: %u W status: %s",
+           temp_code_to_decimal(this->data_.target_temp_room), (uint16_t) this->data_.heating_mode,
+           temp_code_to_decimal(this->data_.target_temp_water), (uint8_t) this->data_.energy_mix_a,
+           (uint16_t) this->data_.el_power_level_a, operating_status_to_str(this->data_.operating_status).c_str());
+  if (this->data_.error_code_low != 0 || this->data_.error_code_high != 0) {
+    ESP_LOGW(TAG, "StatusFrameHeater error_code: 0x%02X 0x%02X", this->data_.error_code_low,
+             this->data_.error_code_high);
+  }
+}
 
 bool TrumaiNetBoxAppHeater::can_update() {
   return TrumaStausFrameResponseStorage<StatusFrameHeater, StatusFrameHeaterResponse>::can_update() &&
@@ -182,7 +191,9 @@ bool TrumaiNetBoxAppHeater::action_heater_energy_mix(EnergyMix energy_mix, Elect
     }
   }
 
-  // This last check is reached if invalid `energy_mix` parameter was submitted.
+  // Consistency guard: ensure energy_mix_a and el_power_level_a are never contradictory.
+  // If el_power_level is non-zero but energy_mix is gas-only, upgrade mix to MIX.
+  // If el_power_level is zero, force energy_mix to gas-only.
   if (heater->el_power_level_a != ElectricPowerLevel::ELECTRIC_POWER_LEVEL_0) {
     if (heater->energy_mix_a != EnergyMix::ENERGY_MIX_MIX &&
         heater->energy_mix_a != EnergyMix::ENERGY_MIX_ELECTRICITY) {
