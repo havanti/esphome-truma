@@ -29,6 +29,14 @@ Testé avec :
 
 ---
 
+## [1.0.10] — 2026-04-11 — Nettoyage supplémentaire
+
+### Modifié
+- Définitions de macros dupliquées `DIAGNOSTIC_FRAME_MASTER` / `DIAGNOSTIC_FRAME_SLAVE` supprimées de deux fichiers `.cpp` et regroupées en une seule `constexpr` dans `LinBusListener.h`
+- Constante magique `1440` remplacée par la constante nommée `MINUTES_PER_DAY`
+
+---
+
 ## [1.0.9] — 2026-04-02 — Nettoyage
 
 ### Modifié

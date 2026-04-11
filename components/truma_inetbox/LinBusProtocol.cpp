@@ -8,8 +8,6 @@ namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.LinBusProtocol";
 
-#define DIAGNOSTIC_FRAME_MASTER 0x3c
-#define DIAGNOSTIC_FRAME_SLAVE 0x3d
 #define LIN_NAD_BROADCAST 0x7F
 #define LIN_SID_RESPONSE 0x40
 #define LIN_SID_ASSIGN_NAD 0xB0

@@ -8,6 +8,7 @@ namespace truma_inetbox {
 
 class TrumaiNetBoxAppTimer : public TrumaStausFrameResponseStorage<StatusFrameTimer, StatusFrameTimerResponse> {
  public:
+  static constexpr uint16_t MINUTES_PER_DAY = 24 * 60;
   StatusFrameTimerResponse *update_prepare() override;
   void create_update_data(StatusFrame *response, uint8_t *response_len, uint8_t command_counter) override;
   void dump_data() const override;

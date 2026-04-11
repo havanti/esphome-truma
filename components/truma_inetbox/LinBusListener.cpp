@@ -24,8 +24,6 @@ static const char *const TAG = "truma_inetbox.LinBusListener";
 
 #define LIN_BREAK 0x00
 #define LIN_SYNC 0x55
-#define DIAGNOSTIC_FRAME_MASTER 0x3c
-#define DIAGNOSTIC_FRAME_SLAVE 0x3d
 #define QUEUE_WAIT_DONT_BLOCK (TickType_t) 0
 
 void LinBusListener::dump_config() {
@@ -441,8 +439,6 @@ void LinBusListener::process_log_queue(TickType_t xTicksToWait) {
 
 #undef LIN_BREAK
 #undef LIN_SYNC
-#undef DIAGNOSTIC_FRAME_MASTER
-#undef DIAGNOSTIC_FRAME_SLAVE
 #undef QUEUE_WAIT_DONT_BLOCK
 
 }  // namespace truma_inetbox

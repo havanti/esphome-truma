@@ -28,6 +28,14 @@ Getestet mit:
 
 ---
 
+## [1.0.10] — 2026-04-11 — Weitere Aufräumarbeiten
+
+### Geändert
+- Doppelte Makro-Definitionen `DIAGNOSTIC_FRAME_MASTER` / `DIAGNOSTIC_FRAME_SLAVE` aus zwei `.cpp`-Dateien entfernt und als einmalige `constexpr` in `LinBusListener.h` zusammengeführt
+- Magic Number `1440` durch benannte Konstante `MINUTES_PER_DAY` ersetzt
+
+---
+
 ## [1.0.9] — 2026-04-02 — Aufräumen
 
 ### Geändert

@@ -84,7 +84,7 @@ bool TrumaiNetBoxAppTimer::action_timer_activate(uint16_t start, uint16_t stop, 
     ESP_LOGW(TAG, "Cannot update Truma.");
     return false;
   }
-  if (start > 1440 || stop > 1440) {
+  if (start > MINUTES_PER_DAY || stop > MINUTES_PER_DAY) {
     ESP_LOGW(TAG, "Invalid values start/stop submitted.");
     return false;
   }

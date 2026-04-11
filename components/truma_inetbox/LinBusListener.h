@@ -25,6 +25,9 @@
 namespace esphome {
 namespace truma_inetbox {
 
+static constexpr uint8_t DIAGNOSTIC_FRAME_MASTER = 0x3c;
+static constexpr uint8_t DIAGNOSTIC_FRAME_SLAVE = 0x3d;
+
 enum class LIN_CHECKSUM { LIN_CHECKSUM_VERSION_1, LIN_CHECKSUM_VERSION_2 };
 
 struct QUEUE_LIN_MSG {

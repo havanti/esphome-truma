@@ -28,6 +28,14 @@ Tested against:
 
 ---
 
+## [1.0.10] — 2026-04-11 — Further cleanup
+
+### Changed
+- Removed duplicate macro definitions of `DIAGNOSTIC_FRAME_MASTER` / `DIAGNOSTIC_FRAME_SLAVE` from two `.cpp` files and consolidated them as a single `constexpr` in `LinBusListener.h`
+- Replaced magic number `1440` with named constant `MINUTES_PER_DAY`
+
+---
+
 ## [1.0.9] — 2026-04-02 — Cleanup
 
 ### Changed
