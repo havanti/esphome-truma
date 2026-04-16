@@ -12,7 +12,7 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release stellt die Kompatibilität mit ESPHome 2025.8 bis 2026.3.x wieder her.
+Dieses Release stellt die Kompatibilität mit ESPHome 2025.8 bis 2026.4.x wieder her.
 Hauptursache war die Entfernung von `get_uart_event_queue()` aus der upstream
 `IDFUARTComponent` in ESPHome 2025.8, wodurch die LIN-Bus-BREAK-Erkennung bei
 ESP-IDF-Builds nicht mehr funktionierte. Zusätzliche Breaking Changes in ESP-IDF 5.x
