@@ -126,6 +126,14 @@ Requires ESPHome >= 2026.3.0.
 
 > **Compatibility note:** Developed and tested with a Truma Combi 6DE (2018 model year, Eberspächer burner). Whether other models — in particular newer diesel generations with a burner developed by Truma themselves (without Eberspächer) — are also compatible has not been verified. Feedback on this is very welcome — please open a [GitHub Issue](https://github.com/havanti/esphome-truma/issues).
 
+### Hardware Setup
+
+For wiring the ESP32-S3 with the TJA1020 LIN transceiver and the Truma connector:
+
+➜ **[hardware/README.en.md](hardware/README.en.md)** — Parts list, wiring diagram, pin assignment, installation order
+
+---
+
 ### Step 1: Choose the energy mix variant
 
 Choose the variant that matches your vehicle. The **E variants** (4E / 6E / DE) additionally support electric operation — the relevant entities (`HEATER_ELECTRICITY`, `ELECTRIC_POWER_LEVEL`) are already included in both example configurations.

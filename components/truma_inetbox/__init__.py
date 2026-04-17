@@ -365,7 +365,6 @@ async def truma_inetbox_heater_set_target_room_temperature_to_code(config, actio
     template_ = await cg.templatable(config[CONF_TEMPERATURE], args, cg.uint8)
     cg.add(var.set_temperature(template_))
 
-# fix ESPHome 2026.4.x     template_ = await cg.templatable(config[CONF_HEATING_MODE], args, cg.uint16)
     template_ = await cg.templatable(config[CONF_HEATING_MODE], args, HeatingMode_dummy_ns)
     cg.add(var.set_heating_mode(template_))
 
@@ -410,7 +409,6 @@ async def truma_inetbox_heater_set_target_water_temperature_enum_to_code(config,
     var = cg.new_Pvariable(action_id, template_arg)
     await cg.register_parented(var, config[CONF_ID])
 
-# fix ESPHome 2026.4.x    template_ = await cg.templatable(config[CONF_TEMPERATURE], args, cg.uint16)
     template_ = await cg.templatable(config[CONF_TEMPERATURE], args, TargetTemp_dummy_ns)
     cg.add(var.set_temperature(template_))
 
@@ -455,11 +453,9 @@ async def truma_inetbox_heater_set_energy_mix_level_to_code(config, action_id, t
     var = cg.new_Pvariable(action_id, template_arg)
     await cg.register_parented(var, config[CONF_ID])
 
-# fix ESPHome 2026.4.x    template_ = await cg.templatable(config[CONF_ENERGY_MIX], args, cg.uint8)
     template_ = await cg.templatable(config[CONF_ENERGY_MIX], args, EnergyMix_dummy_ns)
     cg.add(var.set_energy_mix(template_))
 
-# fix ESPHome 2026.4.x    template_ = await cg.templatable(config[CONF_WATT], args, cg.uint16)
     template_ = await cg.templatable(config[CONF_WATT], args, ElectricPowerLevel_dummy_ns)
     cg.add(var.set_watt(template_))
 
@@ -536,18 +532,15 @@ async def truma_inetbox_timer_activate_to_code(config, action_id, template_arg, 
     cg.add(var.set_room_temperature(template_))
 
 
-# fix ESPHome 2026.4.x    template_ = await cg.templatable(config[CONF_HEATING_MODE], args, cg.uint16)
     template_ = await cg.templatable(config[CONF_HEATING_MODE], args, HeatingMode_dummy_ns)
     cg.add(var.set_heating_mode(template_))
 
     template_ = await cg.templatable(config[CONF_WATER_TEMPERATURE], args, cg.uint8)
     cg.add(var.set_water_temperature(template_))
 
-# fix ESPHome 2026.4.x    template_ = await cg.templatable(config[CONF_ENERGY_MIX], args, cg.uint8)
     template_ = await cg.templatable(config[CONF_ENERGY_MIX], args, EnergyMix_dummy_ns)
     cg.add(var.set_energy_mix(template_))
 
-# fix ESPHome 2026.4.x     template_ = await cg.templatable(config[CONF_WATT], args, cg.uint16)
     template_ = await cg.templatable(config[CONF_WATT], args, ElectricPowerLevel_dummy_ns)
     cg.add(var.set_watt(template_))
     return var

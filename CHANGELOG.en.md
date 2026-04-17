@@ -12,19 +12,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release restores compatibility with ESPHome 2025.8 through 2026.3.x.
+This release restores compatibility with ESPHome 2025.8 through 2026.4.x.
 The primary driver was the removal of `get_uart_event_queue()` from the upstream
 `IDFUARTComponent` in ESPHome 2025.8, which broke LIN-bus BREAK detection on
 ESP-IDF builds. Additional breaking changes in ESP-IDF 5.x (ESP32 toolchain) and
 ESPHome 2026.x API changes were also resolved.
 
 Tested against:
+- ESPHome **2026.4.0** — ESP-IDF ✅
 - ESPHome **2026.3.3** — ESP-IDF ✅
 - ESPHome **2026.3.2** — ESP-IDF ✅
 - ESPHome **2026.3.1** — ESP-IDF ✅
 - ESPHome **2026.3.0** — ESP-IDF ✅
-- ESPHome **2026.2.2** — ESP-IDF ✅
-- ESPHome **2025.9.3** — ESP-IDF ✅
 
 ---
 

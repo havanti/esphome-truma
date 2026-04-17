@@ -171,11 +171,11 @@ sensor:
     type: CURRENT_WATER_TEMPERATURE
 
   - platform: truma_inetbox
-    name: "Target Room Temperature"
+    name: "Target Room Temperature Status"
     type: TARGET_ROOM_TEMPERATURE
 
   - platform: truma_inetbox
-    name: "Target Water Temperature"
+    name: "Target Water Temperature Status"
     type: TARGET_WATER_TEMPERATURE
 
   - platform: truma_inetbox
@@ -187,7 +187,7 @@ sensor:
     type: HEATING_MODE
 
   - platform: truma_inetbox
-    name: "Electric Power Level"
+    name: "Electric Power Level Status"
     type: ELECTRIC_POWER_LEVEL
 
   - platform: truma_inetbox
