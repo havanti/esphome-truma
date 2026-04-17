@@ -305,7 +305,7 @@ sensor:
     name: "Electric Power Level Status"
     type: ELECTRIC_POWER_LEVEL
   - platform: truma_inetbox
-    name: "Energy Mix"
+    name: "Energy Mix Status"
     type: ENERGY_MIX
   - platform: truma_inetbox
     name: "Operating Status"
