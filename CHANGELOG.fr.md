@@ -28,6 +28,41 @@ Testé avec :
 
 ---
 
+## [1.0.11] — 2026-04-17 — Compatibilité ESPHome 2026.4.0
+
+### Corrigé
+- Correction des appels `cg.templatable()` dans `__init__.py` pour ESPHome 2026.4.x :
+  les types enum (`HeatingMode`, `TargetTemp`, `EnergyMix`, `ElectricPowerLevel`)
+  utilisent désormais des références `_dummy_ns` au lieu de `cg.uint16`/`cg.uint8`
+- Résolution des collisions de clés entre des entités Sensor et Number/Select portant
+  le même nom, qui provoquaient un crash `aioesphomeapi` sous ESPHome 2026.4.0
+  (`AttributeError: 'NumberInfo'/'SelectInfo' has no attribute 'accuracy_decimals'`)
+
+### Modifié
+
+**Contexte :** Dans ESPHome, chaque entité reçoit une clé unique (hash de son nom).
+Si deux entités du même appareil portent le même nom — même si elles sont de types
+différents (Sensor vs. Number ou Select) — leurs clés entrent en collision. Depuis
+ESPHome 2026.4.0, l'ordre dans lequel `aioesphomeapi` construit la liste des entités
+a changé, ce qui a fait apparaître ces collisions sous forme de crashs pour la
+première fois.
+
+Les noms de senseurs suivants ont été renommés dans tous les YAMLs d'exemple :
+
+| Ancien nom (sensor) | Nouveau nom (sensor) | Conflit avec |
+|---|---|---|
+| `Target Room Temperature` | `Target Room Temperature Status` | Number |
+| `Target Water Temperature` | `Target Water Temperature Status` | Number |
+| `Electric Power Level` | `Electric Power Level Status` | Number |
+| `Energy Mix` | `Energy Mix Status` | Select |
+
+> **Note de migration pour les installations existantes :** Après le flashage, les
+> anciennes entités de type sensor apparaîtront comme « unavailable » dans Home
+> Assistant. Elles doivent être supprimées manuellement et les nouvelles entités
+> (avec le suffixe « Status ») réintégrées dans les tableaux de bord et automations.
+
+---
+
 ## [1.0.10] — 2026-04-11 — Nettoyage supplémentaire
 
 ### Modifié
