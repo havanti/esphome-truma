@@ -128,9 +128,11 @@ Erfordert ESPHome >= 2026.3.0.
 
 ### Hardware-Aufbau
 
-Für die Verdrahtung des ESP32-S3 mit dem TJA1020 LIN-Transceiver und dem Truma-Anschluss:
+Für den vollständigen Hardware-Aufbau — Teileliste, Verdrahtungsplan, Schritt-für-Schritt-Anleitung und Fehlersuche:
 
-➜ **[hardware/README.md](hardware/README.md)** — Teileliste, Verdrahtungsplan, Pinbelegung, Installationsreihenfolge
+➜ **[hardware/README.md](hardware/README.md)**
+
+[![Verdrahtungsplan](hardware/wiring.png)](hardware/README.md)
 
 ---
 
