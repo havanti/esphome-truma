@@ -29,6 +29,9 @@ Getestet mit:
 
 ## [1.0.11] — 2026-04-17 — ESPHome 2026.4.0 Kompatibilität
 
+### Dokumentation
+- Hardware-Dokumentation auf Nutzerwunsch erweitert, um den Nachbau zu erleichtern
+
 ### Behoben
 - `cg.templatable()`-Aufrufe in `__init__.py` für ESPHome 2026.4.x korrigiert:
   Enum-Typen (`HeatingMode`, `TargetTemp`, `EnergyMix`, `ElectricPowerLevel`) verwenden

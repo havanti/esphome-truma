@@ -8,9 +8,9 @@
 
 | Component | Model / Note |
 |---|---|
-| Microcontroller | Waveshare ESP32-S3-DEV-KIT-N8R8 |
-| LIN Transceiver | TJA1020 module (e.g. FST T151) or WomoLIN Board v2 |
-| Voltage Regulator | DC/DC converter 12V → 5V (min. 500 mA) |
+| Microcontroller | e.g. Waveshare ESP32-S3-DEV-KIT-N8R8 |
+| LIN Transceiver | e.g. TJA1020 module (FST T151) or WomoLIN Board v2 |
+| Voltage Regulator | e.g. DC/DC converter 12V → 5V (min. 500 mA) |
 | Connector Cable | RJ12 plug (6P6C) for Truma port |
 | Wires | Different colors recommended (see color code below) |
 
@@ -18,19 +18,7 @@
 
 ## Wiring Diagram
 
-![Wiring diagram](wiring.png)
-
-Printable version: [einbauanleitung_truma_lin_adapter.pdf](einbauanleitung_truma_lin_adapter.pdf)
-
-### Color Code
-
-| Color | Meaning |
-|---|---|
-| Red | 12V Plus (+) |
-| Blue | Ground / GND (−) |
-| Yellow | 5V supply |
-| Green/Pink | UART TX / RX |
-| Orange | LIN signal (Truma) |
+<img src="Wiring.png" width="700" alt="Wiring diagram">
 
 ---
 
@@ -46,12 +34,13 @@ Printable version: [einbauanleitung_truma_lin_adapter.pdf](einbauanleitung_truma
 | 6 | TJA1020 RX | ESP32-S3 GPIO8 | 3.3V signal |
 | 7 | ESP32-S3 GND | TJA1020 GND | GND |
 | 8 | 12V vehicle supply (+) | TJA1020 12V input | 12V |
-| 9 | TJA1020 LIN | RJ12 Pin 4 | LIN signal |
-| 10 | TJA1020 GND | RJ12 Pin 6 | GND |
+| 9 | TJA1020 LIN | RJ12 Pin 3 | LIN signal |
+| 10 | TJA1020 GND | RJ12 Pin 5 | GND |
 
 > **Note:** The TJA1020 requires 12V directly from the vehicle supply (connection #8) —
-> not from the 5V output of the DC/DC converter. The exact label of the 12V input on
-> the module varies by board type (e.g. FST T151 or WomoLIN Board v2).
+> not from the 5V output of the DC/DC converter. Use a separate **1A fuse** in this
+> 12V line as well. The exact label of the 12V input on the module varies by board type
+> (e.g. FST T151 or WomoLIN Board v2).
 
 ---
 
@@ -88,6 +77,8 @@ Choose the appropriate variant for the ESP32-S3:
 |---|---|
 | Truma Combi 4/6 kW gas | [`ESP32-S3_truma_4-6_Gas_example.yaml`](../ESP32-S3_truma_4-6_Gas_example.yaml) |
 | Truma Combi 6 kW diesel | [`ESP32-S3_truma_6DE_Diesel_example.yaml`](../ESP32-S3_truma_6DE_Diesel_example.yaml) |
+
+> **Onboard LED (Waveshare ESP32-S3):** The Waveshare ESP32-S3-DEV-KIT-N8R8 has a WS2812 RGB LED on GPIO38. The example YAMLs use it as a status indicator — if wiring and configuration are correct, the LED flashes **green** (CP Plus connected) or **blue** (LIN data being sent).
 
 > **Minimum version:** ESPHome 2026.3.1 or later required.
 

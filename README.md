@@ -132,8 +132,6 @@ Für den vollständigen Hardware-Aufbau — Teileliste, Verdrahtungsplan, Schrit
 
 ➜ **[hardware/README.md](hardware/README.md)**
 
-[![Verdrahtungsplan](hardware/wiring.png)](hardware/README.md)
-
 ---
 
 ### Schritt 1: Energiemix-Variante wählen

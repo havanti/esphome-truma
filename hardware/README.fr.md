@@ -8,9 +8,9 @@
 
 | Composant | Modèle / Remarque |
 |---|---|
-| Microcontrôleur | Waveshare ESP32-S3-DEV-KIT-N8R8 |
-| Transceiver LIN | Module TJA1020 (ex. FST T151) ou WomoLIN Board v2 |
-| Convertisseur de tension | DC/DC 12V → 5V (min. 500 mA) |
+| Microcontrôleur | ex. Waveshare ESP32-S3-DEV-KIT-N8R8 |
+| Transceiver LIN | ex. Module TJA1020 (FST T151) ou WomoLIN Board v2 |
+| Convertisseur de tension | ex. DC/DC 12V → 5V (min. 500 mA) |
 | Câble de connexion | Prise RJ12 (6P6C) pour le port Truma |
 | Fils | Couleurs différentes recommandées (voir code couleur) |
 
@@ -18,19 +18,7 @@
 
 ## Schéma de câblage
 
-![Schéma de câblage](wiring.png)
-
-Version imprimable : [einbauanleitung_truma_lin_adapter.pdf](einbauanleitung_truma_lin_adapter.pdf)
-
-### Code couleur
-
-| Couleur | Signification |
-|---|---|
-| Rouge | 12V Plus (+) |
-| Bleu | Masse / GND (−) |
-| Jaune | Alimentation 5V |
-| Vert/Rose | UART TX / RX |
-| Orange | Signal LIN (Truma) |
+<img src="Wiring.png" width="700" alt="Schéma de câblage">
 
 ---
 
@@ -46,11 +34,12 @@ Version imprimable : [einbauanleitung_truma_lin_adapter.pdf](einbauanleitung_tru
 | 6 | TJA1020 RX | ESP32-S3 GPIO8 | Signal 3,3V |
 | 7 | ESP32-S3 GND | TJA1020 GND | GND |
 | 8 | Alimentation 12V véhicule (+) | Entrée 12V TJA1020 | 12V |
-| 9 | TJA1020 LIN | RJ12 Pin 4 | Signal LIN |
-| 10 | TJA1020 GND | RJ12 Pin 6 | GND |
+| 9 | TJA1020 LIN | RJ12 Pin 3 | Signal LIN |
+| 10 | TJA1020 GND | RJ12 Pin 5 | GND |
 
 > **Remarque :** Le TJA1020 nécessite du 12V directement depuis l'alimentation du
 > véhicule (connexion #8) — pas depuis la sortie 5V du convertisseur DC/DC.
+> Prévoir également un **fusible 1A** sur ce fil 12V.
 > Le libellé exact de l'entrée 12V varie selon le type de carte (ex. FST T151
 > ou WomoLIN Board v2).
 
@@ -89,6 +78,8 @@ Choisir la variante appropriée pour l'ESP32-S3 :
 |---|---|
 | Truma Combi 4/6 kW gaz | [`ESP32-S3_truma_4-6_Gas_example.yaml`](../ESP32-S3_truma_4-6_Gas_example.yaml) |
 | Truma Combi 6 kW diesel | [`ESP32-S3_truma_6DE_Diesel_example.yaml`](../ESP32-S3_truma_6DE_Diesel_example.yaml) |
+
+> **LED embarquée (Waveshare ESP32-S3) :** Le Waveshare ESP32-S3-DEV-KIT-N8R8 dispose d'une LED RGB WS2812 sur GPIO38. Les YAMLs d'exemple l'utilisent comme indicateur d'état — si le câblage et la configuration sont corrects, la LED clignote en **vert** (CP Plus connecté) ou en **bleu** (données LIN en cours d'envoi).
 
 > **Version minimale :** ESPHome 2026.3.1 ou version ultérieure requise.
 
