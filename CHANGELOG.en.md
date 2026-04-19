@@ -27,6 +27,20 @@ Tested against:
 
 ---
 
+## [1.0.12] — 2026-04-19 — LIN protocol and thread-safety fixes
+
+### Fixed
+- LIN multi-PDU length decoding corrected (operator precedence `&` vs. `<<`):
+  multi-frame messages > 255 bytes were previously dropped with length 0
+- Length guard added before `reinterpret_cast` on incoming Truma frames
+- `micros()` comparisons made wraparound-safe across the 71-minute rollover
+  using unsigned subtraction
+- Thread safety: timestamp fields (`device_registered_`, `init_requested_`,
+  `init_received_`, `update_time_`) converted to `std::atomic<uint32_t>`
+  (accessed from UART task and main loop)
+- LIN logging: post-increment bug (`len = len++`) fixed, CRC byte was not logged
+- Printf format specifier `%S` → `%s` corrected
+
 ## [1.0.11] — 2026-04-17 — ESPHome 2026.4.0 compatibility
 
 ### Documentation
