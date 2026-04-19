@@ -111,7 +111,7 @@ void LinBusListener::write_lin_answer_(const uint8_t *data, uint8_t len) {
     log_msg.data[i] = data[i];
   }
   log_msg.data[len] = data_CRC;
-  log_msg.len = len++;
+  log_msg.len = len + 1;  // include CRC byte written above
   TRUMA_LOGV(log_msg);
 }
 
@@ -123,6 +123,8 @@ bool LinBusListener::check_for_lin_fault_() {
       if (this->fault_on_lin_bus_reported_ < 0xFF) {
         this->fault_on_lin_bus_reported_++;
       } else {
+        // On overflow, reset to 0x0F (not 0) so get_lin_bus_fault() (checks > 3) stays true
+        // and logging continues every 3rd tick (0x0F % 3 == 0).
         this->fault_on_lin_bus_reported_ = 0x0F;
       }
       if (this->fault_on_lin_bus_reported_ % 3 == 0) {
@@ -425,7 +427,7 @@ void LinBusListener::process_log_queue(TickType_t xTicksToWait) {
                     log_msg.message_source_know ? (log_msg.message_from_master ? " - MASTER" : " - SLAVE") : "",
                     log_msg.current_data_valid ? "" : "INVALID");
         } else {
-          ESP_LOGV(TAG, "PID %02X      %s %s %S", current_PID_, format_hex_pretty(log_msg.data, log_msg.len).c_str(),
+          ESP_LOGV(TAG, "PID %02X      %s %s %s", current_PID_, format_hex_pretty(log_msg.data, log_msg.len).c_str(),
                    log_msg.message_source_know ? (log_msg.message_from_master ? " - MASTER" : " - SLAVE") : "",
                    log_msg.current_data_valid ? "" : "INVALID");
         }

@@ -41,8 +41,10 @@ void TrumaiNetBoxApp::update() {
   // - Time component configured
   // - Update was not done
   // - 30 seconds after init data received
-  if (this->time_ != nullptr && !this->update_status_clock_done && this->init_received_ > 0) {
-    if (micros() > (CLOCK_SYNC_DELAY_US + this->init_received_)) {
+  auto init_received_snapshot = this->init_received_.load(std::memory_order_relaxed);
+  if (this->time_ != nullptr && !this->update_status_clock_done && init_received_snapshot > 0) {
+    // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
+    if ((micros() - init_received_snapshot) > CLOCK_SYNC_DELAY_US) {
       this->update_status_clock_done = true;
       this->clock_.action_write_time();
     }
@@ -72,12 +74,14 @@ const std::array<uint8_t, 4> TrumaiNetBoxApp::lin_identifier() {
   return {0x17 /*Supplied Id*/, 0x46 /*Supplied Id*/, 0x00 /*Function Id*/, 0x1F /*Function Id*/};
 }
 
-void TrumaiNetBoxApp::lin_heartbeat() { this->device_registered_ = micros(); }
+void TrumaiNetBoxApp::lin_heartbeat() {
+  this->device_registered_.store(micros(), std::memory_order_relaxed);
+}
 
 void TrumaiNetBoxApp::lin_reset_device() {
   LinBusProtocol::lin_reset_device();
-  this->device_registered_ = micros();
-  this->init_received_ = 0;
+  this->device_registered_.store(micros(), std::memory_order_relaxed);
+  this->init_received_.store(0, std::memory_order_relaxed);
 
   this->airconAuto_.reset();
   this->airconManual_.reset();
@@ -86,7 +90,7 @@ void TrumaiNetBoxApp::lin_reset_device() {
   this->heater_.reset();
   this->timer_.reset();
 
-  this->update_time_ = 0;
+  this->update_time_.store(0, std::memory_order_relaxed);
 }
 
 bool TrumaiNetBoxApp::answer_lin_order_(const uint8_t pid) {
@@ -152,35 +156,35 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
     auto response_frame = reinterpret_cast<StatusFrame *>(response);
 
     // The order must match with the method 'has_update_to_submit_'.
-    if (this->init_received_ == 0) {
+    if (this->init_received_.load(std::memory_order_relaxed) == 0) {
       ESP_LOGD(TAG, "Requested read: Sending init");
       status_frame_create_init(response_frame, return_len, this->message_counter++);
       return response;
     } else if (this->heater_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending heater update");
       this->heater_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_ = 0;
+      this->update_time_.store(0, std::memory_order_relaxed);
       return response;
     } else if (this->timer_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending timer update");
       this->timer_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_ = 0;
+      this->update_time_.store(0, std::memory_order_relaxed);
       return response;
     } else if (this->airconManual_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending aircon manual update");
       this->airconManual_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_ = 0;
+      this->update_time_.store(0, std::memory_order_relaxed);
       return response;
     } else if (this->airconAuto_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending aircon auto update");
       this->airconAuto_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_ = 0;
+      this->update_time_.store(0, std::memory_order_relaxed);
       return response;
 #ifdef USE_TIME
     } else if (this->clock_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending clock update");
       this->clock_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_ = 0;
+      this->update_time_.store(0, std::memory_order_relaxed);
       return response;
 #endif  // USE_TIME
     } else {
@@ -189,6 +193,12 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
   }
 
   if (message_len < sizeof(StatusFrame) && message[0] == LIN_SID_FIll_STATE_BUFFFER) {
+    return nullptr;
+  }
+
+  // Guard: need at least a full header before reinterpret_cast and field access.
+  if (message_len < sizeof(StatusFrameHeader)) {
+    ESP_LOGW(TAG, "Truma frame too short (%u < %u).", message_len, (unsigned) sizeof(StatusFrameHeader));
     return nullptr;
   }
 
@@ -358,11 +368,11 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
 
     if (device.device_count == 2 && this->heater_device_ != TRUMA_DEVICE::UNKNOWN) {
       // Assumption 2 devices mean CP Plus and Heater.
-      this->init_received_ = micros();
+      this->init_received_.store(micros(), std::memory_order_relaxed);
     } else if (device.device_count == 3 && this->heater_device_ != TRUMA_DEVICE::UNKNOWN &&
                this->aircon_device_ != TRUMA_DEVICE::UNKNOWN) {
       // Assumption 3 devices mean CP Plus, Heater and Aircon.
-      this->init_received_ = micros();
+      this->init_received_.store(micros(), std::memory_order_relaxed);
     }
 
     return response;
@@ -377,29 +387,32 @@ bool TrumaiNetBoxApp::has_update_to_submit_() {
   // No logging in this message!
   // It is called by interrupt. Logging is a blocking operation (especially when Wifi Logging).
   // If logging is necessary use logging queue of LinBusListener class.
-  if (this->init_requested_ == 0) {
-    this->init_requested_ = micros();
+  if (this->init_requested_.load(std::memory_order_relaxed) == 0) {
+    this->init_requested_.store(micros(), std::memory_order_relaxed);
     // ESP_LOGD(TAG, "Requesting initial data.");
     return true;
-  } else if (this->init_received_ == 0) {
-    auto init_wait_time = micros() - this->init_requested_;
+  } else if (this->init_received_.load(std::memory_order_relaxed) == 0) {
+    // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
+    auto init_wait_time = micros() - this->init_requested_.load(std::memory_order_relaxed);
     // it has been 5 seconds and i am still awaiting the init data.
     if (init_wait_time > INIT_RETRY_DELAY_US) {
       // ESP_LOGD(TAG, "Requesting initial data again.");
-      this->init_requested_ = micros();
+      this->init_requested_.store(micros(), std::memory_order_relaxed);
       return true;
     }
   } else if (this->airconAuto_.has_update() || this->airconManual_.has_update() || this->clock_.has_update() ||
              this->heater_.has_update() || this->timer_.has_update()) {
-    if (this->update_time_ == 0) {
+    auto update_time_snapshot = this->update_time_.load(std::memory_order_relaxed);
+    if (update_time_snapshot == 0) {
       // ESP_LOGD(TAG, "Notify CP Plus I got updates.");
-      this->update_time_ = micros();
+      this->update_time_.store(micros(), std::memory_order_relaxed);
       return true;
     }
-    auto update_wait_time = micros() - this->update_time_;
+    // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
+    auto update_wait_time = micros() - update_time_snapshot;
     if (update_wait_time > UPDATE_RETRY_DELAY_US) {
       // ESP_LOGD(TAG, "Notify CP Plus again I still got updates.");
-      this->update_time_ = micros();
+      this->update_time_.store(micros(), std::memory_order_relaxed);
       return true;
     }
   }

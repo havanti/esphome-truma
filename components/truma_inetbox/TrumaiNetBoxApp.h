@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include "LinBusProtocol.h"
 #include "TrumaStructs.h"
 #include "TrumaiNetBoxAppAirconAuto.h"
@@ -37,7 +39,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   TrumaiNetBoxAppHeater *get_heater() { return &this->heater_; }
   TrumaiNetBoxAppTimer *get_timer() { return &this->timer_; }
 
-  int64_t get_last_cp_plus_request() { return this->device_registered_; }
+  int64_t get_last_cp_plus_request() { return this->device_registered_.load(std::memory_order_relaxed); }
 
 #ifdef USE_TIME
   void set_time(time::RealTimeClock *time) { time_ = time; }
@@ -46,9 +48,10 @@ class TrumaiNetBoxApp : public LinBusProtocol {
 
  protected:
   // Truma CP Plus needs init (reset). This device is not registered.
-  uint32_t device_registered_ = 0;
-  uint32_t init_requested_ = 0;
-  uint32_t init_received_ = 0;
+  // Accessed from both the UART ISR/task and the main loop — must be atomic.
+  std::atomic<uint32_t> device_registered_{0};
+  std::atomic<uint32_t> init_requested_{0};
+  std::atomic<uint32_t> init_received_{0};
   uint8_t message_counter = 1;
 
   // Truma heater conected to CP Plus.
@@ -64,7 +67,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   TrumaiNetBoxAppTimer timer_;
 
   // last time CP plus was informed I got an update msg.
-  uint32_t update_time_ = 0;
+  std::atomic<uint32_t> update_time_{0};
 
 #ifdef USE_TIME
   time::RealTimeClock *time_ = nullptr;
