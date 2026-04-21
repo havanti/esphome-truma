@@ -69,7 +69,7 @@
 ## ESPHome Configuration
 
 The matching example configurations are available in the repository:
-[github.com/havanti/esphome-truma](https://github.com/havanti/esphome-truma)
+[codeberg.org/havanti/esphome-truma](https://codeberg.org/havanti/esphome-truma)
 
 Choose the appropriate variant for the ESP32-S3:
 

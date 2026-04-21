@@ -6,12 +6,13 @@
 
 esphome:
   name: "truma"
+  friendly_name: "Truma Heater"
   min_version: "2026.3.1"
 
 external_components:
   - source: 
       type: git
-      url: https://github.com/havanti/esphome-truma.git
+      url: https://codeberg.org/havanti/esphome-truma
     components: [truma_inetbox, uart]
     refresh: 24h     # check for updates once a day (recommended)
     # refresh: always  # always download latest (slower builds, use during development)
@@ -33,7 +34,7 @@ logger:
 # Optional: Home Assistant integration
 api:
   encryption:
-    key: ""
+    key: ""  # WARNING: generate a 32-byte base64 key before deploying — esphome.io/components/api.html
   on_client_connected:
     - logger.log: "Home Assistant CONNECTED"
   on_client_disconnected:
@@ -41,7 +42,7 @@ api:
 
 ota:
   platform: esphome
-  password: "12345678901234567890123456789012"
+  password: "12345678901234567890123456789012"  # WARNING: replace with a unique password before deploying
 
 # Two network configurations
 wifi:
@@ -102,50 +103,50 @@ climate:
 
 binary_sensor:
   - platform: truma_inetbox
-    name: "CP Plus alive"
+    name: "CP Plus Connected"
     type: CP_PLUS_CONNECTED
 
   - platform: truma_inetbox
-    name: "Heater has error"
+    name: "Heater Has Error"
     type: HEATER_HAS_ERROR
 
   - platform: truma_inetbox
-    name: "Room Heater active"
+    name: "Room Heater Active"
     type: HEATER_ROOM
     id: HEATER_ROOM
 
   - platform: truma_inetbox
-    name: "Water Heater active"
+    name: "Water Heater Active"
     type: HEATER_WATER
     id: HEATER_WATER
 
   - platform: truma_inetbox
-    name: "Heater mode Diesel"
+    name: "Heater Mode Diesel"
     type: HEATER_DIESEL
 
   - platform: truma_inetbox
-    name: "Heater mode Mix 1"
+    name: "Heater Mode Mix 1"
     type: HEATER_MIX_1
   
   - platform: truma_inetbox
-    name: "Heater mode Mix 2"
+    name: "Heater Mode Mix 2"
     type: HEATER_MIX_2
   
   - platform: truma_inetbox
-    name: "Heater mode Electric"
+    name: "Heater Mode Electric"
     type: HEATER_ELECTRICITY
 
   - platform: truma_inetbox
-    name: "Timer active"
+    name: "Timer Active"
     type: TIMER_ACTIVE
     id: TIMER_ACTIVE
 
   - platform: truma_inetbox
-    name: "Timer Room Heater active"
+    name: "Timer Room Heater Active"
     type: TIMER_ROOM
 
   - platform: truma_inetbox
-    name: "Timer Water Heater active"
+    name: "Timer Water Heater Active"
     type: TIMER_WATER    
 
 number:  
@@ -199,13 +200,14 @@ sensor:
     type: OPERATING_STATUS
 
   - platform: internal_temperature
-    name: "ESP32 Internal Temperature"    
- 
+    name: "ESP32 Internal Temperature"
+    entity_category: diagnostic
+
   - platform: wifi_signal
     name: "WiFi Signal dB"
     id: wifi_signal_db
     update_interval: 60s
-    entity_category: "diagnostic"
+    entity_category: diagnostic
 
   - platform: copy
     source_id: wifi_signal_db
@@ -213,11 +215,12 @@ sensor:
     filters:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "Signal %"
-    entity_category: "diagnostic"
+    entity_category: diagnostic
     device_class: ""
 
   - platform: uptime
     name: "Uptime"
+    entity_category: diagnostic
 
 switch:
   - platform: template
@@ -297,4 +300,5 @@ web_server:
 
 button:
   - platform: restart
-    name: "Restart ESP32"
+    name: "Restart"
+    entity_category: config

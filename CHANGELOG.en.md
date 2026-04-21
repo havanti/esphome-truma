@@ -8,18 +8,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-
-## [1.0.13] — 2026-04-20 — Truma Aventa Gen 2 air conditioning
-
-### Added
-- Support for the Truma Aventa Gen 2 air conditioner via the same LIN bus as the heater (CP Plus / iNet Box)
-- New climate type `AIRCON` for a full HA climate entity (modes: Off / Cool / Heat / Heat+Cool / Fan only)
-- New select types `AIRCON_MODE` and `AIRCON_VENT_MODE` for direct access to operating mode and fan speed
-- Example configuration `ESP32-S3_truma_Aventa_example.yaml`
-
----
-
-
 ## Compatibility Status
 
 ### Summary
@@ -39,6 +27,30 @@ Tested against:
 - ESPHome **2026.3.0** — ESP-IDF ✅
 
 ---
+
+
+## [1.0.14] — 2026-04-21 — Truma Cooler C(XX) integration
+
+### Added
+- Support for the Truma Cooler C(XX) series via BLE (active connection via `ble_client`)
+- New `truma_cooler` component under `components/truma_cooler/` (alongside `truma_inetbox` and `uart`)
+- Entities: Climate (setpoint −22 °C to +10 °C), interior temperature, ambient temperature, compressor status, turbo switch, device status, BLE connection status
+- Example configuration `ESP32_truma_cooler_example.yaml` (M5Stack Atom Lite)
+- Note on optional parallel use as ESPHome Bluetooth Proxy (M5Stack Atom)
+
+---
+
+
+## [1.0.13] — 2026-04-20 — Truma Aventa Gen 2 air conditioning
+
+### Added
+- Support for the Truma Aventa Gen 2 air conditioner via the same LIN bus as the heater (CP Plus / iNet Box)
+- New climate type `AIRCON` for a full HA climate entity (modes: Off / Cool / Heat / Heat+Cool / Fan only)
+- New select types `AIRCON_MODE` and `AIRCON_VENT_MODE` for direct access to operating mode and fan speed
+- Example configuration `ESP32-S3_truma_Aventa_example.yaml`
+
+---
+
 
 ## [1.0.12] — 2026-04-19 — LIN protocol and thread-safety fixes
 

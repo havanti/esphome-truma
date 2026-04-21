@@ -143,7 +143,7 @@ Der Konverter wandelt die 12V Bordspannung auf die 5V um, die der ESP32-S3 benö
 ## ESPHome-Konfiguration
 
 Die passenden Beispiel-YAMLs sind im Repository verfügbar:
-**[github.com/havanti/esphome-truma](https://github.com/havanti/esphome-truma)**
+**[codeberg.org/havanti/esphome-truma](https://codeberg.org/havanti/esphome-truma)**
 
 Für den ESP32-S3 die passende Variante wählen:
 

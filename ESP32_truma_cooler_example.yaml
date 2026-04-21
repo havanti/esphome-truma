@@ -1,0 +1,145 @@
+###############################
+# ESPHome Version >= 2026.3.1 #
+# ESP32 (M5Stack Atom Lite)   #
+# Truma Cooler C(XX)          #
+###############################
+
+esphome:
+  name: "truma-cooler"
+  friendly_name: "Truma Cooler"
+  min_version: "2026.3.1"
+
+esp32:
+  board: m5stack-atom  # Tested with M5Stack Atom Lite; any ESP32 with BLE and ESP-IDF works
+  framework:
+    type: esp-idf
+    version: recommended
+
+logger:
+  level: INFO
+  baud_rate: 0
+
+api:
+  encryption:
+    key: ""  # WARNING: generate a 32-byte base64 key before deploying — esphome.io/components/api.html
+
+ota:
+  platform: esphome
+  password: "12345678901234567890123456789012"  # WARNING: replace with a unique password before deploying
+
+wifi:
+  networks:
+    - ssid: !secret wifi_Mobile_ssid
+      password: !secret wifi_Mobile_password
+    - ssid: !secret wifi_Home_ssid
+      password: !secret wifi_Home_password
+  output_power: 17dB
+  power_save_mode: none
+  reboot_timeout: 0s
+
+external_components:
+  - source:
+      type: git
+      url: https://codeberg.org/havanti/esphome-truma
+    components: [truma_cooler]
+    refresh: 24h     # check for updates once a day (recommended)
+    # refresh: always  # always download latest (slower builds, use during development)
+    # refresh: 0s      # never re-download (fastest builds, no automatic updates)
+
+# Optional: Onboard RGB LED status indicator (M5Stack Atom Lite: GPIO27)
+# light:
+#   - platform: esp32_rmt_led_strip
+#     rgb_order: GRB
+#     pin: GPIO27
+#     num_leds: 1
+#     rmt_symbols: 64
+#     chipset: WS2812
+#     name: "Status LED"
+#     id: status_led
+#     default_transition_length: 0s
+#     restore_mode: ALWAYS_OFF
+
+# Optional: Bluetooth Proxy — forwards BLE advertisements to Home Assistant.
+# Allows other BLE devices (e.g. sensors) to be discovered without additional hardware.
+# The cooler uses ble_client (active connection); the proxy uses esp32_ble_tracker
+# (passive scanning). Both can run simultaneously on the same ESP32.
+# esp32_ble_tracker:
+#   scan_parameters:
+#     interval: 1100ms
+#     window: 1100ms
+#     active: false
+#
+# bluetooth_proxy:
+#   active: false
+
+esp32_ble:
+  io_capability: none
+
+ble_client:
+  - mac_address: "XX:XX:XX:XX:XX:XX"  # MAC address of your Truma Cooler
+    id: truma_cooler_ble
+    auto_connect: true
+
+truma_cooler:
+  id: cooler
+  ble_client_id: truma_cooler_ble
+
+  climate:
+    name: ""
+    icon: mdi:snowflake
+
+  temperature:
+    name: "Interior Temperature"
+    icon: mdi:thermometer
+    filters:
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 1
+    # Optional: uncomment to blink LED on BLE notification
+    # on_value:
+    #   then:
+    #     - light.turn_on:
+    #         id: status_led
+    #         brightness: 30%
+    #         red: 0%
+    #         green: 0%
+    #         blue: 100%
+    #     - delay: 80ms
+    #     - light.turn_off:
+    #         id: status_led
+
+  ambient_temperature:
+    name: "Ambient Temperature"
+    icon: mdi:thermometer-lines
+
+  compressor_running:
+    name: "Compressor Running"
+    icon: mdi:engine
+
+  turbo_running:
+    name: "Turbo Running"
+    icon: mdi:rocket-launch
+
+  device_on:
+    name: "Device On"
+    icon: mdi:power
+
+  connected:
+    name: "BLE Connected"
+    icon: mdi:bluetooth
+
+  turbo:
+    name: "Turbo"
+    icon: mdi:rocket-launch-outline
+
+web_server:
+  port: 80
+  local: true
+  version: 3
+  include_internal: true
+
+button:
+  - platform: restart
+    name: "Restart"
+    icon: mdi:restart
+    entity_category: config

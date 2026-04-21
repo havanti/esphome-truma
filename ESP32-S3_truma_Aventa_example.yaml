@@ -18,12 +18,13 @@
 
 esphome:
   name: "truma"
+  friendly_name: "Truma Aventa"
   min_version: "2026.3.1"
 
 external_components:
   - source:
       type: git
-      url: https://github.com/havanti/esphome-truma.git
+      url: https://codeberg.org/havanti/esphome-truma
     components: [truma_inetbox, uart]
     refresh: 24h
 
@@ -45,10 +46,12 @@ logger:
   baud_rate: 115200
 
 api:
+  encryption:
+    key: ""  # WARNING: generate a 32-byte base64 key before deploying — esphome.io/components/api.html
 
 ota:
   platform: esphome
-  password: "12345678901234567890123456789012"
+  password: "12345678901234567890123456789012"  # WARNING: replace with a unique password before deploying
 
 wifi:
   networks:
@@ -83,7 +86,7 @@ truma_inetbox:
 climate:
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
-    name: "Truma Aircon"
+    name: "Aircon"
     type: AIRCON
     # Optionally restrict available modes (default: all five)
     # supported_modes:
@@ -96,44 +99,44 @@ climate:
 select:
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
-    name: "Truma Aircon Mode"
+    name: "Aircon Mode"
     type: AIRCON_MODE
 
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
-    name: "Truma Aircon Vent"
+    name: "Aircon Vent"
     type: AIRCON_VENT_MODE
 
 number:
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
-    name: "Truma Aircon Temp"
+    name: "Aircon Temperature"
     type: AIRCON_MANUAL_TEMPERATURE
 
 # ─── Diagnostics ─────────────────────────────────────────────────────────────
 
 sensor:
   - platform: internal_temperature
-    name: "TR ESP32 Temperature"
+    name: "ESP32 Internal Temperature"
     update_interval: 60s
     entity_category: diagnostic
 
   - platform: wifi_signal
-    name: "TR WiFi Signal dB"
+    name: "WiFi Signal dB"
     id: wifi_signal_db
     update_interval: 60s
     entity_category: diagnostic
 
   - platform: copy
     source_id: wifi_signal_db
-    name: "TR WiFi Signal"
+    name: "WiFi Signal"
     filters:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
     entity_category: diagnostic
 
   - platform: uptime
-    name: "Uptime Sensor"
+    name: "Uptime"
     entity_category: diagnostic
 
 binary_sensor:
@@ -144,7 +147,13 @@ binary_sensor:
     type: CP_PLUS_CONNECTED
     entity_category: diagnostic
 
+web_server:
+  port: 80
+  local: true
+  version: 3
+  include_internal: true
+
 button:
   - platform: restart
-    name: "Truma ESP Restart"
+    name: "Restart"
     entity_category: config

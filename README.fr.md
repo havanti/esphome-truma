@@ -7,7 +7,7 @@
 
 [![Stars](https://img.shields.io/github/stars/havanti/esphome-truma?style=flat-square)](https://github.com/havanti/esphome-truma/stargazers) [![Last Commit](https://img.shields.io/github/last-commit/havanti/esphome-truma?style=flat-square)](https://github.com/havanti/esphome-truma/commits/main) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](LICENSE)
 
-[Fonctionnalités](#ce-que-ce-fork-ajoute) • [Démarrage rapide](#démarrage-rapide) • [Matériel](hardware/) • [Décalaminage](#décalaminage-diesel) • [Aventa AC](#truma-aventa-gen-2--climatisation) • [TPMS](#tpms--surveillance-de-la-pression-des-pneus-via-bluetooth) • [Contributing](CONTRIBUTING.fr.md)
+[Fonctionnalités](#ce-que-ce-fork-ajoute) • [Exemples](#exemples-de-configurations) • [Matériel](hardware/) • [Décalaminage](#décalaminage-diesel--combustion-des-résidus) • [Aventa AC](#truma-aventa-gen-2--climatisation) • [Cooler](#truma-cooler-cxx--réfrigérateur-portable) • [TPMS](#tpms--surveillance-de-la-pression-des-pneus-via-proxy-bluetooth) • [Contributing](CONTRIBUTING.fr.md)
 
 [🇩🇪 Deutsch](README.md) | [🇬🇧 English](README.en.md) | 🇫🇷 Français
 
@@ -19,7 +19,7 @@
 
 Un sincère remerciement à **[Fabian Schmidt](https://github.com/Fabian-Schmidt)**, dont remarquable le travail sur l'original  [esphome-truma_inetbox](https://github.com/Fabian-Schmidt/esphome-truma_inetbox)-Repository referenciel qui a initiallement tout redu possible. Ce projet est un fork de son travail et sans son dévouement et son expertise, rien de tout cela n’aurait été possible. Merci, Fabian !
 
-Ce projet s’appuie également sur l’incroyable travail préparatoire de la [WomoLIN-Projekts](https://github.com/muccc/WomoLIN) et [Daniel Fetts inetbox.py](https://github.com/danielfett/inetbox.py) puis [mc0110s inetbox2mqtt](https://github.com/mc0110/inetbox2mqtt) leurs recherches sur le protocole, leurs fichiers journaux et leur documentation ont été d'une valeur inestimable..
+Ce projet s’appuie également sur le travail préparatoire de la [WomoLIN-Projekts](https://github.com/muccc/WomoLIN) et [Daniel Fetts inetbox.py](https://github.com/danielfett/inetbox.py) puis [mc0110s inetbox2mqtt](https://github.com/mc0110/inetbox2mqtt) leurs recherches sur le protocole, leurs fichiers journaux et leur documentation ont été d'une valeur inestimable..
 
 ---
 
@@ -27,23 +27,7 @@ Ce projet s’appuie également sur l’incroyable travail préparatoire de la [
 
 Ce Fork étend le composant d'origine avec plusieurs fonctionnalités éprouvées sur le terrain développées en fonctionnement quotidien dans un camping-car avec un Truma Combi 6DE et une carte ESP32-S3. La configuration complète et fonctionnelle se trouve dans [`ESP32-S3_truma_6DE_Diesel_example.yaml`](ESP32-S3_truma_6DE_Diesel_example.yaml).
 
-### TPMS — Surveillance de la pression des pneus via proxy Bluetooth
-
-L'ESP32 agit également comme un récepteur Bluetooth Low Energy (BLE) pour les capteurs TPMS disponibles dans le commerce, éliminant ainsi le besoin d'une passerelle séparée. Quatre capteurs sont surveillés simultanément (VL, VR, HR, HL), chacun signalant :
-
-- Pression des pneus en bar
-- Température des pneus en °C
-- Tension de la batterie du capteur en V
-
-L'intégration utilise `esp32_ble_tracker` avec un scan passif et parse les parametre specific constructeur directement dans une fonction Lambda en C++. Les douze entités de capteurs apparaissent automatiquement dans Home Assistant en tant que capteurs de diagnostic.
-
-Pour adapter cela à vos propres capteurs, les quatre adresses MAC dans le `on_ble_advertise` Remplacez les blocs par vos propres adresses de capteur TPMS. La logique de décodage (décalage d'impression, mise à l'échelle) peut necessité d'être ajustée en fonction de la marque du capteur.
-
-> le balayage BLE et le bus Truma LIN fonctionnent en parallèle sur la même puce. Sur un ESP32-S3 avec PSRAM OctalSPI, la pile BLE peut être déchargée sur la PSRAM, réduisant ainsi considérablement le risque de conflits de mémoire. La PSRAM incluse `sdkconfig_options` dans `ESP32-S3_truma_6DE_Diesel_example.yaml` sont déjà configurés en conséquence.
-
-> **Variante TPMS modulaire :** [@kamahat](https://github.com/kamahat) a extrait la logique TPMS dans un fichier `tpms.yaml` autonome et une fonction auxiliaire C++. Si vous préférez une structure modulaire, consultez son [fork](https://github.com/kamahat/esphome-truma).
-
-### Diesel-„Ramonage" / Residus de Combustion
+### Décalaminage Diesel / Combustion des résidus
 
 Si un Truma Combi fonctionne au diesel pendant une longue période, des dépôts de suie peuvent s'accumuler sur ou dans la zone du brûleur (matériau fritté en acier inoxydable) et sur la fenetre. Les precautions recommandés :
 
@@ -88,6 +72,63 @@ Vitesses du ventilateur : Low / Mid / High / Night / Auto
 Plage de température : 16–31 °C, pas de 1 °C
 
 Exemple de configuration : [`ESP32-S3_truma_Aventa_example.yaml`](ESP32-S3_truma_Aventa_example.yaml)
+
+### Truma Cooler C(XX) — Réfrigérateur portable
+
+Le Truma Cooler C(XX) est contrôlé directement via BLE — aucune passerelle séparée requise. Le composant `truma_cooler` est placé à côté des autres composants dans `components/` :
+
+```yaml
+external_components:
+  - source:
+      type: git
+      url: https://codeberg.org/havanti/esphome-truma
+      ref: main
+    components: [truma_cooler]
+    refresh: 24h
+```
+
+> **Note :** Le protocole a été rétro-conçu exclusivement sur le C44. Les retours sur d'autres modèles sont les bienvenus — merci d'[ouvrir un issue](../../issues).
+
+#### Fonctionnalités
+
+- **Contrôle climatique** — On/Off et consigne (−22 °C à +10 °C) directement depuis Home Assistant ou le portail web intégré
+- **Interrupteur turbo** — activer/désactiver le mode turbo (l'appareil doit être allumé) ; se réinitialise automatiquement à l'allumage
+- **Température intérieure** — mesurée à l'intérieur du réfrigérateur (avec filtre de lissage)
+- **État du compresseur** — indique si le compresseur fonctionne actuellement
+- **État de l'appareil** — indique si le réfrigérateur est allumé
+- **État de connexion BLE** — état actuel de la connexion BLE vers l'ESP
+- **Mise à jour OTA** — mises à jour du firmware sans fil via WiFi
+- **Portail web** — interface locale sur le port 80 (ESPHome Web Server v3), Home Assistant non requis
+- **Redémarrage ESP** — bouton pour redémarrer l'ESP depuis Home Assistant
+
+#### Prérequis
+
+- **Microcontrôleur** avec BLE — recommandé : [ESP32-S3 DevKitC-1](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)
+- **Framework** : ESP-IDF (obligatoire pour BLE Secure Connections / Bonding — Arduino n'est pas supporté)
+- **ESPHome** ≥ 2026.3.0
+- **Adresse MAC** du réfrigérateur — à déterminer une fois via [nRF Connect](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-mobile) ou l'app Truma (retirer ensuite du couplage : une seule connexion BT possible)
+
+> **Recommandation :** Si vous n'avez que le Truma Cooler, sans chauffage ni climatisation, envisagez de l'utiliser sur un **M5Stack Atom Lite** dédié. Il est compact, abordable et supporte ESP-IDF — un nœud BLE autonome uniquement pour le réfrigérateur. Le M5Stack Atom convient également très bien comme [ESPHome Bluetooth Proxy](https://esphome.io/components/bluetooth_proxy.html), rendant d'autres appareils BLE accessibles via Home Assistant — sans matériel supplémentaire.
+
+Un exemple de configuration complet est disponible dans [`ESP32_truma_cooler_example.yaml`](ESP32_truma_cooler_example.yaml).
+
+### TPMS — Surveillance de la pression des pneus via proxy Bluetooth
+
+L'ESP32 agit également comme un récepteur Bluetooth Low Energy (BLE) pour les capteurs TPMS disponibles dans le commerce, éliminant ainsi le besoin d'une passerelle séparée. Quatre capteurs sont surveillés simultanément (FL, FR, RR, RL), chacun signalant :
+
+- Pression des pneus en bar
+- Température des pneus en °C
+- Tension de la batterie du capteur en V
+
+L'intégration utilise `esp32_ble_tracker` avec un scan passif et parse les parametre specific constructeur directement dans une fonction Lambda en C++. Les douze entités de capteurs apparaissent automatiquement dans Home Assistant en tant que capteurs de diagnostic.
+
+Pour adapter cela à vos propres capteurs, les quatre adresses MAC dans le `on_ble_advertise` Remplacez les blocs par vos propres adresses de capteur TPMS. La logique de décodage (décalage d'impression, mise à l'échelle) peut necessité d'être ajustée en fonction de la marque du capteur.
+
+> le balayage BLE et le bus Truma LIN fonctionnent en parallèle sur la même puce. Sur un ESP32-S3 avec PSRAM OctalSPI, la pile BLE peut être déchargée sur la PSRAM, réduisant ainsi considérablement le risque de conflits de mémoire. La PSRAM incluse `sdkconfig_options` dans `ESP32-S3_truma_6DE_Diesel_example.yaml` sont déjà configurés en conséquence.
+
+> **Variante TPMS modulaire :** [@kamahat](https://github.com/kamahat) a extrait la logique TPMS dans un fichier `tpms.yaml` autonome et une fonction auxiliaire C++. Si vous préférez une structure modulaire, consultez son [fork](https://github.com/kamahat/esphome-truma).
+
+Exemple de configuration : [`ESP32-S3_truma_6DE_Diesel_example.yaml`](ESP32-S3_truma_6DE_Diesel_example.yaml)
 
 ### LED RVB embarqué — indicateur d'état visuel (ESP32-S3)
 
@@ -241,7 +282,7 @@ esphome:
 external_components:
   - source:
       type: git
-      url: https://github.com/havanti/esphome-truma.git
+      url: https://codeberg.org/havanti/esphome-truma.git
     components: [truma_inetbox, uart]
     refresh: 0s
 

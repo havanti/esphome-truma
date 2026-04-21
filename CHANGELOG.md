@@ -29,6 +29,18 @@ Getestet mit:
 ---
 
 
+## [1.0.14] — 2026-04-21 — Truma Cooler C(XX) Integration
+
+### Hinzugefügt
+- Unterstützung für die Truma Cooler C(XX)-Serie über BLE (aktive Verbindung via `ble_client`)
+- Neue Komponente `truma_cooler` unter `components/truma_cooler/` (parallel zu `truma_inetbox` und `uart`)
+- Entitäten: Climate (Solltemperatur −22 °C bis +10 °C), Innentemperatur, Außentemperatur, Kompressor-Status, Turbo-Schalter, Gerätestatus, BLE-Verbindungsstatus
+- Beispielkonfiguration `ESP32_truma_cooler_example.yaml` (M5Stack Atom Lite)
+- Hinweis auf optionale parallele Nutzung als ESPHome Bluetooth Proxy (M5Stack Atom)
+
+---
+
+
 ## [1.0.13] — 2026-04-20 — Truma Aventa Gen 2 Klimaanlage
 
 ### Hinzugefügt

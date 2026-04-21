@@ -216,6 +216,9 @@ async def to_code(config):
     cg.add_global(uart_ns.using)
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
+    # Mark this build as using the custom UART so truma_inetbox's LIN
+    # BREAK detection binds to our IDFUARTComponent (which keeps the
+    # UART event queue that upstream removed in ESPHome 2025.8).
     cg.add_build_flag("-DCUSTOM_ESPHOME_UART");
 
     cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
