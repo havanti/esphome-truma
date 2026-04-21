@@ -10,17 +10,20 @@ namespace truma_inetbox {
 static const char *const TAG = "truma_inetbox.TrumaiNetBoxAppAirconManual";
 
 StatusFrameAirconManualResponse *TrumaiNetBoxAppAirconManual::update_prepare() {
-  // An update is currently going on.
   if (this->update_status_prepared_ || this->update_status_stale_) {
     return &this->update_status_;
   }
 
-  // prepare status response
   this->update_status_ = {};
   this->update_status_.mode = this->data_.mode;
-  this->update_status_.operation = this->data_.operation;
-  this->update_status_.energy_mix = this->data_.energy_mix;
+  this->update_status_.vent_mode = this->data_.vent_mode;
+  this->update_status_.aircon_on = 0x01;  // Must be 1 for commands to be accepted
   this->update_status_.target_temp_aircon = this->data_.target_temp_aircon;
+
+  if (this->update_status_.target_temp_aircon == TargetTemp::TARGET_TEMP_OFF ||
+      static_cast<uint16_t>(this->update_status_.target_temp_aircon) == 0) {
+    this->update_status_.target_temp_aircon = TargetTemp::TARGET_TEMP_22C;
+  }
 
   this->update_status_prepared_ = true;
   return &this->update_status_;
@@ -32,10 +35,11 @@ void TrumaiNetBoxAppAirconManual::create_update_data(StatusFrame *response, uint
                             command_counter);
 
   response->airconManualResponse.mode = this->update_status_.mode;
-  response->airconManualResponse.unknown_02 = this->update_status_.unknown_02;
-  response->airconManualResponse.operation = this->update_status_.operation;
-  response->airconManualResponse.energy_mix = this->update_status_.energy_mix;
+  response->airconManualResponse.unknown_02 = 0x00;
+  response->airconManualResponse.vent_mode = this->update_status_.vent_mode;
+  response->airconManualResponse.aircon_on = 0x01;  // Must always be 1
   response->airconManualResponse.target_temp_aircon = this->update_status_.target_temp_aircon;
+  memset(response->airconManualResponse.padding, 0x00, sizeof(response->airconManualResponse.padding));
 
   status_frame_calculate_checksum(response);
   (*response_len) = sizeof(StatusFrameHeader) + sizeof(StatusFrameAirconManualResponse);
@@ -52,13 +56,81 @@ bool TrumaiNetBoxAppAirconManual::can_update() {
 
 bool TrumaiNetBoxAppAirconManual::action_set_temp(uint8_t temperature) {
   if (!this->can_update()) {
-    ESP_LOGW(TAG, "Cannot update Truma.");
+    ESP_LOGW(TAG, "Cannot update Truma aircon.");
+    return false;
+  }
+
+  auto update_data = this->update_prepare();
+  update_data->target_temp_aircon = decimal_to_aircon_manual_temp(temperature);
+
+  this->update_submit();
+  return true;
+}
+
+bool TrumaiNetBoxAppAirconManual::action_set_mode(AirconMode mode) {
+  if (!this->can_update()) {
+    ESP_LOGW(TAG, "Cannot update Truma aircon.");
+    return false;
+  }
+
+  auto update_data = this->update_prepare();
+  update_data->mode = mode;
+
+  if (mode == AirconMode::AIRCON_MODE_OFF) {
+    update_data->vent_mode = AirconVentMode::AIRCON_VENT_LOW;
+  } else if (mode == AirconMode::AIRCON_MODE_AUTO) {
+    // AUTO mode requires AUTO vent — protocol constraint
+    update_data->vent_mode = AirconVentMode::AIRCON_VENT_AUTO;
+  } else if (update_data->vent_mode == AirconVentMode::AIRCON_VENT_AUTO) {
+    update_data->vent_mode = AirconVentMode::AIRCON_VENT_LOW;
+  }
+
+  this->update_submit();
+  return true;
+}
+
+bool TrumaiNetBoxAppAirconManual::action_set_vent_mode(AirconVentMode vent_mode) {
+  if (!this->can_update()) {
+    ESP_LOGW(TAG, "Cannot update Truma aircon.");
     return false;
   }
 
   auto update_data = this->update_prepare();
 
+  if (vent_mode == AirconVentMode::AIRCON_VENT_AUTO) {
+    // AUTO vent only valid with AUTO mode — protocol constraint
+    update_data->mode = AirconMode::AIRCON_MODE_AUTO;
+  } else if (update_data->mode == AirconMode::AIRCON_MODE_OFF) {
+    update_data->mode = AirconMode::AIRCON_MODE_VENTILATION;
+  } else if (update_data->mode == AirconMode::AIRCON_MODE_AUTO) {
+    update_data->mode = AirconMode::AIRCON_MODE_COOLING;
+  }
+
+  update_data->vent_mode = vent_mode;
+
+  this->update_submit();
+  return true;
+}
+
+bool TrumaiNetBoxAppAirconManual::action_aircon_manual(uint8_t temperature, AirconMode mode,
+                                                        AirconVentMode vent_mode) {
+  if (!this->can_update()) {
+    ESP_LOGW(TAG, "Cannot update Truma aircon.");
+    return false;
+  }
+
+  auto update_data = this->update_prepare();
+  update_data->mode = mode;
+  update_data->vent_mode = vent_mode;
   update_data->target_temp_aircon = decimal_to_aircon_manual_temp(temperature);
+
+  if (mode == AirconMode::AIRCON_MODE_OFF) {
+    update_data->vent_mode = AirconVentMode::AIRCON_VENT_LOW;
+  } else if (mode == AirconMode::AIRCON_MODE_AUTO) {
+    update_data->vent_mode = AirconVentMode::AIRCON_VENT_AUTO;
+  } else if (update_data->vent_mode == AirconVentMode::AIRCON_VENT_AUTO) {
+    update_data->vent_mode = AirconVentMode::AIRCON_VENT_LOW;
+  }
 
   this->update_submit();
   return true;

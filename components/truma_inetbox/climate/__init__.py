@@ -5,6 +5,7 @@ from esphome.const import (
     CONF_ID,
     CONF_TYPE,
 )
+from esphome.components.climate import ClimateMode
 from .. import truma_inetbox_ns, CONF_TRUMA_INETBOX_ID, TrumaINetBoxApp
 
 DEPENDENCIES = ["truma_inetbox"]
@@ -13,15 +14,25 @@ CODEOWNERS = ["@Fabian-Schmidt"]
 TrumaClimate = truma_inetbox_ns.class_(
     "TrumaClimate", climate.Climate, cg.Component)
 
+CLIMATE_MODES = {
+    "OFF": ClimateMode.CLIMATE_MODE_OFF,
+    "HEAT": ClimateMode.CLIMATE_MODE_HEAT,
+    "COOL": ClimateMode.CLIMATE_MODE_COOL,
+    "HEAT_COOL": ClimateMode.CLIMATE_MODE_HEAT_COOL,
+    "FAN_ONLY": ClimateMode.CLIMATE_MODE_FAN_ONLY,
+}
+
 CONF_SUPPORTED_TYPE = {
     "ROOM": truma_inetbox_ns.class_("TrumaRoomClimate", climate.Climate, cg.Component),
     "WATER": truma_inetbox_ns.class_("TrumaWaterClimate", climate.Climate, cg.Component),
+    "AIRCON": truma_inetbox_ns.class_("TrumaAirconClimate", climate.Climate, cg.Component),
 }
+
+AIRCON_DEFAULT_MODES = ["OFF", "COOL", "HEAT", "HEAT_COOL", "FAN_ONLY"]
 
 
 def set_default_based_on_type():
     def set_defaults_(config):
-        # update the class
         config[CONF_ID].type = CONF_SUPPORTED_TYPE[config[CONF_TYPE]]
         return config
 
@@ -29,11 +40,11 @@ def set_default_based_on_type():
 
 
 CONFIG_SCHEMA = climate._CLIMATE_SCHEMA.extend(
-
     {
         cv.GenerateID(): cv.declare_id(TrumaClimate),
         cv.GenerateID(CONF_TRUMA_INETBOX_ID): cv.use_id(TrumaINetBoxApp),
         cv.Required(CONF_TYPE): cv.enum(CONF_SUPPORTED_TYPE, upper=True),
+        cv.Optional("supported_modes"): cv.ensure_list(cv.enum(CLIMATE_MODES, upper=True)),
     }
 ).extend(cv.COMPONENT_SCHEMA)
 FINAL_VALIDATE_SCHEMA = set_default_based_on_type()
@@ -44,3 +55,7 @@ async def to_code(config):
     await cg.register_component(var, config)
     await climate.register_climate(var, config)
     await cg.register_parented(var, config[CONF_TRUMA_INETBOX_ID])
+
+    if config[CONF_TYPE] == "AIRCON":
+        modes = config.get("supported_modes", [CLIMATE_MODES[m] for m in AIRCON_DEFAULT_MODES])
+        cg.add(var.set_supported_modes(modes))

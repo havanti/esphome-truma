@@ -18,7 +18,7 @@
 
 ## Schéma de câblage
 
-<img src="Wiring.png" width="700" alt="Schéma de câblage">
+<img src="../pics/Wiring.png" width="700" alt="Schéma de câblage">
 
 ---
 

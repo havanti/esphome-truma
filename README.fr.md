@@ -1,6 +1,5 @@
 <div align="center">
 
-<img src="pics/CamperVan.png" width="480" alt="esphome-truma">
 
 # ESPHOME-TRUMA-HEATER AND MORE
 
@@ -8,7 +7,7 @@
 
 [![Stars](https://img.shields.io/github/stars/havanti/esphome-truma?style=flat-square)](https://github.com/havanti/esphome-truma/stargazers) [![Last Commit](https://img.shields.io/github/last-commit/havanti/esphome-truma?style=flat-square)](https://github.com/havanti/esphome-truma/commits/main) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](LICENSE)
 
-[Fonctionnalités](#ce-que-ce-fork-ajoute) • [Démarrage rapide](#démarrage-rapide) • [TPMS](#tpms--surveillance-de-la-pression-des-pneus-via-bluetooth) • [Décalaminage](#décalaminage-diesel) • [Matériel](hardware/) • [Contributing](CONTRIBUTING.fr.md)
+[Fonctionnalités](#ce-que-ce-fork-ajoute) • [Démarrage rapide](#démarrage-rapide) • [Matériel](hardware/) • [Décalaminage](#décalaminage-diesel) • [Aventa AC](#truma-aventa-gen-2--climatisation) • [TPMS](#tpms--surveillance-de-la-pression-des-pneus-via-bluetooth) • [Contributing](CONTRIBUTING.fr.md)
 
 [🇩🇪 Deutsch](README.md) | [🇬🇧 English](README.en.md) | 🇫🇷 Français
 
@@ -67,6 +66,28 @@ Deux boutons sont fournis dans Home Assistant :
 | Abort Diesel De-coking | Annule le cycle et éteint le chauffage |
 
 Un capteur de modèle (Diesel De-coking Remaining Time, unité : min) affiche le temps restant et est visible dans le tableau de bord Home Assistant et l'interface utilisateur Web intégrée.
+
+### Truma Aventa Gen 2 — Climatisation
+
+<img src="pics/Aventa.png" width="300" alt="Climatisation Truma Aventa Gen 2">
+
+L'ESP32 pilote la climatisation Truma Aventa Gen 2 via le même bus LIN que le chauffage — aucun second appareil requis. Une entité climate complète avec tous les modes de fonctionnement apparaît dans Home Assistant.
+
+Modes pris en charge :
+
+| Mode HA | Fonction Aventa |
+|---|---|
+| Off | Climatisation éteinte |
+| Cool | Refroidissement |
+| Heat | Chauffage |
+| Heat/Cool | Automatique (chauffage + refroidissement) |
+| Fan only | Ventilateur seul |
+
+Vitesses du ventilateur : Low / Mid / High / Night / Auto
+
+Plage de température : 16–31 °C, pas de 1 °C
+
+Exemple de configuration : [`ESP32-S3_truma_Aventa_example.yaml`](ESP32-S3_truma_Aventa_example.yaml)
 
 ### LED RVB embarqué — indicateur d'état visuel (ESP32-S3)
 
@@ -190,8 +211,8 @@ Les broches UART ont été éloignées des GPIO16/17, qui sont réservées à la
 Utiliser toutes les configurations `secrets.yaml` pour les données d'accès Wi-Fi. A `secrets.yaml` créer dans le même répertoire avec :
 
 ```yaml
-wifi_WOMO_WLAN_ssid: "MobileSSID"
-wifi_WOMO_password: "MotDePasseMobile"
+wifi_Mobile_ssid: "MobileSSID"
+wifi_Mobile_password: "MotDePasseMobile"
 wifi_Home_ssid: "SSIDMaison"
 wifi_Home_password: "MotDePasseMaison"
 api_encryption_key: ""
@@ -310,6 +331,7 @@ Ce qui suit `type` les valeurs sont disponibles :
 
 - `ROOM`
 - `WATER`
+- `AIRCON` — Truma Aventa Gen 2
 
 ### Number
 
@@ -346,6 +368,8 @@ Ce qui suit `type` les valeurs sont disponibles :
 - `HEATER_FAN_MODE_VARIO_HEAT`
 - `HEATER_ENERGY_MIX_GAS`
 - `HEATER_ENERGY_MIX_DIESEL`
+- `AIRCON_MODE` — mode de fonctionnement Aventa (Off / Ventilation / Cooling / Heating / Auto)
+- `AIRCON_VENT_MODE` — vitesse du ventilateur Aventa (Low / Mid / High / Night / Auto)
 
 ### Sensor
 

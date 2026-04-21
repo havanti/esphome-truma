@@ -22,6 +22,18 @@ TrumaSelect = truma_inetbox_ns.class_(
 TRUMA_SELECT_TYPE_dummy_ns = truma_inetbox_ns.namespace("TRUMA_SELECT_TYPE")
 
 CONF_SUPPORTED_TYPE = {
+    "AIRCON_MODE": {
+        CONF_CLASS: truma_inetbox_ns.class_("TrumaAirconSelect", select.Select, cg.Component),
+        CONF_TYPE: TRUMA_SELECT_TYPE_dummy_ns.AIRCON_MODE,
+        CONF_ICON: ICON_THERMOMETER,
+        CONF_OPTIONS: ("Off", "Ventilation", "Cooling", "Heating", "Auto"),
+    },
+    "AIRCON_VENT_MODE": {
+        CONF_CLASS: truma_inetbox_ns.class_("TrumaAirconSelect", select.Select, cg.Component),
+        CONF_TYPE: TRUMA_SELECT_TYPE_dummy_ns.AIRCON_VENT_MODE,
+        CONF_ICON: ICON_THERMOMETER,
+        CONF_OPTIONS: ("Low", "Mid", "High", "Night", "Auto"),
+    },
     "HEATER_FAN_MODE_COMBI": {
         CONF_CLASS: truma_inetbox_ns.class_("TrumaHeaterSelect", select.Select, cg.Component),
         CONF_TYPE: TRUMA_SELECT_TYPE_dummy_ns.HEATER_FAN_MODE,

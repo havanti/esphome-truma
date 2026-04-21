@@ -14,9 +14,6 @@ class TrumaWaterClimate : public Component, public climate::Climate, public Pare
   void control(const climate::ClimateCall &call) override;
 
   climate::ClimateTraits traits() override;
-
- protected:
- private:
 };
 }  // namespace truma_inetbox
 }  // namespace esphome

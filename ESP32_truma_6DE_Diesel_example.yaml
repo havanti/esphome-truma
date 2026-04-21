@@ -46,8 +46,8 @@ ota:
 # Two network configurations
 wifi:
   networks:
-    - ssid: !secret wifi_WOMO_WLAN_ssid
-      password: !secret wifi_WOMO_password
+    - ssid: !secret wifi_Mobile_ssid
+      password: !secret wifi_Mobile_password
     - ssid: !secret wifi_Home_ssid
       password: !secret wifi_Home_password
   fast_connect: false

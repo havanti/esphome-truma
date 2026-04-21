@@ -91,7 +91,6 @@ enum class EnergyMix : uint8_t {
 };
 
 enum class OperatingStatus : uint8_t {
-  OPERATING_STATUS_UNSET = 0x0,
   OPERATING_STATUS_OFF = 0x0,
   OPERATING_STATUS_WARNING = 0x1,
   OPERATING_STATUS_START_OR_COOL_DOWN = 0x4,
@@ -160,8 +159,6 @@ enum class TRUMA_DEVICE : uint8_t {
   HEATER_COMBI4 = 0x02,
   // Vario Heat Comfort (non E)
   HEATER_VARIO = 0x03,
-  // Old Truma CP6 (MY 2015)
-  HEATER_CP6 = 0x05,
   // Combi 6 D
   HEATER_COMBI6D = 0x06,
 };
@@ -172,16 +169,21 @@ enum class TRUMA_DEVICE_STATE : uint8_t {
 };
 
 enum class AirconMode : uint8_t {
-  // Auto - 18 to 25
-  OFF = 0x00,
-  AC_VENTILATION = 0x04,
-  AC_COOLING = 0x05,
+  AIRCON_MODE_OFF = 0x00,
+  AIRCON_MODE_VENTILATION = 0x04,
+  AIRCON_MODE_COOLING = 0x05,
+  AIRCON_MODE_HEATING = 0x06,
+  AIRCON_MODE_AUTO = 0x07,
+
+
 };
 
-enum class AirconOperation : uint8_t {
-  AC_ONLY = 0x71,
-  // Heater and Aircon
-  AUTO = 0x72,
+enum class AirconVentMode : uint8_t {
+  AIRCON_VENT_LOW = 0x71,
+  AIRCON_VENT_MID = 0x72,
+  AIRCON_VENT_HIGH = 0x73,
+  AIRCON_VENT_NIGHT = 0x74,
+  AIRCON_VENT_AUTO = 0x77,
 };
 
 }  // namespace truma_inetbox

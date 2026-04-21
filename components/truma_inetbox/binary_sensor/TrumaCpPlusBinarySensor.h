@@ -12,9 +12,6 @@ class TrumaCpPlusBinarySensor : public PollingComponent,
  public:
   void update() override;
   void dump_config() override;
-
- protected:
- private:
 };
 }  // namespace truma_inetbox
 }  // namespace esphome

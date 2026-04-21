@@ -8,13 +8,17 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/)
 
 ---
 
-## [1.0.13] — 2026-04-20 — Refonte de l'en-tête README
 
-### Documentation
-- Refonte de l'en-tête des trois versions linguistiques du README (DE/EN/FR) : image camping-car centrée, titre, badges (Stars, Last Commit, License) et barre de navigation
-- Testé avec ESPHome **2026.4.1** — ESP-IDF ✅
+## [1.0.13] — 2026-04-20 — Climatisation Truma Aventa Gen 2
+
+### Ajouté
+- Prise en charge de la climatisation Truma Aventa Gen 2 via le même bus LIN que le chauffage (CP Plus / iNet Box)
+- Nouveau type climate `AIRCON` pour une entité climate HA complète (modes : Off / Cool / Heat / Heat+Cool / Fan only)
+- Nouveaux types select `AIRCON_MODE` et `AIRCON_VENT_MODE` pour accès direct au mode de fonctionnement et à la vitesse du ventilateur
+- Exemple de configuration `ESP32-S3_truma_Aventa_example.yaml`
 
 ---
+
 
 ## État de compatibilité
 

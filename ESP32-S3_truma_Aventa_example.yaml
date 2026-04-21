@@ -1,0 +1,150 @@
+################################
+# ESPHome Version >= 2026.3.1  #
+# ESP32-S3 !                   #
+# Truma Aventa Gen 2 AC    #
+################################
+#
+# Provides Home Assistant climate entity for the Truma Aventa Gen 2
+# air conditioning unit via LIN-Bus (CP Plus / iNet Box).
+#
+# Hardware: Waveshare ESP32-S3-DEV-KIT-N8R8 (or compatible ESP32-S3)
+# Wiring:   see hardware/README.md
+#
+# HA entities exposed:
+#   climate  – Truma Aircon         (modes: Off / Cool / Heat / Heat+Cool / Fan only)
+#   select   – Truma Aircon Mode    (Off / Ventilation / Cooling / Heating / Auto)
+#   select   – Truma Aircon Vent    (Low / Mid / High / Night / Auto)
+#   number   – Truma Aircon Temp    (15–31 °C)
+
+esphome:
+  name: "truma"
+  min_version: "2026.3.1"
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/havanti/esphome-truma.git
+    components: [truma_inetbox, uart]
+    refresh: 24h
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  framework:
+    type: esp-idf
+    version: recommended
+    sdkconfig_options:
+      CONFIG_SPIRAM: "y"
+      CONFIG_SPIRAM_MODE_OCT: "y"
+      CONFIG_SPIRAM_SPEED_80M: "y"
+      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: "y"
+      CONFIG_SPIRAM_RODATA: "y"
+
+logger:
+  level: DEBUG
+  baud_rate: 115200
+
+api:
+
+ota:
+  platform: esphome
+  password: "12345678901234567890123456789012"
+
+wifi:
+  networks:
+    - ssid: !secret wifi_Mobile_ssid
+      password: !secret wifi_Mobile_password
+    - ssid: !secret wifi_Home_ssid
+      password: !secret wifi_Home_password
+  output_power: 17dB
+  power_save_mode: light
+  reboot_timeout: 0s
+
+uart:
+  - id: lin_uart_bus
+    tx_pin: GPIO18
+    rx_pin: GPIO8
+    baud_rate: 9600
+    data_bits: 8
+    parity: NONE
+    stop_bits: 2
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+truma_inetbox:
+  id: truma_inetbox_id
+  uart_id: lin_uart_bus
+  cs_pin: GPIO4    # LIN-Bus CS/Sleep pin — adjust to your wiring
+
+# ─── Truma Aventa Gen 2 ─────────────────────────────────────────────────
+
+climate:
+  - platform: truma_inetbox
+    truma_inetbox_id: truma_inetbox_id
+    name: "Truma Aircon"
+    type: AIRCON
+    # Optionally restrict available modes (default: all five)
+    # supported_modes:
+    #   - "OFF"
+    #   - "COOL"
+    #   - "HEAT"
+    #   - "HEAT_COOL"
+    #   - "FAN_ONLY"
+
+select:
+  - platform: truma_inetbox
+    truma_inetbox_id: truma_inetbox_id
+    name: "Truma Aircon Mode"
+    type: AIRCON_MODE
+
+  - platform: truma_inetbox
+    truma_inetbox_id: truma_inetbox_id
+    name: "Truma Aircon Vent"
+    type: AIRCON_VENT_MODE
+
+number:
+  - platform: truma_inetbox
+    truma_inetbox_id: truma_inetbox_id
+    name: "Truma Aircon Temp"
+    type: AIRCON_MANUAL_TEMPERATURE
+
+# ─── Diagnostics ─────────────────────────────────────────────────────────────
+
+sensor:
+  - platform: internal_temperature
+    name: "TR ESP32 Temperature"
+    update_interval: 60s
+    entity_category: diagnostic
+
+  - platform: wifi_signal
+    name: "TR WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: diagnostic
+
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "TR WiFi Signal"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: diagnostic
+
+  - platform: uptime
+    name: "Uptime Sensor"
+    entity_category: diagnostic
+
+binary_sensor:
+  - platform: truma_inetbox
+    truma_inetbox_id: truma_inetbox_id
+    name: "CP Plus Connected"
+    id: cp_plus_alive
+    type: CP_PLUS_CONNECTED
+    entity_category: diagnostic
+
+button:
+  - platform: restart
+    name: "Truma ESP Restart"
+    entity_category: config

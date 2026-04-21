@@ -102,7 +102,6 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
   uint8_t current_data_count_ = 0;
   // up to 8 byte data frame + CRC
   uint8_t current_data_[9] = {};
-  // // Time when the last LIN data was available.
   uint32_t last_data_received_ = 0;
 
   void current_state_reset_() {

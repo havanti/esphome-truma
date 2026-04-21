@@ -14,9 +14,6 @@ class TrumaRoomClimate : public Component, public climate::Climate, public Paren
   void control(const climate::ClimateCall &call) override;
 
   climate::ClimateTraits traits() override;
-
- protected:
- private:
 };
 }  // namespace truma_inetbox
 }  // namespace esphome

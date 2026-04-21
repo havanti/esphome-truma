@@ -28,13 +28,18 @@ Getestet mit:
 
 ---
 
-## [1.0.13] — 2026-04-20 — README-Header überarbeitet
 
-### Dokumentation
-- README-Header aller drei Sprachversionen (DE/EN/FR) neu gestaltet: zentriertes Campervan-Bild, Titel, Badges (Stars, Last Commit, License) und Navigationsleiste
-- Getestet mit ESPHome **2026.4.1** — ESP-IDF ✅
+## [1.0.13] — 2026-04-20 — Truma Aventa Gen 2 Klimaanlage
+
+### Hinzugefügt
+- Unterstützung für die Truma Aventa Gen 2 Klimaanlage über denselben LIN-Bus wie die Heizung (CP Plus / iNet Box)
+- Neuer Climate-Typ `AIRCON` für vollständige HA-Klimaentität (Modi: Off / Cool / Heat / Heat+Cool / Fan only)
+- Neue Select-Typen `AIRCON_MODE` und `AIRCON_VENT_MODE` für direkten Zugriff auf Betriebsmodus und Lüftergeschwindigkeit
+- Neue Number-Typ `AIRCON_MANUAL_TEMPERATURE` (bereits vorhanden, jetzt dokumentiert)
+- Beispielkonfiguration `ESP32-S3_truma_Aventa_example.yaml`
 
 ---
+
 
 ## [1.0.12] — 2026-04-19 — LIN-Protokoll- und Thread-Safety-Fixes
 

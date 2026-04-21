@@ -183,7 +183,7 @@ struct StatusFrameAirconManual {  // NOLINT(altera-struct-pack-align)
   AirconMode mode;
   // 0x00
   uint8_t unknown_02;
-  AirconOperation operation;
+  AirconVentMode vent_mode;
   EnergyMix energy_mix;
   TargetTemp target_temp_aircon;
   // 0x00
@@ -204,20 +204,22 @@ struct StatusFrameAirconManual {  // NOLINT(altera-struct-pack-align)
   TargetTemp current_temp_room;
 } __attribute__((packed));
 
+// Length 12 (0x0C) - Must match expected message length from CP Plus
 struct StatusFrameAirconManualResponse {  // NOLINT(altera-struct-pack-align)
   AirconMode mode;
   // 0x00
   uint8_t unknown_02;
-  AirconOperation operation;
-  EnergyMix energy_mix;
+  AirconVentMode vent_mode;
+  uint8_t aircon_on;  // Must be 0x01 for commands to be accepted
   TargetTemp target_temp_aircon;
+  uint8_t padding[6];  // Required padding to make message 12 bytes
 } __attribute__((packed));
 
 // Length 22 (0x16)
 struct StatusFrameAirconManualInit {  // NOLINT(altera-struct-pack-align)
   uint8_t unknown_01;                // 0x00
   uint8_t unknown_02;                // 0x00
-  AirconOperation operation;
+  AirconVentMode vent_mode;
   EnergyMix energy_mix;
   uint8_t unknown_05;  // 0x00
   uint8_t unknown_06;  // 0x00

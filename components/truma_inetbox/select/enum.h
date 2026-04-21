@@ -10,6 +10,8 @@ enum class TRUMA_SELECT_TYPE {
 
   HEATER_FAN_MODE,
   HEATER_ENERGY_MIX,
+  AIRCON_MODE,
+  AIRCON_VENT_MODE,
 };
 
 enum class TRUMA_SELECT_TYPE_HEATER_FAN_MODE {
@@ -29,19 +31,35 @@ enum class TRUMA_SELECT_TYPE_HEATER_ENERGY_MIX {
   ELECTRIC_2 = 4,
 };
 
+enum class TRUMA_SELECT_TYPE_AIRCON_MODE {
+  OFF = 0,
+  VENTILATION = 1,
+  COOLING = 2,
+  HEATING = 3,
+  AUTO = 4,
+};
+
+enum class TRUMA_SELECT_TYPE_AIRCON_VENT_MODE {
+  VENT_LOW = 0,
+  VENT_MID = 1,
+  VENT_HIGH = 2,
+  VENT_NIGHT = 3,
+  VENT_AUTO = 4,
+};
+
 #ifdef ESPHOME_LOG_HAS_CONFIG
 static const char *enum_to_c_str(const TRUMA_SELECT_TYPE val) {
   switch (val) {
     case TRUMA_SELECT_TYPE::HEATER_FAN_MODE:
       return "HEATER_FAN_MODE";
-      break;
     case TRUMA_SELECT_TYPE::HEATER_ENERGY_MIX:
       return "HEATER_ENERGY_MIX";
-      break;
-
+    case TRUMA_SELECT_TYPE::AIRCON_MODE:
+      return "AIRCON_MODE";
+    case TRUMA_SELECT_TYPE::AIRCON_VENT_MODE:
+      return "AIRCON_VENT_MODE";
     default:
       return "";
-      break;
   }
 }
 #endif  // ESPHOME_LOG_HAS_CONFIG

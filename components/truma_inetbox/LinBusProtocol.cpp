@@ -40,7 +40,6 @@ bool LinBusProtocol::answer_lin_order_(const uint8_t pid) {
 void LinBusProtocol::lin_message_received_(const uint8_t pid, const uint8_t *message, uint8_t length) {
   if (pid == DIAGNOSTIC_FRAME_MASTER) {
     {
-      // auto node_address = message[0];
       bool my_node_address = message[0] == this->lin_node_address_;
       bool broadcast_address = message[0] == LIN_NAD_BROADCAST;
       if (!my_node_address && !broadcast_address) {
@@ -79,7 +78,6 @@ bool LinBusProtocol::is_matching_identifier_(const uint8_t *message) {
 }
 
 void LinBusProtocol::lin_msg_diag_single_(const uint8_t *message, uint8_t length) {
-  // auto node_address = message[0];
   bool my_node_address = message[0] == this->lin_node_address_;
   bool broadcast_address = message[0] == LIN_NAD_BROADCAST;
 
