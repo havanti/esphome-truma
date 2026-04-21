@@ -1,0 +1,47 @@
+#pragma once
+
+#ifdef USE_ESP32_FRAMEWORK_ESP_IDF
+
+#include <driver/uart.h>
+#include "esphome/core/component.h"
+#include "uart_component.h"
+
+namespace esphome {
+namespace uart {
+
+class IDFUARTComponent : public UARTComponent, public Component {
+ public:
+  void setup() override;
+  void dump_config() override;
+  float get_setup_priority() const override { return setup_priority::BUS; }
+
+  void set_rx_full_threshold(size_t rx_full_threshold) override;
+  void set_rx_timeout(size_t rx_timeout) override;
+
+  void write_array(const uint8_t *data, size_t len) override;
+
+  bool peek_byte(uint8_t *data) override;
+  bool read_array(uint8_t *data, size_t len) override;
+
+  size_t available() override;
+  void flush() override;
+
+  uint8_t get_hw_serial_number() { return this->uart_num_; }
+
+  void load_settings(bool dump_config) override;
+  void load_settings() override { this->load_settings(true); }
+
+ protected:
+  void check_logger_conflict() override;
+  uart_port_t uart_num_;
+  QueueHandle_t uart_event_queue_;
+  uart_config_t get_config_();
+
+  bool has_peek_{false};
+  uint8_t peek_byte_;
+};
+
+}  // namespace uart
+}  // namespace esphome
+
+#endif  // USE_ESP32_FRAMEWORK_ESP_IDF
