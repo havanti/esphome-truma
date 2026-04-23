@@ -64,6 +64,7 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
   GPIOPin *fault_pin_ = nullptr;
   bool observer_mode_ = false;
 
+  // Must only be called from uartEventTask_ — not ISR-safe, not main-loop-safe.
   void write_lin_answer_(const uint8_t *data, uint8_t len);
   bool check_for_lin_fault_();
   virtual bool answer_lin_order_(const uint8_t pid) = 0;
@@ -72,11 +73,11 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
  private:
   // Microseconds per UART Baud
   uint32_t time_per_baud_;
-  // 9.. 15
-  const uint8_t lin_break_length = 13;
+  // LIN break = 13 bit times minimum (spec allows 9–15)
+  static constexpr uint8_t lin_break_length = 13;
   // Microseconds per LIN Break
   uint32_t time_per_lin_break_;
-  const uint8_t frame_length_ = (8 /* bits */ + 1 /* Start bit */ + 2 /* Stop bits */);
+  static constexpr uint8_t frame_length_ = 8 /* bits */ + 1 /* Start bit */ + 2 /* Stop bits */;
   // Microseconds per UART Byte (UART Frame)
   uint32_t time_per_pid_;
   // Microseconds per UART Byte (UART Frame)
@@ -118,6 +119,8 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
   void clear_uart_buffer_();
   void setup_framework();
 
+  // Declaration order matters: storage → static-queue-struct → handle.
+  // xQueueCreateStatic initialises the storage internally; BSS zero-init is sufficient.
   uint8_t lin_msg_static_queue_storage[TRUMA_MSG_QUEUE_LENGTH * sizeof(QUEUE_LIN_MSG)];
   StaticQueue_t lin_msg_static_queue_;
   QueueHandle_t lin_msg_queue_ =

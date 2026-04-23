@@ -40,23 +40,25 @@ bool TrumaiNetBoxAppClock::action_write_time() {
 }
 
 void TrumaiNetBoxAppClock::create_update_data(StatusFrame *response, uint8_t *response_len, uint8_t command_counter) {
-  if (this->parent_->get_time() != nullptr) {
-    ESP_LOGD(TAG, "Requested read: Sending clock update");
-    // read time live
-    auto now = this->parent_->get_time()->now();
-
-    status_frame_create_empty(response, STATUS_FRAME_CLOCK_RESPONSE, sizeof(StatusFrameClock), command_counter);
-
-    response->clock.clock_hour = now.hour;
-    response->clock.clock_minute = now.minute;
-    response->clock.clock_second = now.second;
-    response->clock.display_1 = 0x1;
-    response->clock.display_2 = 0x1;
-    response->clock.clock_mode = this->data_.clock_mode;
-
-    status_frame_calculate_checksum(response);
-    (*response_len) = sizeof(StatusFrameHeader) + sizeof(StatusFrameClock);
+  if (this->parent_->get_time() == nullptr) {
+    *response_len = 0;
+    this->update_status_unsubmitted_ = false;
+    return;
   }
+  ESP_LOGD(TAG, "Requested read: Sending clock update");
+  auto now = this->parent_->get_time()->now();
+
+  status_frame_create_empty(response, STATUS_FRAME_CLOCK_RESPONSE, sizeof(StatusFrameClock), command_counter);
+
+  response->clock.clock_hour = now.hour;
+  response->clock.clock_minute = now.minute;
+  response->clock.clock_second = now.second;
+  response->clock.display_1 = 0x1;
+  response->clock.display_2 = 0x1;
+  response->clock.clock_mode = this->data_.clock_mode;
+
+  status_frame_calculate_checksum(response);
+  (*response_len) = sizeof(StatusFrameHeader) + sizeof(StatusFrameClock);
   this->update_status_unsubmitted_ = false;
 }
 

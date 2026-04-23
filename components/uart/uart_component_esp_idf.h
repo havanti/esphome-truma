@@ -34,7 +34,7 @@ class IDFUARTComponent : public UARTComponent, public Component {
  protected:
   void check_logger_conflict() override;
   uart_port_t uart_num_;
-  QueueHandle_t uart_event_queue_;
+  volatile QueueHandle_t uart_event_queue_;
   uart_config_t get_config_();
 
   bool has_peek_{false};

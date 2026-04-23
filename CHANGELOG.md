@@ -30,6 +30,24 @@ Getestet mit:
 ---
 
 
+## [1.0.15] — 2026-04-23 — Sicherheits- und Robustheitsfixes
+
+### Behoben
+- LIN-Diagnoseframe: Längenprüfung vor Bytezugriff (`message[2]`) verhindert Verarbeitung unvollständiger Frames
+- `operating_status_to_str`: Ausgabepuffer um 1 Byte vergrößert — „ON 255" wurde fälschlich zu „ON 25" abgeschnitten
+- `create_update_data` (Clock): `response_len` wird bei fehlendem Zeitserver korrekt auf 0 gesetzt; `update_status_unsubmitted_` wird auf beiden Codepfaden zurückgesetzt — verhindert dauerhaft aktives `has_update()`
+- `heater_device_` / `aircon_device_`: Zugriff zwischen UART-Task und Main-Loop durch `std::atomic` abgesichert
+- `uart_event_queue_`: als `volatile` markiert — verhindert Compiler-Caching bei Cross-Core-Zugriff
+- `send_command` (Truma Cooler): `const_cast` entfernt; Befehlspuffer wird vor IDF-Aufruf kopiert
+- LIN TP First Frame: toter `answer_len >> 8`-Shift entfernt (war auf `uint8_t` immer 0)
+- `send_command` (Truma Cooler): Längenprüfung vor Pufferkopie verhindert Out-of-Bounds-Schreiben
+- Truma Cooler: `connected_`, `poll_enabled_`, `write_handle_`, `device_is_on_` als `volatile` markiert — verhindert Compiler-Caching bei Cross-Task-Zugriff (BT-Task ↔ App-Task)
+- Truma Cooler Climate: Solltemperatur wird auch bei kombiniertem Modus- und Temperaturwechsel übernommen
+- LIN-Nachrichten-Queue: verworfene Frames bei voller Queue werden per `ESP_LOGW` gemeldet statt still ignoriert
+
+---
+
+
 ## [1.0.14] — 2026-04-21 — Truma Cooler C(XX) Integration
 
 ### Hinzugefügt

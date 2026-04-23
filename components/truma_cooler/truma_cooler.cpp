@@ -4,6 +4,7 @@
 
 #include "esphome/core/log.h"
 #include <cmath>
+#include <cstring>
 
 namespace esphome {
 namespace truma_cooler {
@@ -260,11 +261,18 @@ void TrumaCooler::send_command(const uint8_t *cmd, size_t len) {
 
   ESP_LOGD(TAG, "Sending %02X %02X %02X... to handle 0x%04X", cmd[0], cmd[1], cmd[2], write_handle_);
 
+  if (len > FRAME_LEN) {
+    ESP_LOGW(TAG, "send_command: len %u > FRAME_LEN %u, truncated", (unsigned) len, (unsigned) FRAME_LEN);
+    len = FRAME_LEN;
+  }
+  // IDF write_char takes uint8_t* (non-const) even for NO_RSP writes.
+  uint8_t buf[FRAME_LEN];
+  memcpy(buf, cmd, len);
   auto status = esp_ble_gattc_write_char(
       this->parent_->get_gattc_if(),
       this->parent_->get_conn_id(),
       write_handle_, len,
-      const_cast<uint8_t *>(cmd),
+      buf,
       ESP_GATT_WRITE_TYPE_NO_RSP,
       ESP_GATT_AUTH_REQ_NONE);
 
@@ -302,8 +310,10 @@ void TrumaCoolerClimate::control(const climate::ClimateCall &call) {
   if (has_mode) {
     bool on = (this->mode != climate::CLIMATE_MODE_OFF);
     this->parent_->set_mode(on);
+    // Send setpoint after ON (never before — triggers display input mode and ON is ignored).
+    if (on && has_temp)
+      this->parent_->set_setpoint(this->target_temperature);
   } else if (has_temp) {
-    // Setpoint-only change: keep current power state, just update temperature
     this->parent_->set_setpoint(this->target_temperature);
   }
 

@@ -15,6 +15,11 @@ namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.LinBusListener";
 
+// Priority 24: above Wi-Fi (23) so LIN BREAK detection is not delayed by network traffic.
+static constexpr UBaseType_t UART_EVENT_TASK_PRIORITY = 24;
+// Priority 2: low — LIN message processing runs after time-critical UART task.
+static constexpr UBaseType_t LIN_EVENT_TASK_PRIORITY = 2;
+
 #define QUEUE_WAIT_BLOCKING (TickType_t) portMAX_DELAY
 
 #ifndef ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE
@@ -47,7 +52,7 @@ void LinBusListener::setup_framework() {
                           "uart_event_task",                      // name
                           ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE,   // stack size (in words)
                           this,                                   // input params
-                          24,                                     // priority
+                          UART_EVENT_TASK_PRIORITY,               // priority
                           &this->uartEventTaskHandle_,            // handle
                           ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE  // core
   );
@@ -60,7 +65,7 @@ void LinBusListener::setup_framework() {
                           "lin_event_task",                       // name
                           ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE,   // stack size (in words)
                           this,                                   // input params
-                          2,                                      // priority
+                          LIN_EVENT_TASK_PRIORITY,                // priority
                           &this->eventTaskHandle_,                // handle
                           ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE  // core
   );

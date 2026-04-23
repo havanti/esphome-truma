@@ -135,7 +135,7 @@ bool TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::arr
 
 const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, const uint8_t message_len,
                                                          uint8_t *return_len) {
-  static uint8_t response[48] = {};
+  static uint8_t response[sizeof(StatusFrame)] = {};
   // Validate message prefix.
   if (message_len < truma_message_header.size()) {
     return nullptr;
@@ -358,19 +358,20 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
     if (!is_CPPLUSDevice) {
       // Assumption first device is Heater
       if (device.device_id == 1) {
-        this->heater_device_ = truma_device;
+        this->heater_device_.store(truma_device, std::memory_order_relaxed);
       }
       // Assumption second device is Aircon
       if (device.device_id == 2) {
-        this->aircon_device_ = TRUMA_DEVICE::AIRCON_DEVICE;
+        this->aircon_device_.store(TRUMA_DEVICE::AIRCON_DEVICE, std::memory_order_relaxed);
       }
     }
 
-    if (device.device_count == 2 && this->heater_device_ != TRUMA_DEVICE::UNKNOWN) {
+    if (device.device_count == 2 && this->heater_device_.load(std::memory_order_relaxed) != TRUMA_DEVICE::UNKNOWN) {
       // Assumption 2 devices mean CP Plus and Heater.
       this->init_received_.store(micros(), std::memory_order_relaxed);
-    } else if (device.device_count == 3 && this->heater_device_ != TRUMA_DEVICE::UNKNOWN &&
-               this->aircon_device_ != TRUMA_DEVICE::UNKNOWN) {
+    } else if (device.device_count == 3 &&
+               this->heater_device_.load(std::memory_order_relaxed) != TRUMA_DEVICE::UNKNOWN &&
+               this->aircon_device_.load(std::memory_order_relaxed) != TRUMA_DEVICE::UNKNOWN) {
       // Assumption 3 devices mean CP Plus, Heater and Aircon.
       this->init_received_.store(micros(), std::memory_order_relaxed);
     }

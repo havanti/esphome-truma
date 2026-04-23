@@ -344,7 +344,9 @@ void LinBusListener::read_lin_frame_() {
       for (uint8_t i = 0; i < lin_msg.len; i++) {
         lin_msg.data[i] = this->current_data_[i];
       }
-      xQueueSendFromISR(this->lin_msg_queue_, (void *) &lin_msg, QUEUE_WAIT_DONT_BLOCK);
+      if (xQueueSendFromISR(this->lin_msg_queue_, (void *) &lin_msg, QUEUE_WAIT_DONT_BLOCK) != pdPASS) {
+        ESP_LOGW(TAG, "LIN message queue full — frame dropped (PID 0x%02X)", this->current_PID_);
+      }
     }
     this->current_state_ = READ_STATE_BREAK;
   }

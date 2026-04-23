@@ -29,8 +29,8 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   void lin_heartbeat() override;
   void lin_reset_device() override;
 
-  TRUMA_DEVICE get_heater_device() const { return this->heater_device_; }
-  TRUMA_DEVICE get_aircon_device() const { return this->aircon_device_; }
+  TRUMA_DEVICE get_heater_device() const { return this->heater_device_.load(std::memory_order_relaxed); }
+  TRUMA_DEVICE get_aircon_device() const { return this->aircon_device_.load(std::memory_order_relaxed); }
 
   TrumaiNetBoxAppAirconAuto *get_aircon_auto() { return &this->airconAuto_; }
   TrumaiNetBoxAppAirconManual *get_aircon_manual() { return &this->airconManual_; }
@@ -56,8 +56,9 @@ class TrumaiNetBoxApp : public LinBusProtocol {
 
   // Truma heater connected to CP Plus.
   TRUMA_COMPANY company_ = TRUMA_COMPANY::TRUMA;
-  TRUMA_DEVICE heater_device_ = TRUMA_DEVICE::UNKNOWN;
-  TRUMA_DEVICE aircon_device_ = TRUMA_DEVICE::UNKNOWN;
+  // Written from uartEventTask_, read from main loop — must be atomic.
+  std::atomic<TRUMA_DEVICE> heater_device_{TRUMA_DEVICE::UNKNOWN};
+  std::atomic<TRUMA_DEVICE> aircon_device_{TRUMA_DEVICE::UNKNOWN};
 
   TrumaiNetBoxAppAirconAuto airconAuto_;
   TrumaiNetBoxAppAirconManual airconManual_;

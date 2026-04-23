@@ -30,6 +30,24 @@ Tested against:
 ---
 
 
+## [1.0.15] — 2026-04-23 — Safety and robustness fixes
+
+### Fixed
+- LIN diagnostic frame: length guard before `message[2]` access prevents processing of truncated frames
+- `operating_status_to_str`: output buffer enlarged by 1 byte — "ON 255" was silently truncated to "ON 25"
+- `create_update_data` (Clock): `response_len` correctly set to 0 when no time source is configured; `update_status_unsubmitted_` is now cleared on both code paths — prevents permanently active `has_update()`
+- `heater_device_` / `aircon_device_`: access between UART task and main loop protected with `std::atomic`
+- `uart_event_queue_`: marked `volatile` — prevents compiler from caching the value across cores
+- `send_command` (Truma Cooler): removed `const_cast`; command buffer is copied before the IDF call
+- LIN TP first frame: removed dead `answer_len >> 8` shift (always zero on `uint8_t`)
+- `send_command` (Truma Cooler): length guard before buffer copy prevents out-of-bounds write
+- Truma Cooler: `connected_`, `poll_enabled_`, `write_handle_`, `device_is_on_` marked `volatile` — prevents compiler caching on cross-task access (BT task ↔ app task)
+- Truma Cooler Climate: setpoint is now applied when mode and temperature are changed simultaneously
+- LIN message queue: dropped frames on full queue are now reported via `ESP_LOGW` instead of silently discarded
+
+---
+
+
 ## [1.0.14] — 2026-04-21 — Truma Cooler C(XX) integration
 
 ### Added

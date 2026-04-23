@@ -46,6 +46,10 @@ void LinBusProtocol::lin_message_received_(const uint8_t pid, const uint8_t *mes
         return;
       }
     }
+    if (length < 3) {
+      ESP_LOGE(TAG, "LIN Protocol issue: Diagnostic frame too short (%u bytes).", length);
+      return;
+    }
     uint8_t protocol_control_information = message[1];
     if ((protocol_control_information & 0xF0) == 0x00) {
       // Single Frame mode
@@ -226,8 +230,10 @@ void LinBusProtocol::lin_msg_diag_multi_() {
     } else {
       // Multi Frame response
       response[0] = this->lin_node_address_;
-      response[1] = 0x10 | ((answer_len >> 8) & 0x0F);
-      response[2] = answer_len & 0xFF;
+      // LIN TP first-frame: 12-bit length = (response[1] & 0x0F)<<8 | response[2].
+      // answer_len is uint8_t so upper 4 bits are always 0.
+      response[1] = 0x10;
+      response[2] = answer_len;
       response[3] = answer[0] | LIN_SID_RESPONSE;
       for (uint8_t i = 1; i < 5; i++) {
         response[i + 3] = answer[i];

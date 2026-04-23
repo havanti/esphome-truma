@@ -10,7 +10,7 @@ namespace uart {
 class truma_IDFUARTComponent : public IDFUARTComponent {
  public:
   // `uart_event_queue_` is always available in IDFUARTComponent (not conditional).
-  QueueHandle_t *get_uart_event_queue() { return &this->uart_event_queue_; }
+  volatile QueueHandle_t *get_uart_event_queue() { return &this->uart_event_queue_; }
 };
 
 }  // namespace uart

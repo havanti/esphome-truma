@@ -114,11 +114,12 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
   TrumaCoolerClimate *climate_{nullptr};
   TrumaCoolerSwitch *turbo_switch_{nullptr};
 
-  uint16_t write_handle_{0};
-  bool connected_{false};
+  // Written from BT task (gattc_event_handler), read from app task (loop/send_command).
+  volatile uint16_t write_handle_{0};
+  volatile bool connected_{false};
+  volatile bool poll_enabled_{false};
+  volatile bool device_is_on_{false};
   uint32_t last_poll_{0};
-  bool poll_enabled_{false};
-  bool device_is_on_{false};
 };
 
 class TrumaCoolerClimate : public climate::Climate, public Parented<TrumaCooler> {
