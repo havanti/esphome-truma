@@ -40,7 +40,7 @@ wifi:
 external_components:
   - source:
       type: git
-      url: https://codeberg.org/havanti/esphome-truma
+      url: https://github.com/havanti/esphome-truma
     components: [truma_cooler]
     refresh: 24h     # check for updates once a day (recommended)
     # refresh: always  # always download latest (slower builds, use during development)

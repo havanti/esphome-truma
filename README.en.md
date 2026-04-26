@@ -92,7 +92,7 @@ The Truma Cooler C(XX) is controlled directly via BLE — no separate gateway ne
 external_components:
   - source:
       type: git
-      url: https://codeberg.org/havanti/esphome-truma
+      url: https://github.com/havanti/esphome-truma
       ref: main
     components: [truma_cooler]
     refresh: 24h
@@ -209,7 +209,7 @@ Requires ESPHome >= 2026.4.2.
 | Combi Diesel 4E | ~4 kW (+Hybrid) | Diesel               | ✅               |
 | Combi Diesel 6E | ~6 kW (+Hybrid) | Diesel               | ✅               |
 
-> **Compatibility note:** Developed and tested with a Truma Combi 6DE (2018 model year, Eberspächer burner). Whether other models — in particular newer diesel generations with a burner developed by Truma themselves (without Eberspächer) — are also compatible has not been verified. Feedback on this is very welcome — please open an [issue](https://codeberg.org/havanti/esphome-truma/issues).
+> **Compatibility note:** Developed and tested with a Truma Combi 6DE (2018 model year, Eberspächer burner). Whether other models — in particular newer diesel generations with a burner developed by Truma themselves (without Eberspächer) — are also compatible has not been verified. Feedback on this is very welcome — please open an [issue](https://github.com/havanti/esphome-truma/issues).
 
 ### Hardware Setup
 
@@ -297,7 +297,7 @@ esphome:
 external_components:
   - source:
       type: git
-      url: https://codeberg.org/havanti/esphome-truma.git
+      url: https://github.com/havanti/esphome-truma.git
     components: [truma_inetbox, uart]
     refresh: 0s
 
@@ -450,6 +450,18 @@ The following `type` values are available:
 - `OPERATING_STATUS`
 - `HEATER_ERROR_CODE`
 
+### Text Sensor
+
+Exposes the installed component version in the ESPHome web interface and Home Assistant.
+
+```yaml
+text_sensor:
+  - platform: truma_inetbox
+    name: "ESPHome Truma Version"
+```
+
+Defaults: `entity_category: diagnostic`, `icon: mdi:tag`. No further parameters required.
+
 ### Actions
 
 The following [ESP Home actions](https://esphome.io/guides/automations.html#actions) are available:
@@ -484,7 +496,7 @@ The following [ESP Home actions](https://esphome.io/guides/automations.html#acti
 If you give this component a try, your feedback is very welcome!
 
 Please test it with your setup and let us know how it goes — whether everything works smoothly
-or you run into any issues. Feel free to open an [issue](https://codeberg.org/havanti/esphome-truma/issues) with your findings,
+or you run into any issues. Feel free to open an [issue](https://github.com/havanti/esphome-truma/issues) with your findings,
 bug reports, or suggestions for improvement. Every report helps make this project better for everyone.
 
 ---

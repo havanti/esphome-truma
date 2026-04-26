@@ -24,7 +24,7 @@ esphome:
 external_components:
   - source:
       type: git
-      url: https://codeberg.org/havanti/esphome-truma
+      url: https://github.com/havanti/esphome-truma
     components: [truma_inetbox, uart]
     refresh: 24h
 
@@ -146,6 +146,10 @@ binary_sensor:
     id: cp_plus_alive
     type: CP_PLUS_CONNECTED
     entity_category: diagnostic
+
+text_sensor:
+  - platform: truma_inetbox
+    name: "ESPHome Truma Version"
 
 web_server:
   port: 80

@@ -2,6 +2,7 @@
 #include "esphome/core/helpers.h"
 #include "esphome/core/log.h"
 #include "helpers.h"
+#include "version.h"
 
 namespace esphome {
 namespace truma_inetbox {
@@ -28,6 +29,7 @@ static const char *const TAG = "truma_inetbox.LinBusListener";
 
 void LinBusListener::dump_config() {
   ESP_LOGCONFIG(TAG, "LinBusListener:");
+  ESP_LOGCONFIG(TAG, "  Component version: %s", TRUMA_INETBOX_VERSION);
   LOG_PIN("  CS Pin: ", this->cs_pin_);
   LOG_PIN("  FAULT Pin: ", this->fault_pin_);
   LOG_UPDATE_INTERVAL(this);

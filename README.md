@@ -90,7 +90,7 @@ Der Truma Cooler C(XX) wird über BLE direkt gesteuert — kein separates Gatewa
 external_components:
   - source:
       type: git
-      url: https://codeberg.org/havanti/esphome-truma
+      url: https://github.com/havanti/esphome-truma
       ref: main
     components: [truma_cooler]
     refresh: 24h
@@ -207,7 +207,7 @@ Erfordert ESPHome >= 2026.4.2.
 | Combi Diesel 4E | ~4 kW (+Hybrid) | Diesel             | ✅              |
 | Combi Diesel 6E | ~6 kW (+Hybrid) | Diesel             | ✅              |
 
-> **Hinweis zur Kompatibilität:** Entwickelt und getestet mit einer Truma Combi 6DE (Baujahr 2018, Eberspächer-Brenner). Ob andere Modelle und insbesondere neuere Diesel-Generationen mit einem von Truma selbst entwickelten Brenner (ohne Eberspächer) ebenfalls kompatibel sind, ist nicht sichergestellt. Rückmeldungen dazu sind sehr willkommen — bitte ein [Issue](https://codeberg.org/havanti/esphome-truma/issues) öffnen.
+> **Hinweis zur Kompatibilität:** Entwickelt und getestet mit einer Truma Combi 6DE (Baujahr 2018, Eberspächer-Brenner). Ob andere Modelle und insbesondere neuere Diesel-Generationen mit einem von Truma selbst entwickelten Brenner (ohne Eberspächer) ebenfalls kompatibel sind, ist nicht sichergestellt. Rückmeldungen dazu sind sehr willkommen — bitte ein [Issue](https://github.com/havanti/esphome-truma/issues) öffnen.
 
 ### Hardware-Aufbau
 
@@ -293,7 +293,7 @@ esphome:
 external_components:
   - source:
       type: git
-      url: https://codeberg.org/havanti/esphome-truma.git
+      url: https://github.com/havanti/esphome-truma.git
     components: [truma_inetbox, uart]
     refresh: 0s
 
@@ -446,6 +446,18 @@ Folgende `type`-Werte sind verfügbar:
 - `OPERATING_STATUS`
 - `HEATER_ERROR_CODE`
 
+### Text Sensor
+
+Zeigt die installierte Komponentenversion im ESPHome-Webinterface und Home Assistant an.
+
+```yaml
+text_sensor:
+  - platform: truma_inetbox
+    name: "ESPHome Truma Version"
+```
+
+Standardwerte: `entity_category: diagnostic`, `icon: mdi:tag`. Keine weiteren Parameter erforderlich.
+
 ### Aktionen
 
 Folgende [ESPHome-Aktionen](https://esphome.io/guides/automations.html#actions) sind verfügbar:
@@ -479,7 +491,7 @@ Folgende [ESPHome-Aktionen](https://esphome.io/guides/automations.html#actions) 
 
 Wer diese Komponente ausprobiert, dessen Feedback ist sehr willkommen!
 
-Bitte mit dem eigenen Setup testen und mitteilen, wie es läuft — ob alles reibungslos funktioniert oder Probleme auftreten. Einfach ein [Issue](https://codeberg.org/havanti/esphome-truma/issues) mit den Ergebnissen, Fehlerberichten oder Verbesserungsvorschlägen öffnen. Jeder Bericht hilft, dieses Projekt für alle besser zu machen.
+Bitte mit dem eigenen Setup testen und mitteilen, wie es läuft — ob alles reibungslos funktioniert oder Probleme auftreten. Einfach ein [Issue](https://github.com/havanti/esphome-truma/issues) mit den Ergebnissen, Fehlerberichten oder Verbesserungsvorschlägen öffnen. Jeder Bericht hilft, dieses Projekt für alle besser zu machen.
 
 ---
 

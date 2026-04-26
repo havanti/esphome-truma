@@ -12,7 +12,7 @@ esphome:
 external_components:
   - source:
       type: git
-      url: https://codeberg.org/havanti/esphome-truma
+      url: https://github.com/havanti/esphome-truma
     components: [truma_inetbox, uart]
     refresh: 24h     # check for updates once a day (recommended)
     # refresh: always  # always download latest (slower builds, use during development)
@@ -220,6 +220,10 @@ sensor:
   - platform: uptime
     name: "Uptime"
     entity_category: diagnostic
+
+text_sensor:
+  - platform: truma_inetbox
+    name: "ESPHome Truma Version"
 
 switch:
   - platform: template

@@ -30,6 +30,18 @@ Getestet mit:
 ---
 
 
+## [1.0.16] — 2026-04-26 — Versionsanzeige im Webinterface
+
+### Hinzugefügt
+- `text_sensor`-Plattform: zeigt Komponentenversion im ESPHome-Webinterface und Home Assistant an (`entity_category: diagnostic`, `icon: mdi:tag`)
+- `version.h`: zentrale Konstante `TRUMA_INETBOX_VERSION` — single source of truth für alle Versionsreferenzen
+- Versionsnummer wird beim Start über `dump_config` geloggt
+- Alle Heater-Beispiel-YAMLs enthalten jetzt einen `text_sensor`-Block
+
+### Dokumentation
+- Alle Beispiel-YAMLs: neuer Block `text_sensor: - platform: truma_inetbox, name: "ESPHome Truma Version"`
+
+
 ## [1.0.15] — 2026-04-23 — Sicherheits- und Robustheitsfixes
 
 ### Behoben
