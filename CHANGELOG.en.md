@@ -26,6 +26,16 @@ Tested against:
 ---
 
 
+## [1.0.18] — 2026-04-29 — Cross-task synchronisation in heater/aircon/clock
+
+### Changed
+- `TrumaStausFrameStorage` / `TrumaStausFrameResponseStorage` / `TrumaiNetBoxAppClock`: 5 shared boolean flags (`data_valid_`, `data_updated_`, `update_status_prepared_`, `update_status_unsubmitted_`, `update_status_stale_`) converted to `std::atomic<bool>` — prevents race conditions between LIN eventTask_ and main loop
+- `TrumaStausFrameStorage::update()`: uses `exchange(false)` for atomic test-and-clear of update flag
+
+### Documentation
+- Thread-safety comments in both storage headers: documents remaining (deliberately unfixed) risk on struct-level access
+
+
 ## [1.0.17] — 2026-04-29 — Truma Cooler: robustness fixes
 
 ### Changed

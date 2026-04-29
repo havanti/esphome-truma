@@ -42,7 +42,7 @@ bool TrumaiNetBoxAppClock::action_write_time() {
 void TrumaiNetBoxAppClock::create_update_data(StatusFrame *response, uint8_t *response_len, uint8_t command_counter) {
   if (this->parent_->get_time() == nullptr) {
     *response_len = 0;
-    this->update_status_unsubmitted_ = false;
+    this->update_status_unsubmitted_.store(false);
     return;
   }
   ESP_LOGD(TAG, "Requested read: Sending clock update");
@@ -59,7 +59,7 @@ void TrumaiNetBoxAppClock::create_update_data(StatusFrame *response, uint8_t *re
 
   status_frame_calculate_checksum(response);
   (*response_len) = sizeof(StatusFrameHeader) + sizeof(StatusFrameClock);
-  this->update_status_unsubmitted_ = false;
+  this->update_status_unsubmitted_.store(false);
 }
 
 #endif  // USE_TIME

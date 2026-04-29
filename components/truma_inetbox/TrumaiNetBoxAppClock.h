@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include "TrumaStausFrameResponseStorage.h"
 #include "TrumaStructs.h"
 
@@ -12,9 +14,9 @@ class TrumaiNetBoxAppClock : public TrumaStausFrameStorage<StatusFrameClock>, pu
  public:
   void dump_data() const override;
 #ifdef USE_TIME
-  bool can_update() { return this->data_valid_; }
-  void update_submit() { this->update_status_unsubmitted_ = true; }
-  bool has_update() const { return this->update_status_unsubmitted_; }
+  bool can_update() { return this->data_valid_.load(); }
+  void update_submit() { this->update_status_unsubmitted_.store(true); }
+  bool has_update() const { return this->update_status_unsubmitted_.load(); }
   bool action_write_time();
   void create_update_data(StatusFrame *response, uint8_t *response_len, uint8_t command_counter);
 
@@ -22,7 +24,7 @@ class TrumaiNetBoxAppClock : public TrumaStausFrameStorage<StatusFrameClock>, pu
   // The behaviour of `update_status_clock_unsubmitted_` is special.
   // Just an update is marked. The actual package is prepared when CP Plus asks for the data in the
   // `lin_multiframe_received` method.
-  bool update_status_unsubmitted_ = false;
+  std::atomic<bool> update_status_unsubmitted_{false};
 #else
   constexpr bool has_update() const { return false; }
 #endif  // USE_TIME
