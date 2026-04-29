@@ -5,7 +5,7 @@
 
 **Why freeze in campervan when ESP32 fix everything for you?**
 
-[![Release](https://img.shields.io/github/v/release/havanti/esphome-truma?style=flat-square&color=blue)](https://github.com/havanti/esphome-truma/releases) [![Stars](https://img.shields.io/github/stars/havanti/esphome-truma?style=flat-square&color=yellow)](https://github.com/havanti/esphome-truma) [![ESPHome](https://img.shields.io/badge/ESPHome-%E2%89%A52026.4.2-blue?style=flat-square)](https://esphome.io) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/havanti/esphome-truma?style=flat-square&color=blue)](https://github.com/havanti/esphome-truma/releases) [![Stars](https://img.shields.io/github/stars/havanti/esphome-truma?style=flat-square&color=yellow)](https://github.com/havanti/esphome-truma) [![ESPHome](https://img.shields.io/badge/ESPHome-%E2%89%A52026.4.3-blue?style=flat-square)](https://esphome.io) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](LICENSE)
 
 [Features](#what-this-fork-adds) • [Examples](#example-configurations) • [Hardware](hardware/) • [De-coking](#diesel-de-coking--residue-combustion) • [Aventa AC](#truma-aventa-gen-2--air-conditioning) • [Cooler](#truma-cooler-cxx--cooling-box) • [TPMS](#tpms--tire-pressure-monitoring-via-bluetooth-proxy) • [Contributing](CONTRIBUTING.en.md)
 
@@ -64,7 +64,7 @@ A template sensor (Diesel De-coking Remaining Time, unit: min) counts down the r
 
 ### Truma Aventa Gen 2 — Air Conditioning
 
-<img src="pics/Aventa.png" width="300" alt="Truma Aventa Gen 2 air conditioner">
+<img src="img/Aventa.png" width="300" alt="Truma Aventa Gen 2 air conditioner">
 
 The ESP32 controls the Truma Aventa Gen 2 air conditioner over the same LIN bus as the heater — no second device required. A full climate entity with all operating modes appears in Home Assistant.
 
@@ -116,7 +116,7 @@ external_components:
 
 - **Microcontroller** with BLE — recommended: [ESP32-S3 DevKitC-1](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitc-1.html)
 - **Framework**: ESP-IDF (mandatory for BLE Secure Connections / Bonding — Arduino is not supported)
-- **ESPHome** ≥ 2026.4.2
+- **ESPHome** ≥ 2026.4.3
 - **MAC address** of the cooler — look up once via [nRF Connect](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-mobile) or the Truma app (unpair from app afterwards: only one BT connection allowed)
 
 > **Recommendation:** If you only have the Truma Cooler without a heater or air conditioner, consider running it on a dedicated **M5Stack Atom Lite**. It's compact, affordable, and supports ESP-IDF — a standalone BLE node just for the cooler. The M5Stack Atom also works excellently as an [ESPHome Bluetooth Proxy](https://esphome.io/components/bluetooth_proxy.html), making additional BLE devices accessible via Home Assistant — no extra hardware needed.
@@ -194,7 +194,7 @@ Restart button — A one-click ESP restart button is exposed in Home Assistant f
 
 This repository provides four ready-to-use example configurations for the Truma Combi heater family.
 All use the ESP-IDF framework and pull the component directly from this repository.
-Requires ESPHome >= 2026.4.2.
+Requires ESPHome >= 2026.4.3.
 
 **Supported models:**
 
@@ -341,7 +341,7 @@ This project contains the following ESPHome components:
   - `fault_pin` (optional) if you connect the pin of your lin driver chip.
   - `on_heater_message` (optional) [ESPHome Trigger](https://esphome.io/guides/automations.html) when a message from CP Plus is recieved.
 
-Requires ESPHome 2026.4.2 or higher.
+Requires ESPHome 2026.4.3 or higher.
 
 ### Binary sensor
 

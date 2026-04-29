@@ -18,7 +18,7 @@
 
 ## Wiring Diagram
 
-<img src="../pics/Wiring.png" width="700" alt="Wiring diagram">
+<img src="../img/Wiring.png" width="700" alt="Wiring diagram">
 
 ---
 

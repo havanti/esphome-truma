@@ -37,7 +37,7 @@ Home Assistant im Wohnmobil ermöglicht.
 
 ## Verdrahtungsplan
 
-<img src="../pics/Wiring.png" width="700" alt="Montage- &amp; Verdrahtungsplan">
+<img src="../img/Wiring.png" width="700" alt="Montage- &amp; Verdrahtungsplan">
 
 ---
 
@@ -81,7 +81,7 @@ Der Konverter wandelt die 12V Bordspannung auf die 5V um, die der ESP32-S3 benö
 
 ### Schritt 4 — LIN-Transceiver → RJ12 (Truma-Port)
 
-<img src="../pics/PIN.png" width="300" alt="RJ12 Pin-Belegung">
+<img src="../img/PIN.png" width="300" alt="RJ12 Pin-Belegung">
 
 | Kabel | Von | Zu |
 |---|---|---|

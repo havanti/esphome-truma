@@ -12,27 +12,27 @@ namespace truma_cooler {
 static const char *const TAG = "truma_cooler";
 
 // Poll command
-static const uint8_t CMD_POLL[] = {
+static constexpr uint8_t CMD_POLL[FRAME_LEN] = {
     0xAA, 0xC1, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5C
 };
 // Turn ON:  byte[3]=0x01 — confirmed from HCI log: every OFF→ON transition uses this exact frame
-static const uint8_t CMD_ON[] = {
+static constexpr uint8_t CMD_ON[FRAME_LEN] = {
     0xAA, 0xC1, 0xF1, 0x01, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5E
 };
 // Turn OFF: byte[9]=0x00 — confirmed from HCI log (NOTIF OFF follows immediately)
-static const uint8_t CMD_OFF[] = {
+static constexpr uint8_t CMD_OFF[FRAME_LEN] = {
     0xAA, 0xC1, 0xF1, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5D
 };
 // Turbo ON (device must already be ON): byte[4]=0x01, byte[9]=0x03
-static const uint8_t CMD_TURBO[] = {
+static constexpr uint8_t CMD_TURBO[FRAME_LEN] = {
     0xAA, 0xC1, 0xF1, 0x00, 0x01, 0x00, 0x00, 0x00,
     0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x61
 };
 // Turbo OFF (device must already be ON): byte[4]=0x00, byte[9]=0x03
-static const uint8_t CMD_TURBO_OFF[] = {
+static constexpr uint8_t CMD_TURBO_OFF[FRAME_LEN] = {
     0xAA, 0xC1, 0xF1, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60
 };
@@ -48,10 +48,10 @@ void TrumaCooler::setup() {
 }
 
 void TrumaCooler::loop() {
-  if (!connected_ || write_handle_ == 0) return;
+  if (!connected_.load() || write_handle_.load() == 0) return;
 
-  // Poll as fallback — device sends unsolicited notifications every ~2s.
-  if (poll_enabled_ && millis() - last_poll_ > POLL_INTERVAL_MS) {
+  // Poll as fallback — device sends unsolicited notifications every ~2 s.
+  if (poll_enabled_.load() && millis() - last_poll_ > POLL_INTERVAL_MS) {
     send_poll();
     last_poll_ = millis();
   }
@@ -61,7 +61,7 @@ void TrumaCooler::dump_config() {
   ESP_LOGCONFIG(TAG, "TrumaCooler BLE:");
   ESP_LOGCONFIG(TAG, "  MAC: %s", this->parent_->address_str());
   ESP_LOGCONFIG(TAG, "  Service UUID: 0xFFF0");
-  ESP_LOGCONFIG(TAG, "  Write Handle: 0x%04X", write_handle_);
+  ESP_LOGCONFIG(TAG, "  Write Handle: 0x%04X", write_handle_.load());
   ESP_LOGCONFIG(TAG, "  Notify Handle: 0x%04X", NOTIFY_HANDLE);
 }
 
@@ -72,20 +72,29 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
     case ESP_GATTC_OPEN_EVT:
       if (param->open.status == ESP_GATT_OK) {
         ESP_LOGI(TAG, "Connected to TrumaCooler");
-        connected_ = true;
+        connected_.store(true);
         if (connected_sensor_ != nullptr) connected_sensor_->publish_state(true);
-        // Reset sensors to unknown until first notification arrives
+        // Reset sensors to unknown until first notification arrives.
         if (temperature_sensor_ != nullptr) temperature_sensor_->publish_state(NAN);
+        if (ambient_temperature_sensor_ != nullptr) ambient_temperature_sensor_->publish_state(NAN);
         if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
+        // Publish initial OFF state so HA sees the entity online instead of "unknown".
+        if (climate_ != nullptr) {
+          climate_->mode = climate::CLIMATE_MODE_OFF;
+          climate_->action = climate::CLIMATE_ACTION_OFF;
+          climate_->current_temperature = NAN;
+          climate_->publish_state();
+        }
       }
       break;
 
     case ESP_GATTC_DISCONNECT_EVT:
       ESP_LOGI(TAG, "Disconnected from TrumaCooler");
-      connected_ = false;
-      poll_enabled_ = false;
-      write_handle_ = 0;
-      device_is_on_ = false;
+      connected_.store(false);
+      poll_enabled_.store(false);
+      write_handle_.store(0);
+      device_is_on_.store(false);
+      this->cancel_timeout("turbo_reset");
       if (connected_sensor_ != nullptr) connected_sensor_->publish_state(false);
       if (temperature_sensor_ != nullptr) temperature_sensor_->publish_state(NAN);
       if (ambient_temperature_sensor_ != nullptr) ambient_temperature_sensor_->publish_state(NAN);
@@ -101,8 +110,8 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       break;
 
     case ESP_GATTC_SEARCH_CMPL_EVT: {
-      write_handle_ = 0x0012;
-      poll_enabled_ = false;
+      write_handle_.store(WRITE_HANDLE);
+      poll_enabled_.store(false);
       ESP_LOGI(TAG, "Service discovery done. Registering for notify (no encryption required).");
 
       auto reg_ret = esp_ble_gattc_register_for_notify(gattc_if,
@@ -114,11 +123,11 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       uint8_t notify_en[] = {0x01, 0x00};
       auto cccd_ret = esp_ble_gattc_write_char_descr(gattc_if,
                                                       this->parent_->get_conn_id(),
-                                                      NOTIFY_HANDLE + 1, sizeof(notify_en),
+                                                      CCCD_HANDLE, sizeof(notify_en),
                                                       notify_en, ESP_GATT_WRITE_TYPE_RSP,
                                                       ESP_GATT_AUTH_REQ_NONE);
       ESP_LOGI(TAG, "CCCD write ret=%d", cccd_ret);
-      poll_enabled_ = true;
+      poll_enabled_.store(true);
       last_poll_ = millis();
       break;
     }
@@ -162,7 +171,7 @@ void TrumaCooler::parse_notification_(const uint8_t *data, uint16_t len) {
   }
 
   bool device_on = (data[4] == DEVICE_ON);
-  device_is_on_ = device_on;
+  device_is_on_.store(device_on);
   bool compressor_running = (data[5] == COMPRESSOR_RUNNING || data[5] == COMPRESSOR_TURBO);
   bool turbo_running = (data[5] == COMPRESSOR_TURBO);
   float interior_temp = (int8_t)data[6];        // interior temperature in °C (signed)
@@ -208,7 +217,7 @@ uint8_t TrumaCooler::calculate_checksum_(const uint8_t *data, size_t len) {
 void TrumaCooler::send_poll() { send_command(CMD_POLL, sizeof(CMD_POLL)); }
 
 void TrumaCooler::set_mode(bool on) {
-  device_is_on_ = on;
+  device_is_on_.store(on);
   if (on) {
     // Send fixed ON command — device uses its internally stored setpoint.
     // Do NOT send a setpoint command before this: it triggers temperature-input
@@ -233,6 +242,12 @@ void TrumaCooler::set_mode(bool on) {
 }
 
 void TrumaCooler::set_turbo(bool state) {
+  // Protocol requires device to be ON before turbo commands take effect.
+  if (!device_is_on_.load()) {
+    ESP_LOGW(TAG, "Turbo command ignored — device is OFF");
+    if (turbo_switch_ != nullptr) turbo_switch_->publish_state(false);
+    return;
+  }
   if (state) {
     ESP_LOGI(TAG, "Turbo: ON");
     send_command(CMD_TURBO, sizeof(CMD_TURBO));
@@ -254,24 +269,27 @@ void TrumaCooler::set_setpoint(float temp_celsius) {
 }
 
 void TrumaCooler::send_command(const uint8_t *cmd, size_t len) {
-  if (!connected_ || write_handle_ == 0) {
+  uint16_t handle = write_handle_.load();
+  if (!connected_.load() || handle == 0) {
     ESP_LOGW(TAG, "Cannot send: not connected");
     return;
   }
-
-  ESP_LOGD(TAG, "Sending %02X %02X %02X... to handle 0x%04X", cmd[0], cmd[1], cmd[2], write_handle_);
 
   if (len > FRAME_LEN) {
     ESP_LOGW(TAG, "send_command: len %u > FRAME_LEN %u, truncated", (unsigned) len, (unsigned) FRAME_LEN);
     len = FRAME_LEN;
   }
+
+  ESP_LOGD(TAG, "Sending [%s] to handle 0x%04X",
+           format_hex_pretty(cmd, len).c_str(), handle);
+
   // IDF write_char takes uint8_t* (non-const) even for NO_RSP writes.
   uint8_t buf[FRAME_LEN];
   memcpy(buf, cmd, len);
   auto status = esp_ble_gattc_write_char(
       this->parent_->get_gattc_if(),
       this->parent_->get_conn_id(),
-      write_handle_, len,
+      handle, len,
       buf,
       ESP_GATT_WRITE_TYPE_NO_RSP,
       ESP_GATT_AUTH_REQ_NONE);
@@ -279,8 +297,8 @@ void TrumaCooler::send_command(const uint8_t *cmd, size_t len) {
   if (status != ESP_OK) {
     ESP_LOGW(TAG, "Write failed: 0x%X", status);
   } else {
-    // Reset poll timer so next poll happens after full 60s interval.
-    // The device sends unsolicited notifications every ~2s, so state
+    // Reset poll timer so next poll happens after full POLL_INTERVAL_MS.
+    // The device sends unsolicited notifications every ~2 s, so state
     // updates arrive automatically without needing an immediate poll.
     last_poll_ = millis();
   }

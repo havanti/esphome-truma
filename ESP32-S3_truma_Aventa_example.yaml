@@ -1,5 +1,5 @@
 ################################
-# ESPHome Version >= 2026.4.2  #
+# ESPHome Version >= 2026.4.3 #
 # ESP32-S3 !                   #
 # Truma Aventa Gen 2 AC    #
 ################################
@@ -19,7 +19,7 @@
 esphome:
   name: "truma"
   friendly_name: "Truma Aventa"
-  min_version: "2026.4.2"
+  min_version: "2026.4.3"
 
 external_components:
   - source:

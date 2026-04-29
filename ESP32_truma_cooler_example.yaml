@@ -1,5 +1,5 @@
 ###############################
-# ESPHome Version >= 2026.4.2 #
+# ESPHome Version >= 2026.4.3 #
 # ESP32 (M5Stack Atom Lite)   #
 # Truma Cooler C(XX)          #
 ###############################
@@ -7,7 +7,7 @@
 esphome:
   name: "truma-cooler"
   friendly_name: "Truma Cooler"
-  min_version: "2026.4.2"
+  min_version: "2026.4.3"
 
 esp32:
   board: m5stack-atom  # Tested with M5Stack Atom Lite; any ESP32 with BLE and ESP-IDF works

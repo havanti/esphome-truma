@@ -19,15 +19,27 @@ ESP-IDF builds. Additional breaking changes in ESP-IDF 5.x (ESP32 toolchain) and
 ESPHome 2026.x API changes were also resolved.
 
 Tested against:
-- ESPHome **2026.4.2** — ESP-IDF ✅
+- ESPHome **2026.4.3** — ESP-IDF ✅
 - ESPHome **2026.4.1** — ESP-IDF ✅
 - ESPHome **2026.4.0** — ESP-IDF ✅
-- ESPHome **2026.3.3** — ESP-IDF ✅
-- ESPHome **2026.3.2** — ESP-IDF ✅
-- ESPHome **2026.3.1** — ESP-IDF ✅
-- ESPHome **2026.3.0** — ESP-IDF ✅
 
 ---
+
+
+## [1.0.17] — 2026-04-29 — Truma Cooler: robustness fixes
+
+### Changed
+- `truma_cooler`: replaced `volatile` with `std::atomic` (safe cross-task sync between BT and app tasks)
+- `truma_cooler`: GATT handles as named `constexpr` constants (`WRITE_HANDLE`, `CCCD_HANDLE`)
+- `truma_cooler`: command arrays moved to `static constexpr`
+
+### Fixed
+- `truma_cooler`: turbo-reset timeout is cancelled on disconnect (no dangling callback)
+- `truma_cooler`: `set_turbo` ignores command when device is off (protocol constraint)
+- `truma_cooler`: climate entity publishes initial OFF state on connect — no more "unknown" in Home Assistant
+
+### Documentation
+- `truma_cooler`: debug log uses `format_hex_pretty()` for full frame instead of first 3 bytes
 
 
 ## [1.0.16] — 2026-04-26 — Version display in web interface

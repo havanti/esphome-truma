@@ -2,6 +2,8 @@
 
 #ifdef USE_ESP32_FRAMEWORK_ESP_IDF
 
+#include <atomic>
+
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
 #include "esphome/components/ble_client/ble_client.h"
@@ -47,7 +49,10 @@ namespace truma_cooler {
 //   [10-14] 0x00  Fixed
 //   [15] CHECKSUM = (sum(byte[0..14]) + 1) % 256
 
+// GATT handles — hardcoded from HCI snoop / GATT attribute table.
+static constexpr uint16_t WRITE_HANDLE = 0x0012;
 static constexpr uint16_t NOTIFY_HANDLE = 0x0015;
+static constexpr uint16_t CCCD_HANDLE = NOTIFY_HANDLE + 1;  // 0x0016
 
 // Setpoint range supported by the device (also exposed via climate traits).
 static constexpr float SETPOINT_MIN_C = -22.0f;
@@ -66,11 +71,10 @@ static constexpr uint8_t DEVICE_ON = 0x01;
 static constexpr uint8_t COMPRESSOR_RUNNING = 0x01;
 static constexpr uint8_t COMPRESSOR_TURBO = 0x0D;
 
-// Polling cadence and turbo auto-reset delay.
+// Polling cadence (fallback only — device sends unsolicited notifications every ~2 s)
+// and turbo auto-reset delay after device power-on.
 static constexpr uint32_t POLL_INTERVAL_MS = 60000;
 static constexpr uint32_t TURBO_RESET_DELAY_MS = 500;
-// Write handle 0x0012 is set directly after service discovery (hardcoded, confirmed from HCI log).
-// CCCD is at NOTIFY_HANDLE + 1 (0x0016), confirmed from GATT attribute table.
 
 // Forward declarations
 class TrumaCoolerClimate;
@@ -103,7 +107,7 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
 
  protected:
   void parse_notification_(const uint8_t *data, uint16_t len);
-  uint8_t calculate_checksum_(const uint8_t *data, size_t len);
+  static uint8_t calculate_checksum_(const uint8_t *data, size_t len);
 
   sensor::Sensor *temperature_sensor_{nullptr};
   sensor::Sensor *ambient_temperature_sensor_{nullptr};
@@ -115,10 +119,11 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
   TrumaCoolerSwitch *turbo_switch_{nullptr};
 
   // Written from BT task (gattc_event_handler), read from app task (loop/send_command).
-  volatile uint16_t write_handle_{0};
-  volatile bool connected_{false};
-  volatile bool poll_enabled_{false};
-  volatile bool device_is_on_{false};
+  // std::atomic for cross-task safety — `volatile` does not guarantee atomicity.
+  std::atomic<uint16_t> write_handle_{0};
+  std::atomic<bool> connected_{false};
+  std::atomic<bool> poll_enabled_{false};
+  std::atomic<bool> device_is_on_{false};
   uint32_t last_poll_{0};
 };
 
