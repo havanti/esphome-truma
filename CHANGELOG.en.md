@@ -19,9 +19,9 @@ ESP-IDF builds. Additional breaking changes in ESP-IDF 5.x (ESP32 toolchain) and
 ESPHome 2026.x API changes were also resolved.
 
 Tested against:
+- ESPHome **2026.4.5** — ESP-IDF ✅
 - ESPHome **2026.4.4** — ESP-IDF ✅
 - ESPHome **2026.4.3** — ESP-IDF ✅
-- ESPHome **2026.4.1** — ESP-IDF ✅
 
 ---
 
