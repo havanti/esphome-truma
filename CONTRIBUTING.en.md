@@ -11,11 +11,3 @@ Feedback and ideas in issues are very welcome.
 ## Bilingual documentation
 
 README, CHANGELOG and CONTRIBUTING always exist in DE + EN. Changes must be submitted in **both language versions simultaneously**.
-
-A pre-commit hook enforces this automatically:
-
-```bash
-git config core.hooksPath .githooks
-```
-
-The hook blocks commits where only one language version was changed.
