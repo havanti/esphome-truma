@@ -8,12 +8,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #endif  // USE_ESP32
-#ifdef USE_RP2040
-#include <hardware/uart.h>
-#include <FreeRTOS.h>
-#include <semphr.h>
-#include <queue.h>
-#endif  // USE_RP2040
 
 #ifndef  TRUMA_MSG_QUEUE_LENGTH
 #define TRUMA_MSG_QUEUE_LENGTH 6
@@ -52,11 +46,6 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
 
   void process_lin_msg_queue(TickType_t xTicksToWait);
   void process_log_queue(TickType_t xTicksToWait);
-
-#ifdef USE_RP2040
-  // Return is the expected wait time till next data check is recommended.
-  uint32_t onSerialEvent();
-#endif  // USE_RP2040
 
  protected:
   LIN_CHECKSUM lin_checksum_ = LIN_CHECKSUM::LIN_CHECKSUM_VERSION_2;
@@ -145,10 +134,6 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
   TaskHandle_t uartEventTaskHandle_;
   static void uartEventTask_(void *args);
 #endif  // USE_ESP32_FRAMEWORK_ESP_IDF
-#ifdef USE_RP2040
-  uint8_t uart_number_ = 0;
-  uart_inst_t *uart_ = nullptr;
-#endif  // USE_RP2040
 };
 
 }  // namespace truma_inetbox

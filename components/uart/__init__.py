@@ -8,7 +8,6 @@ from esphome import pins, automation
 from esphome.const import (
     CONF_BAUD_RATE,
     CONF_ID,
-    CONF_NUMBER,
     CONF_RX_PIN,
     CONF_TX_PIN,
     CONF_UART_ID,
@@ -36,8 +35,6 @@ UARTComponent = uart_ns.class_("UARTComponent")
 
 IDFUARTComponent = uart_ns.class_(
     "truma_IDFUARTComponent", UARTComponent, cg.Component)
-RP2040UartComponent = uart_ns.class_(
-    "truma_RP2040UartComponent", UARTComponent, cg.Component)
 
 UARTDevice = uart_ns.class_("UARTDevice")
 UARTWriteAction = uart_ns.class_("UARTWriteAction", automation.Action)
@@ -78,10 +75,8 @@ def validate_invert_esp32(config):
 def _uart_declare_type(value):
     if CORE.is_esp32 and not CORE.using_arduino:
         return cv.declare_id(IDFUARTComponent)(value)
-    if CORE.is_rp2040:
-        return cv.declare_id(RP2040UartComponent)(value)
     raise cv.Invalid(
-        "truma's custom uart only supports ESP32 (ESP-IDF) and RP2040.")
+        "truma's custom uart only supports ESP32 (ESP-IDF).")
 
 
 UARTParityOptions = uart_ns.enum("UARTParityOptions")

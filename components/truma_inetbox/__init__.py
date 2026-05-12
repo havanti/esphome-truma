@@ -7,12 +7,10 @@ from esphome import pins, automation
 from esphome.components import uart, time
 from esphome.const import (
     CONF_ID,
-    CONF_NUMBER,
     CONF_BAUD_RATE,
     CONF_UART_ID,
     CONF_RX_PIN,
     CONF_TX_PIN,
-    CONF_INVERTED,
     CONF_CS_PIN,
     CONF_TEMPERATURE,
     CONF_TRIGGER_ID,
@@ -27,7 +25,7 @@ from esphome.components.uart import (
     KEY_UART_DEVICES,
 )
 from esphome.core import CORE
-from .entity_helpers import count_id_usage
+from .entity_helpers import count_id_usage  # noqa: F401
 
 DEPENDENCIES = ["uart"]
 CODEOWNERS = ["@Fabian-Schmidt"]
@@ -58,37 +56,6 @@ CONF_SUPPORTED_LIN_CHECKSUM = {
     "VERSION_2": LIN_CHECKSUM_dummy_ns.LIN_CHECKSUM_VERSION_2,
 }
 
-# [RP2040] Hardware serial of uart validation:
-#   constexpr uint32_t valid_tx_uart_0 = __bitset({0, 12, 16, 28});
-#   constexpr uint32_t valid_tx_uart_1 = __bitset({4, 8, 20, 24});
-#   constexpr uint32_t valid_rx_uart_0 = __bitset({1, 13, 17, 29});
-#   constexpr uint32_t valid_rx_uart_1 = __bitset({5, 9, 21, 25});
-CONF_RP2040_HARDWARE_UART = {
-    CONF_TX_PIN: {
-        # Pin : Hardware UART number
-        0: 0,
-        12: 0,
-        16: 0,
-        28: 0,
-        4: 1,
-        8: 1,
-        20: 1,
-        24: 1,
-    },
-    CONF_RX_PIN: {
-        # Pin : Hardware UART number
-        1: 0,
-        13: 0,
-        17: 0,
-        29: 0,
-        5: 1,
-        9: 1,
-        21: 1,
-        25: 1,
-    }
-}
-
-
 def final_validate_device_schema(
     name: str,
     *,
@@ -98,7 +65,6 @@ def final_validate_device_schema(
     stop_bits: Optional[int] = None,
     data_bits: Optional[int] = None,
     parity: str = None,
-    require_hardware_uart: Optional[bool] = None,
 ):
     def validate_baud_rate(value):
         if value != baud_rate:
@@ -140,22 +106,6 @@ def final_validate_device_schema(
             )
         return value
 
-    def validate_hardware_uart(opt, opt2=None, declaration_config=None):
-        def validator(value):
-            if (CORE.is_rp2040):
-                if value[CONF_INVERTED]:
-                    raise cv.Invalid(
-                        f"Component {name} required Hardware UART. Inverted is not supported by Hardware UART.")
-                if value[CONF_NUMBER] not in CONF_RP2040_HARDWARE_UART[opt]:
-                    raise cv.Invalid(
-                        f"Component {name} required Hardware UART. {opt} is not a Hardware UART pin.")
-                if opt2 and declaration_config and CONF_RP2040_HARDWARE_UART[opt2][declaration_config[opt2][CONF_NUMBER]] != CONF_RP2040_HARDWARE_UART[opt][value[CONF_NUMBER]]:
-                    raise cv.Invalid(
-                        f"Component {name} required Hardware UART. {opt} and {opt2} are not a matching Hardware UART pin set.")
-
-            return value
-        return validator
-
     def validate_hub(hub_config):
         hub_schema = {}
         uart_id = hub_config[CONF_ID]
@@ -184,14 +134,6 @@ def final_validate_device_schema(
             hub_schema[cv.Required(CONF_DATA_BITS)] = validate_data_bits
         if parity is not None:
             hub_schema[cv.Required(CONF_PARITY)] = validate_parity
-        if require_hardware_uart is not None:
-            fconf = fv.full_config.get()
-            path = fconf.get_path_for_id(uart_id)[:-1]
-            declaration_config = fconf.get_config_for_path(path)
-            hub_schema[cv.Required(CONF_TX_PIN)] = validate_hardware_uart(
-                CONF_TX_PIN)
-            hub_schema[cv.Required(CONF_RX_PIN)] = validate_hardware_uart(
-                CONF_RX_PIN, CONF_TX_PIN, declaration_config)
         return cv.Schema(hub_schema, extra=cv.ALLOW_EXTRA)(hub_config)
 
     return cv.Schema(
@@ -221,11 +163,11 @@ CONFIG_SCHEMA = cv.All(
     # Reading and communication is done in a seperate thread/core.
     .extend(cv.polling_component_schema("500ms"))
     .extend(uart.UART_DEVICE_SCHEMA),
-    cv.only_on(["esp32", "rp2040"]),
+    cv.only_on(["esp32"]),
 )
 FINAL_VALIDATE_SCHEMA = cv.All(
     final_validate_device_schema(
-        "truma_inetbox", baud_rate=9600, require_tx=True, require_rx=True, stop_bits=2, data_bits=8, parity="NONE", require_hardware_uart=True),
+        "truma_inetbox", baud_rate=9600, require_tx=True, require_rx=True, stop_bits=2, data_bits=8, parity="NONE"),
 )
 
 async def to_code(config):

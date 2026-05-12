@@ -26,6 +26,25 @@ Tested against:
 ---
 
 
+## [1.0.19] — 2026-05-12 — RP2040 support removed
+
+### Removed
+- Platform support for Raspberry Pi Pico (RP2040) — repo is ESP-IDF-only
+- `components/truma_inetbox/LinBusListener_rp2040.cpp` (file deleted)
+- `components/uart/uart_component_rp2040.h` / `.cpp` (files deleted)
+- `components/uart/truma_uart_component_rp2040.h` (file deleted)
+- `USE_RP2040` preprocessor guards in `LinBusListener.h` (includes, virtual `onSerialEvent()`, UART member fields)
+- `CONF_RP2040_HARDWARE_UART` pin-validation dict and `validate_hardware_uart()` helper in `truma_inetbox/__init__.py`
+- `RP2040UartComponent` class alias and `CORE.is_rp2040` branch in `uart/__init__.py`
+
+### Changed
+- `CONFIG_SCHEMA` `only_on` reduced from `["esp32", "rp2040"]` to `["esp32"]`
+- Error message in `_uart_declare_type()` shortened from "ESP32 (ESP-IDF) and RP2040" to "ESP32 (ESP-IDF)"
+
+### Verified
+- ESP-IDF compile `truma.yaml` (ESP32-S3): ✅ successful (93s)
+
+
 ## [1.0.18] — 2026-04-29 — Cross-task synchronisation in heater/aircon/clock
 
 ### Changed
