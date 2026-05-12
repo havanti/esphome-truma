@@ -45,6 +45,7 @@ void TrumaCooler::setup() {
   ESP_LOGCONFIG(TAG, "TrumaCooler component setup");
   // HCI snoop analysis shows the TrumaCooler does not require encryption or bonding.
   // Notifications and commands work without authentication.
+  if (climate_ != nullptr) climate_->apply_restored_state();
 }
 
 void TrumaCooler::loop() {
@@ -73,18 +74,23 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       if (param->open.status == ESP_GATT_OK) {
         ESP_LOGI(TAG, "Connected to TrumaCooler");
         connected_.store(true);
-        if (connected_sensor_ != nullptr) connected_sensor_->publish_state(true);
-        // Reset sensors to unknown until first notification arrives.
-        if (temperature_sensor_ != nullptr) temperature_sensor_->publish_state(NAN);
-        if (ambient_temperature_sensor_ != nullptr) ambient_temperature_sensor_->publish_state(NAN);
-        if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
-        // Publish initial OFF state so HA sees the entity online instead of "unknown".
-        if (climate_ != nullptr) {
-          climate_->mode = climate::CLIMATE_MODE_OFF;
-          climate_->action = climate::CLIMATE_ACTION_OFF;
-          climate_->current_temperature = NAN;
-          climate_->publish_state();
-        }
+        // gattc events fire on the BT controller task. Defer entity mutations
+        // (publish_state, climate field writes, scheduler ops) to the main loop.
+        this->defer([this]() {
+          if (connected_sensor_ != nullptr) connected_sensor_->publish_state(true);
+          // Reset sensors to a known baseline until the first notification arrives.
+          if (temperature_sensor_ != nullptr) temperature_sensor_->publish_state(NAN);
+          if (ambient_temperature_sensor_ != nullptr) ambient_temperature_sensor_->publish_state(NAN);
+          if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
+          if (turbo_running_sensor_ != nullptr) turbo_running_sensor_->publish_state(false);
+          if (device_on_sensor_ != nullptr) device_on_sensor_->publish_state(false);
+          if (climate_ != nullptr) {
+            climate_->mode = climate::CLIMATE_MODE_OFF;
+            climate_->action = climate::CLIMATE_ACTION_OFF;
+            climate_->current_temperature = NAN;
+            climate_->publish_state();
+          }
+        });
       }
       break;
 
@@ -94,19 +100,22 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       poll_enabled_.store(false);
       write_handle_.store(0);
       device_is_on_.store(false);
-      this->cancel_timeout("turbo_reset");
-      if (connected_sensor_ != nullptr) connected_sensor_->publish_state(false);
-      if (temperature_sensor_ != nullptr) temperature_sensor_->publish_state(NAN);
-      if (ambient_temperature_sensor_ != nullptr) ambient_temperature_sensor_->publish_state(NAN);
-      if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
-      if (turbo_running_sensor_ != nullptr) turbo_running_sensor_->publish_state(false);
-      if (device_on_sensor_ != nullptr) device_on_sensor_->publish_state(false);
-      if (turbo_switch_ != nullptr) turbo_switch_->publish_state(false);
-      if (climate_ != nullptr) {
-        climate_->mode = climate::CLIMATE_MODE_OFF;
-        climate_->action = climate::CLIMATE_ACTION_OFF;
-        climate_->publish_state();
-      }
+      // Defer scheduler op + publishes to main loop (BT task is not the right context).
+      this->defer([this]() {
+        this->cancel_timeout("turbo_reset");
+        if (connected_sensor_ != nullptr) connected_sensor_->publish_state(false);
+        if (temperature_sensor_ != nullptr) temperature_sensor_->publish_state(NAN);
+        if (ambient_temperature_sensor_ != nullptr) ambient_temperature_sensor_->publish_state(NAN);
+        if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
+        if (turbo_running_sensor_ != nullptr) turbo_running_sensor_->publish_state(false);
+        if (device_on_sensor_ != nullptr) device_on_sensor_->publish_state(false);
+        if (turbo_switch_ != nullptr) turbo_switch_->publish_state(false);
+        if (climate_ != nullptr) {
+          climate_->mode = climate::CLIMATE_MODE_OFF;
+          climate_->action = climate::CLIMATE_ACTION_OFF;
+          climate_->publish_state();
+        }
+      });
       break;
 
     case ESP_GATTC_SEARCH_CMPL_EVT: {
@@ -186,26 +195,29 @@ void TrumaCooler::parse_notification_(const uint8_t *data, uint16_t len) {
            turbo_running ? "ON" : "OFF",
            data[5], interior_temp, ambient_temp, setpoint);
 
-  if (temperature_sensor_ != nullptr)
-    temperature_sensor_->publish_state(interior_temp);
-  if (ambient_temperature_sensor_ != nullptr)
-    ambient_temperature_sensor_->publish_state(ambient_temp);
-  if (compressor_running_sensor_ != nullptr)
-    compressor_running_sensor_->publish_state(compressor_running);
-  if (turbo_running_sensor_ != nullptr)
-    turbo_running_sensor_->publish_state(turbo_running);
-  if (device_on_sensor_ != nullptr)
-    device_on_sensor_->publish_state(device_on);
+  // Defer entity mutations to the main loop — gattc notifications run on the BT task.
+  this->defer([this, device_on, compressor_running, turbo_running, interior_temp, ambient_temp, setpoint]() {
+    if (temperature_sensor_ != nullptr)
+      temperature_sensor_->publish_state(interior_temp);
+    if (ambient_temperature_sensor_ != nullptr)
+      ambient_temperature_sensor_->publish_state(ambient_temp);
+    if (compressor_running_sensor_ != nullptr)
+      compressor_running_sensor_->publish_state(compressor_running);
+    if (turbo_running_sensor_ != nullptr)
+      turbo_running_sensor_->publish_state(turbo_running);
+    if (device_on_sensor_ != nullptr)
+      device_on_sensor_->publish_state(device_on);
 
-  if (climate_ != nullptr) {
-    climate_->current_temperature = interior_temp;
-    climate_->target_temperature = (float)setpoint;
-    climate_->mode = device_on ? climate::CLIMATE_MODE_COOL : climate::CLIMATE_MODE_OFF;
-    climate_->action = !device_on          ? climate::CLIMATE_ACTION_OFF
-                       : compressor_running ? climate::CLIMATE_ACTION_COOLING
-                                           : climate::CLIMATE_ACTION_IDLE;
-    climate_->publish_state();
-  }
+    if (climate_ != nullptr) {
+      climate_->current_temperature = interior_temp;
+      climate_->target_temperature = (float) setpoint;
+      climate_->mode = device_on ? climate::CLIMATE_MODE_COOL : climate::CLIMATE_MODE_OFF;
+      climate_->action = !device_on          ? climate::CLIMATE_ACTION_OFF
+                         : compressor_running ? climate::CLIMATE_ACTION_COOLING
+                                             : climate::CLIMATE_ACTION_IDLE;
+      climate_->publish_state();
+    }
+  });
 }
 
 uint8_t TrumaCooler::calculate_checksum_(const uint8_t *data, size_t len) {
@@ -233,6 +245,9 @@ void TrumaCooler::set_mode(bool on) {
         turbo_switch_->publish_state(false);
     });
   } else {
+    // Cancel any pending turbo reset from a recent ON — otherwise a queued
+    // CMD_TURBO_OFF would be sent to an already-off device.
+    this->cancel_timeout("turbo_reset");
     // Fixed OFF command (byte[4]=0x00, byte[9]=0x00)
     ESP_LOGI(TAG, "control: OFF");
     send_command(CMD_OFF, sizeof(CMD_OFF));
@@ -314,8 +329,15 @@ climate::ClimateTraits TrumaCoolerClimate::traits() {
   traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_COOL});
   traits.set_visual_min_temperature(SETPOINT_MIN_C);
   traits.set_visual_max_temperature(SETPOINT_MAX_C);
-  traits.set_visual_temperature_step(1);
+  traits.set_visual_temperature_step(1.0f);
   return traits;
+}
+
+void TrumaCoolerClimate::apply_restored_state() {
+  auto restore = this->restore_state_();
+  if (restore.has_value()) {
+    restore->apply(this);
+  }
 }
 
 void TrumaCoolerClimate::control(const climate::ClimateCall &call) {

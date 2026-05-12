@@ -131,6 +131,9 @@ class TrumaCoolerClimate : public climate::Climate, public Parented<TrumaCooler>
  public:
   climate::ClimateTraits traits() override;
   void control(const climate::ClimateCall &call) override;
+  // Restore last persisted mode/setpoint from flash so HA sees a stable entity
+  // before the first BLE notification arrives after reboot.
+  void apply_restored_state();
 };
 
 class TrumaCoolerSwitch : public switch_::Switch, public Parented<TrumaCooler> {

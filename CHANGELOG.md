@@ -26,6 +26,20 @@ Getestet mit:
 ---
 
 
+## [1.0.20] — 2026-05-12 — Truma Cooler: Task-Safety + State-Restore
+
+### Geändert
+- `truma_cooler`: Entity-Mutationen (`publish_state`, Climate-Feldschreibungen, `cancel_timeout`) aus `gattc_event_handler` + `parse_notification_` werden via `defer()` in den Main-Loop verschoben — gattc-Events laufen auf dem BT-Controller-Task, der nicht der korrekte Kontext für Entity-/Scheduler-Operationen ist
+- `truma_cooler`: `set_visual_temperature_step(1)` → `1.0f` (Float-Literal entspricht Trait-Signatur)
+
+### Hinzugefügt
+- `truma_cooler` Climate: Persistenz von Modus + Solltemperatur über Reboot via `apply_restored_state()` (`restore_state_()` aus ESPHome-Climate-Basisklasse) — Entity hat sofort sinnvolle Werte, bevor erste BLE-Notification nach Boot eintrifft
+- `truma_cooler` Connect-Init: `turbo_running` + `device_on` Binary-Sensoren werden bei `ESP_GATTC_OPEN_EVT` auf `false` initialisiert (vorher „unbekannt" in HA bis erste Notification)
+
+### Behoben
+- `truma_cooler`: `set_mode(false)` bricht ein offenes `turbo_reset`-Timeout ab — bei schnellem ON→OFF (<500 ms) wurde sonst ein überflüssiger `CMD_TURBO_OFF` an das bereits ausgeschaltete Gerät gesendet
+
+
 ## [1.0.19] — 2026-05-12 — RP2040-Support entfernt
 
 ### Entfernt
