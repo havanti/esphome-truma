@@ -1,5 +1,5 @@
 ###############################
-# ESPHome Version >= 2026.5.0 #
+# ESPHome Version >= 2026.5.1 #
 # ESP32-S3 !                  #
 # Truma 6 (Gas)               #
 ###############################
@@ -7,7 +7,7 @@
 esphome:
   name: "truma"
   friendly_name: "Truma Heater"
-  min_version: "2026.5.0"
+  min_version: "2026.5.1"
 
 external_components:
   - source:
