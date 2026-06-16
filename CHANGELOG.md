@@ -19,7 +19,7 @@ ESP-IDF-Builds nicht mehr funktionierte. Zusätzliche Breaking Changes in ESP-ID
 (ESP32-Toolchain) und ESPHome 2026.x API-Änderungen wurden ebenfalls behoben.
 
 Getestet mit:
-- ESPHome **2026.5.1** — ESP-IDF ✅
+- ESPHome **2026.5.3** — ESP-IDF ✅
 - ESPHome **2026.5.0** — ESP-IDF ✅
 - ESPHome **2026.4.5** — ESP-IDF ✅
 
