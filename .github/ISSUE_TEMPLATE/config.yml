@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "📖 Sniffing Guide (DE) — Truma Cooler"
+    url: https://github.com/havanti/esphome-truma/blob/main/SNIFFING.md
+    about: "Anleitung zum Mitschneiden der BLE-Kommunikation, bevor du ein Cooler-Modell meldest."
+  - name: "📖 Sniffing Guide (EN) — Truma Cooler"
+    url: https://github.com/havanti/esphome-truma/blob/main/SNIFFING.en.md
+    about: "How to capture the BLE communication before reporting a cooler model."

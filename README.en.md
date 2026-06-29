@@ -98,7 +98,7 @@ external_components:
     refresh: always
 ```
 
-> **Note:** The protocol was reverse-engineered exclusively on the C44. Feedback on other models is welcome — please [open an issue](../../issues).
+> **Note:** The protocol was reverse-engineered exclusively on the C44. Other models (e.g. the dual-zone **C69**) differ. Help support more models: see [**SNIFFING.en.md**](SNIFFING.en.md) for a BLE capture guide and report your model via an [issue](../../issues/new/choose).
 
 #### Features
 

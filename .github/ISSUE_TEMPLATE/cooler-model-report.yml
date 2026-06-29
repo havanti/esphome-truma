@@ -1,0 +1,101 @@
+name: "❄️ Truma Cooler model report / Cooler-Modell melden"
+description: "Report a Truma Cooler model and share a BLE sniff so it can be supported / Modell melden + BLE-Sniff teilen"
+title: "[Cooler] <model> — <one-line summary>"
+labels: ["cooler", "protocol", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping support more Truma Cooler models! 🙏
+        Danke fürs Mithelfen, weitere Truma-Cooler-Modelle zu unterstützen!
+
+        **Please read the [Sniffing Guide](../../blob/main/SNIFFING.md) first.**
+        **Bitte zuerst die [Sniffing-Anleitung](../../blob/main/SNIFFING.md) lesen.**
+
+        File attachments (e.g. `btsnoop_hci.log`) can be **dragged into any text box below** — GitHub uploads them.
+        Datei-Anhänge (z. B. `btsnoop_hci.log`) lassen sich **in ein Textfeld unten ziehen** — GitHub lädt sie hoch.
+
+  - type: input
+    id: model
+    attributes:
+      label: "Cooler model / Kühlbox-Modell"
+      description: "Exact model name as printed on the device / Genaue Modellbezeichnung laut Typenschild"
+      placeholder: "e.g. Truma Cooler C69"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: zones
+    attributes:
+      label: "Number of zones / Anzahl Zonen"
+      options:
+        - "1 (single zone / eine Zone)"
+        - "2 (dual zone / zwei Zonen)"
+        - "more / mehr"
+        - "unknown / unbekannt"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: status
+    attributes:
+      label: "Current behaviour with this component / Aktuelles Verhalten mit dieser Komponente"
+      options:
+        - "Does not connect at all / Verbindet gar nicht"
+        - "Connects, but no data / Verbindet, aber keine Daten"
+        - "Partly works (e.g. only zone 1) / Funktioniert teilweise (z. B. nur Zone 1)"
+        - "Not tried yet / Noch nicht getestet"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "What works / what doesn't / Was funktioniert, was nicht"
+      description: "Describe the behaviour. What did you expect, what happened? / Verhalten beschreiben: erwartet vs. tatsächlich"
+    validations:
+      required: true
+
+  - type: textarea
+    id: btsnoop
+    attributes:
+      label: "BLE capture / BLE-Mitschnitt (btsnoop_hci.log)"
+      description: "Drag the btsnoop_hci.log file(s) here to attach / Die btsnoop_hci.log-Datei(en) hier hineinziehen"
+      placeholder: "Drop btsnoop_hci.log here / btsnoop_hci.log hier ablegen"
+
+  - type: textarea
+    id: action-notes
+    attributes:
+      label: "Action/time notes / Aktions-/Zeit-Notizen"
+      description: "The choreography from Step 2 with timestamps — essential to map bytes to functions / Die Choreografie aus Schritt 2 mit Uhrzeiten — entscheidend für die Zuordnung"
+      placeholder: |
+        14:03:10 connected, idle
+        14:03:25 Zone 1 ON
+        14:03:40 Zone 1 setpoint +5°C
+        14:03:55 Zone 1 setpoint -10°C
+        ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: esphome-log
+    attributes:
+      label: "ESPHome DEBUG log (optional)"
+      description: "Serial log with logger level DEBUG from Step 0 / Serielles Log mit logger level DEBUG aus Schritt 0"
+      render: text
+
+  - type: input
+    id: app-version
+    attributes:
+      label: "Truma app version / Truma-App-Version"
+      placeholder: "e.g. 3.4.1 (Android)"
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: "Confirmation / Bestätigung"
+      options:
+        - label: "I read the [Sniffing Guide](../../blob/main/SNIFFING.md) / Ich habe die [Sniffing-Anleitung](../../blob/main/SNIFFING.md) gelesen"
+          required: true
+        - label: "The btsnoop log contains only BLE traffic, no personal data / Das btsnoop-Log enthält nur BLE-Verkehr, keine persönlichen Daten"
+          required: true

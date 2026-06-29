@@ -96,7 +96,7 @@ external_components:
     refresh: always
 ```
 
-> **Hinweis:** Das Protokoll wurde ausschließlich am C44 reverse-engineered. Rückmeldungen zu anderen Modellen sind willkommen — bitte ein [Issue](../../issues) öffnen.
+> **Hinweis:** Das Protokoll wurde ausschließlich am C44 reverse-engineered. Andere Modelle (z. B. der zweizonige **C69**) weichen ab. Hilf mit, weitere Modelle zu unterstützen: siehe [**SNIFFING.md**](SNIFFING.md) für eine Anleitung zum BLE-Mitschnitt und melde dein Modell per [Issue](../../issues/new/choose).
 
 #### Features
 
