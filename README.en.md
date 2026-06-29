@@ -491,6 +491,28 @@ The following [ESP Home actions](https://esphome.io/guides/automations.html#acti
   - `watt` - Optional: Set electricity level to `0`, `900`, `1800`.
 - `truma_inetbox.clock.set` - Update CP Plus from ESP Home. You *must* have another [clock source](https://esphome.io/#time-components) configured like Home Assistant Time, GPS or DS1307 RTC.
 
+**Set the Truma clock automatically (e.g. after a power loss / blown fuse):** Wire a clock source as `time_id` into the `truma_inetbox` block and call `truma_inetbox.clock.set` via `on_time_sync` (right after boot/reconnect) and optionally hourly — the CP Plus clock then corrects itself without manual re-setting:
+
+```yaml
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    on_time_sync:
+      then:
+        - truma_inetbox.clock.set:
+
+truma_inetbox:
+  uart_id: lin_uart_bus
+  time_id: homeassistant_time   # clock source for clock.set
+
+interval:
+  - interval: 1h
+    then:
+      - truma_inetbox.clock.set:
+```
+
+GPS or a DS1307 RTC also work as a clock source instead of Home Assistant Time. The example configurations already include this setup.
+
 ## Feedback & Testing
 
 If you give this component a try, your feedback is very welcome!

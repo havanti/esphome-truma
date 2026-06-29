@@ -487,6 +487,28 @@ Folgende [ESPHome-Aktionen](https://esphome.io/guides/automations.html#actions) 
   - `watt` - Optional: Stromstufe: `0`, `900`, `1800`.
 - `truma_inetbox.clock.set` - CP Plus vom ESP aus aktualisieren. Es muss eine weitere [Zeitquelle](https://esphome.io/#time-components) konfiguriert sein, z.B. Home Assistant Time, GPS oder DS1307 RTC.
 
+**Truma-Uhr automatisch stellen (z. B. nach Stromausfall / herausgeflogener Sicherung):** Eine Zeitquelle als `time_id` im `truma_inetbox`-Block einhängen und `truma_inetbox.clock.set` per `on_time_sync` (direkt nach Boot/Reconnect) sowie optional stündlich aufrufen — so korrigiert sich die CP-Plus-Uhr von selbst, ohne manuelles Nachstellen:
+
+```yaml
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    on_time_sync:
+      then:
+        - truma_inetbox.clock.set:
+
+truma_inetbox:
+  uart_id: lin_uart_bus
+  time_id: homeassistant_time   # Zeitquelle für clock.set
+
+interval:
+  - interval: 1h
+    then:
+      - truma_inetbox.clock.set:
+```
+
+Statt Home Assistant Time funktioniert auch GPS oder eine DS1307-RTC als Zeitquelle. Die Beispiel-Konfigurationen enthalten diese Einrichtung bereits.
+
 ## Feedback & Tests
 
 Wer diese Komponente ausprobiert, dessen Feedback ist sehr willkommen!

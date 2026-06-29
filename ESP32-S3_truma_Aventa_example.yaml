@@ -75,10 +75,15 @@ uart:
 time:
   - platform: homeassistant
     id: homeassistant_time
+    # Set the Truma (CP Plus) clock automatically — re-syncs after a power loss
+    on_time_sync:
+      then:
+        - truma_inetbox.clock.set:
 
 truma_inetbox:
   id: truma_inetbox_id
   uart_id: lin_uart_bus
+  time_id: homeassistant_time   # time source for truma_inetbox.clock.set
   cs_pin: GPIO4    # LIN-Bus CS/Sleep pin — adjust to your wiring
 
 # ─── Truma Aventa Gen 2 ─────────────────────────────────────────────────
