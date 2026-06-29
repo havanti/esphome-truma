@@ -44,6 +44,8 @@ You need an Android phone with the **Truma app** that controls your cooler norma
 2. In Developer options, enable **"Enable Bluetooth HCI snoop log"**.
 3. **Toggle Bluetooth off and on once** — otherwise the capture doesn't start.
 
+> **Tip:** Disconnect other Bluetooth devices beforehand (headphones, smartwatch, car) so the capture stays clean and readable.
+
 ---
 
 ## Step 2 — Recording choreography
@@ -88,23 +90,25 @@ Note the approximate time for each step (second precision is enough).
 adb bugreport bugreport.zip
 ```
 
-Produces a ZIP. Inside, the log lives at
+Produces a ZIP. Inside, the log usually lives at
 
 ```
 FS/data/misc/bluetooth/logs/btsnoop_hci.log
 ```
 
-(sometimes several `btsnoop_hci.log.*` — send them all). Open the ZIP and extract the file.
+The path varies by Android version and vendor (e.g. also `FS/data/log/bt/` or directly in the ZIP root) — easiest is to search the extracted bug report for **`btsnoop`**. Sometimes there are several parts (`btsnoop_hci.log.*`) — send them all.
 
-### Method B — Direct pull (faster, not on every phone)
+> **Fallback if no file shows up at all:** On some devices a vendor config sets the path (key `BtSnoopFileName`, e.g. in `/etc/bluetooth/bt_stack.conf`). Check there for the output location.
 
-Some devices write the snoop straight to internal storage:
+### Method B — Direct pull (legacy, very old Android versions only)
+
+Very old devices (roughly before Android 9) wrote the snoop straight to internal storage:
 
 ```
 adb pull /sdcard/btsnoop_hci.log
 ```
 
-"No such file or directory" → use Method A.
+On newer Android versions this file practically never exists anymore → use **Method A**. "No such file or directory" → likewise Method A.
 
 > **Important:** Disable the HCI snoop **only after** recording and grab the log **promptly** — another Bluetooth off/on overwrites it.
 
@@ -149,4 +153,6 @@ The simplest path for a full app sniff remains an **Android phone**.
 
 ## Privacy
 
-The `btsnoop_hci.log` contains Bluetooth traffic only — **no account, location or personal data**. It can be shared safely. To be extra safe, record only while operating the cooler and disconnect other BLE devices (headphones, smartwatch) beforehand.
+The `btsnoop_hci.log` contains the **entire BLE/HCI traffic of your phone** during the recording — including packets from other paired devices (headphones, smartwatch, car, etc.), with MAC addresses and sometimes device names. **Account, location or personal app data** is normally **not** included, and the capture is harmless for protocol analysis.
+
+To keep the capture clean and minimal: **disconnect other BLE devices** beforehand (headphones, smartwatch) and record **only while operating the cooler**.

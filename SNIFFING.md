@@ -44,6 +44,8 @@ Du brauchst ein Android-Handy mit der **Truma-App**, das deine Kühlbox normal s
 2. In den Entwickleroptionen **„Bluetooth-HCI-Snoop-Log aktivieren"** einschalten.
 3. **Bluetooth einmal aus- und wieder einschalten** — sonst greift die Aufzeichnung nicht.
 
+> **Tipp:** Trenne vorher möglichst andere Bluetooth-Geräte (Kopfhörer, Smartwatch, Auto), damit der Mitschnitt sauber und übersichtlich bleibt.
+
 ---
 
 ## Schritt 2 — Aufzeichnungs-Choreografie
@@ -88,23 +90,25 @@ Notiere zu jedem Schritt die ungefähre Uhrzeit (Sekundengenauigkeit reicht).
 adb bugreport bugreport.zip
 ```
 
-Erzeugt ein ZIP. Darin liegt das Log unter
+Erzeugt ein ZIP. Darin liegt das Log meist unter
 
 ```
 FS/data/misc/bluetooth/logs/btsnoop_hci.log
 ```
 
-(manchmal mehrere `btsnoop_hci.log.*` — alle mitschicken). ZIP öffnen, Datei rausziehen.
+Der Pfad variiert je nach Android-Version und Hersteller (z. B. auch `FS/data/log/bt/` oder direkt im ZIP-Root) — am einfachsten im entpackten Bugreport nach **`btsnoop`** suchen. Manchmal liegen mehrere Teile (`btsnoop_hci.log.*`) vor — alle mitschicken.
 
-### Methode B — Direkter Pull (schneller, nicht auf jedem Handy)
+> **Fallback, falls partout keine Datei auftaucht:** Bei manchen Geräten legt eine Hersteller-Config den Pfad fest (Schlüssel `BtSnoopFileName`, z. B. in `/etc/bluetooth/bt_stack.conf`). Dann dort nachschauen, wohin geschrieben wird.
 
-Manche Geräte schreiben den Snoop direkt auf den internen Speicher:
+### Methode B — Direkter Pull (Legacy, nur sehr alte Android-Versionen)
+
+Sehr alte Geräte (etwa vor Android 9) schrieben den Snoop direkt auf den internen Speicher:
 
 ```
 adb pull /sdcard/btsnoop_hci.log
 ```
 
-Fehlermeldung „No such file or directory" → nimm Methode A.
+Auf neueren Android-Versionen existiert diese Datei praktisch nie mehr → dann **Methode A** nutzen. Fehlermeldung „No such file or directory" → ebenfalls Methode A.
 
 > **Wichtig:** HCI-Snoop **erst nach** der Aufzeichnung deaktivieren und das Log **zeitnah** holen — bei erneutem Bluetooth-An/Aus wird es überschrieben.
 
@@ -149,4 +153,6 @@ Am unkompliziertesten bleibt ein **Android-Handy** für den vollständigen App-S
 
 ## Datenschutz
 
-Die `btsnoop_hci.log` enthält ausschließlich Bluetooth-Verkehr — **keine Konto-, Standort- oder persönlichen Daten**. Sie kann unbesorgt geteilt werden. Wer ganz sicher gehen will, zeichnet nur während der Cooler-Bedienung auf und schließt vorher andere BLE-Geräte (Kopfhörer, Smartwatch).
+Die `btsnoop_hci.log` enthält den **gesamten BLE/HCI-Verkehr deines Handys** während der Aufzeichnung — also auch Pakete anderer gekoppelter Geräte (Kopfhörer, Smartwatch, Auto usw.), inklusive MAC-Adressen und teils Gerätenamen. **Konto-, Standort- oder persönliche App-Daten** stecken normalerweise **nicht** drin, und für die Protokoll-Analyse ist sie unbedenklich.
+
+Wer den Mitschnitt sauber und minimal halten will: vorher **andere BLE-Geräte trennen** (Kopfhörer, Smartwatch) und **nur während der Cooler-Bedienung** aufzeichnen.
