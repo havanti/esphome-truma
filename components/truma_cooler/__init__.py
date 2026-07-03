@@ -26,6 +26,9 @@ TrumaCoolerClimate = truma_cooler_ns.class_(
 TrumaCoolerSwitch = truma_cooler_ns.class_(
     "TrumaCoolerSwitch", switch.Switch, cg.Parented.template(TrumaCooler)
 )
+TrumaCoolerPowerSwitch = truma_cooler_ns.class_(
+    "TrumaCoolerPowerSwitch", switch.Switch, cg.Parented.template(TrumaCooler)
+)
 
 CONF_MODEL = "model"
 
@@ -46,6 +49,7 @@ CONF_CLIMATE_ZONE1 = "climate_zone1"
 CONF_CLIMATE_ZONE2 = "climate_zone2"
 CONF_TEMPERATURE_ZONE1 = "temperature_zone1"
 CONF_TEMPERATURE_ZONE2 = "temperature_zone2"
+CONF_POWER = "power"
 
 
 def _temperature_schema():
@@ -94,6 +98,7 @@ C69_SCHEMA = (
             cv.Optional(CONF_CLIMATE_ZONE2): climate.climate_schema(TrumaCoolerClimate),
             cv.Optional(CONF_TEMPERATURE_ZONE1): _temperature_schema(),
             cv.Optional(CONF_TEMPERATURE_ZONE2): _temperature_schema(),
+            cv.Optional(CONF_POWER): switch.switch_schema(TrumaCoolerPowerSwitch),
             **_SHARED,
         }
     )
@@ -109,13 +114,14 @@ CONFIG_SCHEMA = cv.typed_schema(
 )
 
 
-async def _new_climate(config, key, var, zone):
+async def _new_climate(config, key, var, zone, manages_power=True):
     if key not in config:
         return None
     clim = cg.new_Pvariable(config[key][CONF_ID])
     await climate.register_climate(clim, config[key])
     cg.add(clim.set_parent(var))
     cg.add(clim.set_zone(zone))
+    cg.add(clim.set_manages_power(manages_power))
     return clim
 
 
@@ -136,16 +142,21 @@ async def _to_code_c44(var, config):
 
 
 async def _to_code_c69(var, config):
-    clim1 = await _new_climate(config, CONF_CLIMATE_ZONE1, var, 1)
+    # Zone climates are COOL-only; the master power switch owns global on/off.
+    clim1 = await _new_climate(config, CONF_CLIMATE_ZONE1, var, 1, manages_power=False)
     if clim1 is not None:
         cg.add(var.set_climate_zone1(clim1))
-    clim2 = await _new_climate(config, CONF_CLIMATE_ZONE2, var, 2)
+    clim2 = await _new_climate(config, CONF_CLIMATE_ZONE2, var, 2, manages_power=False)
     if clim2 is not None:
         cg.add(var.set_climate_zone2(clim2))
     if CONF_TEMPERATURE_ZONE1 in config:
         cg.add(var.set_temperature_zone1_sensor(await sensor.new_sensor(config[CONF_TEMPERATURE_ZONE1])))
     if CONF_TEMPERATURE_ZONE2 in config:
         cg.add(var.set_temperature_zone2_sensor(await sensor.new_sensor(config[CONF_TEMPERATURE_ZONE2])))
+    if CONF_POWER in config:
+        sw = await switch.new_switch(config[CONF_POWER])
+        cg.add(sw.set_parent(var))
+        cg.add(var.set_power_switch(sw))
 
 
 async def to_code(config):

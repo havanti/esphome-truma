@@ -5,8 +5,9 @@
 ###############################
 
 # Dual-zone Truma Cooler C69. Set `model: c69`. Power is global (there is no
-# per-zone power in the protocol) — turning either zone climate off powers down
-# the whole box. Turbo is not supported on the C69 (see README).
+# per-zone power in the protocol) — a single master `power` switch turns the whole
+# box on/off; the zone climates are COOL-only and just set each zone's target
+# temperature. Turbo is not supported on the C69 (see README).
 
 esphome:
   name: "truma-cooler"
@@ -61,7 +62,13 @@ truma_cooler:
   model: c69
   ble_client_id: truma_cooler_ble
 
-  # One climate per zone. Mode OFF/COOL maps to the global power state.
+  # Master power switch — the single global on/off for the whole box.
+  power:
+    name: "Power"
+    icon: mdi:power
+
+  # One climate per zone — COOL-only, each just sets its target temperature.
+  # Use the master `power` switch above to turn the box on/off.
   climate_zone1:
     name: "Zone 1"
     icon: mdi:snowflake

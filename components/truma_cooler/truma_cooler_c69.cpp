@@ -31,6 +31,8 @@ void TrumaCoolerC69::handle_status_(const uint8_t *data) {
                zone2_interior, zone2_setpoint]() {
     if (device_on_sensor_ != nullptr)
       device_on_sensor_->publish_state(device_on);
+    if (power_switch_ != nullptr)
+      power_switch_->publish_state(device_on);
     if (compressor_running_sensor_ != nullptr)
       compressor_running_sensor_->publish_state(compressor_running);
     if (temperature_zone1_sensor_ != nullptr)
@@ -47,7 +49,8 @@ void TrumaCoolerC69::publish_zone_(TrumaCoolerClimate *c, float interior, int8_t
   if (c == nullptr) return;
   c->current_temperature = interior;
   c->target_temperature = (float) setpoint;
-  c->mode = device_on ? climate::CLIMATE_MODE_COOL : climate::CLIMATE_MODE_OFF;
+  // COOL-only zones: on/off is shown via action + the master power switch.
+  c->mode = climate::CLIMATE_MODE_COOL;
   c->action = !device_on          ? climate::CLIMATE_ACTION_OFF
               : compressor_running ? climate::CLIMATE_ACTION_COOLING
                                    : climate::CLIMATE_ACTION_IDLE;
@@ -59,7 +62,7 @@ void TrumaCoolerC69::reset_entities_() {
   if (temperature_zone2_sensor_ != nullptr) temperature_zone2_sensor_->publish_state(NAN);
   for (auto *c : {climate_zone1_, climate_zone2_}) {
     if (c == nullptr) continue;
-    c->mode = climate::CLIMATE_MODE_OFF;
+    c->mode = climate::CLIMATE_MODE_COOL;  // COOL-only; off is expressed via action
     c->action = climate::CLIMATE_ACTION_OFF;
     c->current_temperature = NAN;
     c->publish_state();

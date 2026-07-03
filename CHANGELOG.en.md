@@ -26,6 +26,19 @@ Tested against:
 ---
 
 
+## [1.0.22] — 2026-07-03 — Truma Cooler C69: master power switch + compressor confirmed
+
+### Added
+- `truma_cooler` C69: **master `power` switch** — a single global on/off for the whole box. Removes the confusion where turning one zone on left the second zone showing "cool" only after the next status update (issue #18).
+
+### Changed
+- `truma_cooler` C69: the zone climates are now **cool-only** (no OFF mode) — on/off runs exclusively through the new `power` switch; the climate entities only set each zone's target temperature. The device power state is also mirrored onto the `power` switch.
+- `truma_cooler` C69: **compressor status confirmed on real C69 hardware** (issue #18) — no longer provisional; the idle bit (`data[5] & 0x08`) was verified via an observed compressor spin-up (byte5=0x07 running, 0x0B idle).
+
+### Compatibility
+- The C44 path is unchanged (climate still exposes OFF/COOL, no `power` switch).
+- Existing C69 configs: add the `power` switch to the YAML (see the updated example) — the zones can no longer be switched off via climate OFF.
+
 ## [1.0.21] — 2026-07-03 — Truma Cooler: C69 (dual zone) via `model:` selector
 
 ### Added

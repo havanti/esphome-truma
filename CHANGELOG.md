@@ -26,6 +26,19 @@ Getestet mit:
 ---
 
 
+## [1.0.22] — 2026-07-03 — Truma Cooler C69: Master-Power-Schalter + Kompressor bestätigt
+
+### Hinzugefügt
+- `truma_cooler` C69: **Master-Schalter `power`** — ein einzelnes globales Ein/Aus für die ganze Box. Beseitigt die Verwirrung, dass beim Einschalten einer Zone die zweite Zone erst mit der nächsten Statusmeldung auf „Kühlen" sprang (Issue #18).
+
+### Geändert
+- `truma_cooler` C69: Zonen-Climates sind jetzt **nur Kühlen** (kein OFF-Modus mehr) — Ein/Aus läuft ausschließlich über den neuen `power`-Schalter; die Climate-Entities setzen nur noch die Solltemperatur je Zone. Der Gerätestatus wird zusätzlich am `power`-Schalter gespiegelt.
+- `truma_cooler` C69: **Kompressor-Status auf echter C69-Hardware bestätigt** (Issue #18) — nicht mehr vorläufig; das Idle-Bit (`data[5] & 0x08`) wurde per beobachtetem Kompressor-Anlauf verifiziert (byte5=0x07 laufend, 0x0B im Leerlauf).
+
+### Kompatibilität
+- Der C44-Pfad bleibt unverändert (Climate weiterhin mit OFF/COOL, kein `power`-Schalter).
+- Bestehende C69-Konfigurationen: den `power`-Schalter in die YAML ergänzen (siehe aktualisiertes Beispiel) — die Zonen lassen sich nicht mehr per Climate-OFF abschalten.
+
 ## [1.0.21] — 2026-07-03 — Truma Cooler: C69 (zwei Zonen) via `model:`-Selektor
 
 ### Hinzugefügt

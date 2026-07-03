@@ -70,6 +70,7 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
         this->defer([this]() {
           if (connected_sensor_ != nullptr) connected_sensor_->publish_state(true);
           if (device_on_sensor_ != nullptr) device_on_sensor_->publish_state(false);
+          if (power_switch_ != nullptr) power_switch_->publish_state(false);
           if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
           // Reset the model-specific entities to a known baseline.
           this->reset_entities_();
@@ -88,6 +89,7 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
         this->on_disconnect_cleanup_();
         if (connected_sensor_ != nullptr) connected_sensor_->publish_state(false);
         if (device_on_sensor_ != nullptr) device_on_sensor_->publish_state(false);
+        if (power_switch_ != nullptr) power_switch_->publish_state(false);
         if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
         this->reset_entities_();
       });
@@ -230,7 +232,12 @@ void TrumaCooler::send_command(const uint8_t *cmd, size_t len) {
 climate::ClimateTraits TrumaCoolerClimate::traits() {
   auto traits = climate::ClimateTraits();
   traits.add_feature_flags(climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE);
-  traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_COOL});
+  if (manages_power_) {
+    traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_COOL});
+  } else {
+    // Power lives on the master switch — expose COOL only, no OFF toggle here.
+    traits.set_supported_modes({climate::CLIMATE_MODE_COOL});
+  }
   traits.set_visual_min_temperature(SETPOINT_MIN_C);
   traits.set_visual_max_temperature(SETPOINT_MAX_C);
   traits.set_visual_temperature_step(1.0f);
@@ -242,14 +249,26 @@ void TrumaCoolerClimate::apply_restored_state() {
   if (restore.has_value()) {
     restore->apply(this);
   }
+  // COOL-only zones must never sit in OFF (not an advertised mode) — e.g. after a
+  // restore persisted by an older firmware that still exposed the OFF mode.
+  if (!manages_power_ && this->mode == climate::CLIMATE_MODE_OFF)
+    this->mode = climate::CLIMATE_MODE_COOL;
 }
 
 void TrumaCoolerClimate::control(const climate::ClimateCall &call) {
-  bool has_mode = call.get_mode().has_value();
   bool has_temp = call.get_target_temperature().has_value();
-
-  if (has_mode) this->mode = *call.get_mode();
   if (has_temp) this->target_temperature = *call.get_target_temperature();
+
+  if (!manages_power_) {
+    // Master switch owns power; this COOL-only climate just writes the setpoint.
+    if (has_temp)
+      this->parent_->set_zone_setpoint(this->zone_, this->target_temperature);
+    this->publish_state();
+    return;
+  }
+
+  bool has_mode = call.get_mode().has_value();
+  if (has_mode) this->mode = *call.get_mode();
 
   if (has_mode) {
     // Power is global on both models — turning any zone off powers the whole box.
@@ -271,6 +290,16 @@ void TrumaCoolerClimate::control(const climate::ClimateCall &call) {
 
 void TrumaCoolerSwitch::write_state(bool state) {
   this->parent_->set_turbo(state);
+  this->publish_state(state);
+}
+
+// ---------------------------------------------------------------------------
+// TrumaCoolerPowerSwitch (master power — C69)
+// ---------------------------------------------------------------------------
+
+void TrumaCoolerPowerSwitch::write_state(bool state) {
+  // Optimistic publish; the next status notification confirms the real state.
+  this->parent_->set_mode(state);
   this->publish_state(state);
 }
 

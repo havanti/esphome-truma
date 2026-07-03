@@ -106,7 +106,7 @@ truma_cooler:
   # model: c69 # dual-zone C69
 ```
 
-> **Models:** The **C44** (single zone) is fully supported. The dual-zone **C69** is included since v1.0.21 (`model: c69`) — both zones with their own setpoint and interior temperature. C69 limitations: **power is global** (there is no per-zone on/off — turning one zone off powers the whole box down), **turbo is not implemented** (it does not work reliably even on the C44 — to be revisited later) and the **compressor status is provisional** (derived from a single capture). More models: see [**SNIFFING.en.md**](SNIFFING.en.md) and report your model via an [issue](../../issues/new/choose).
+> **Models:** The **C44** (single zone) is fully supported. The dual-zone **C69** is included since v1.0.21 (`model: c69`) — both zones with their own setpoint and interior temperature, verified on real hardware (including compressor status). On the C69 **power is global** (there is no per-zone on/off): a single **master `power` switch** turns the whole box on/off, and the zone climates are **cool-only**, setting just each zone's target temperature. **Turbo is not implemented on the C69** (it does not work reliably even on the C44 — to be revisited later). More models: see [**SNIFFING.en.md**](SNIFFING.en.md) and report your model via an [issue](../../issues/new/choose).
 
 #### Features
 

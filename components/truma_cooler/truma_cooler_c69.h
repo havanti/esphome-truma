@@ -21,14 +21,15 @@ namespace truma_cooler {
 //   [10] fixed (0x0A observed) — meaning unconfirmed
 //   [11] noisy value — NOT exposed (C44 treats it as ambient; unclear on C69)
 //
-// Power is global (no per-zone power in the protocol). Turbo is deliberately
+// Power is global (no per-zone power in the protocol): the zone climates are
+// COOL-only and a single master `power` switch owns on/off. Turbo is deliberately
 // NOT implemented for the C69 — it does not work reliably even on the C44.
 // ===========================================================================
 
 // Byte [4] device-state mask.
 static constexpr uint8_t C69_DEVICE_ON_MASK = 0x01;
-// Byte [5] compressor: bit3 set = idle. Derived from a single ~10 s post-ON
-// spin-up in the snoop — treat as provisional until confirmed on real hardware.
+// Byte [5] compressor: bit3 set = idle (0 = running). Confirmed on real C69
+// hardware (issue #18): compressor spin-up observed with byte5=0x07, idle 0x0B.
 static constexpr uint8_t C69_COMPRESSOR_IDLE_MASK = 0x08;
 
 class TrumaCoolerC69 : public TrumaCooler {

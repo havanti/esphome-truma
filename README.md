@@ -104,7 +104,7 @@ truma_cooler:
   # model: c69 # zweizoniger C69
 ```
 
-> **Modelle:** Der **C44** (einzonig) ist vollständig unterstützt. Der zweizonige **C69** ist seit v1.0.21 dabei (`model: c69`) — beide Zonen mit eigener Solltemperatur und Ist-Temperatur. Einschränkungen beim C69: die **Power ist global** (es gibt kein Ein/Aus je Zone — schaltet man eine Zone aus, geht die ganze Box aus), **Turbo ist nicht implementiert** (funktioniert schon am C44 nicht zuverlässig — wird bei Gelegenheit erneut angegangen) und der **Kompressor-Status ist vorläufig** (aus einem einzelnen Mitschnitt abgeleitet). Weitere Modelle: siehe [**SNIFFING.md**](SNIFFING.md) und melde dein Modell per [Issue](../../issues/new/choose).
+> **Modelle:** Der **C44** (einzonig) ist vollständig unterstützt. Der zweizonige **C69** ist seit v1.0.21 dabei (`model: c69`) — beide Zonen mit eigener Solltemperatur und Ist-Temperatur, auf echter Hardware verifiziert (inkl. Kompressor-Status). Beim C69 ist die **Power global** (es gibt kein Ein/Aus je Zone): ein einzelner **Master-Schalter `power`** schaltet die ganze Box ein/aus, die Zonen-Climates sind **nur Kühlen** und setzen je Zone nur die Solltemperatur. **Turbo ist beim C69 nicht implementiert** (funktioniert schon am C44 nicht zuverlässig — wird bei Gelegenheit erneut angegangen). Weitere Modelle: siehe [**SNIFFING.md**](SNIFFING.md) und melde dein Modell per [Issue](../../issues/new/choose).
 
 #### Features
 

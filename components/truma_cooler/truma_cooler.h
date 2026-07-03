@@ -73,6 +73,8 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
   void set_connected_sensor(binary_sensor::BinarySensor *s) { connected_sensor_ = s; }
   void set_device_on_sensor(binary_sensor::BinarySensor *s) { device_on_sensor_ = s; }
   void set_compressor_running_sensor(binary_sensor::BinarySensor *s) { compressor_running_sensor_ = s; }
+  // Optional master power switch — mirrors the global device power state.
+  void set_power_switch(switch_::Switch *s) { power_switch_ = s; }
 
   // Control API (called by the climate / switch entities).
   void set_mode(bool on);
@@ -99,6 +101,7 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
   binary_sensor::BinarySensor *connected_sensor_{nullptr};
   binary_sensor::BinarySensor *device_on_sensor_{nullptr};
   binary_sensor::BinarySensor *compressor_running_sensor_{nullptr};
+  switch_::Switch *power_switch_{nullptr};
 
   // Written from BT task (gattc_event_handler), read from app task (loop/send_command).
   // std::atomic for cross-task safety — `volatile` does not guarantee atomicity.
@@ -113,6 +116,9 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
 class TrumaCoolerClimate : public climate::Climate, public Parented<TrumaCooler> {
  public:
   void set_zone(uint8_t zone) { zone_ = zone; }
+  // When false, power is owned by an external master switch: the climate exposes
+  // COOL only (no OFF mode) and never toggles power — it only writes the setpoint.
+  void set_manages_power(bool v) { manages_power_ = v; }
   climate::ClimateTraits traits() override;
   void control(const climate::ClimateCall &call) override;
   // Restore last persisted mode/setpoint from flash so HA sees a stable entity
@@ -121,9 +127,17 @@ class TrumaCoolerClimate : public climate::Climate, public Parented<TrumaCooler>
 
  protected:
   uint8_t zone_{0};
+  bool manages_power_{true};
 };
 
+// Turbo switch (C44 only) — write_state drives set_turbo.
 class TrumaCoolerSwitch : public switch_::Switch, public Parented<TrumaCooler> {
+ protected:
+  void write_state(bool state) override;
+};
+
+// Master power switch (C69) — global on/off; write_state drives set_mode.
+class TrumaCoolerPowerSwitch : public switch_::Switch, public Parented<TrumaCooler> {
  protected:
   void write_state(bool state) override;
 };
