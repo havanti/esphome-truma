@@ -98,7 +98,15 @@ external_components:
     refresh: always
 ```
 
-> **Note:** The protocol was reverse-engineered exclusively on the C44. Other models (e.g. the dual-zone **C69**) differ. Help support more models: see [**SNIFFING.en.md**](SNIFFING.en.md) for a BLE capture guide and report your model via an [issue](../../issues/new/choose).
+The model is selected in the YAML:
+
+```yaml
+truma_cooler:
+  model: c44   # default: single-zone C44
+  # model: c69 # dual-zone C69
+```
+
+> **Models:** The **C44** (single zone) is fully supported. The dual-zone **C69** is included since v1.0.21 (`model: c69`) — both zones with their own setpoint and interior temperature. C69 limitations: **power is global** (there is no per-zone on/off — turning one zone off powers the whole box down), **turbo is not implemented** (it does not work reliably even on the C44 — to be revisited later) and the **compressor status is provisional** (derived from a single capture). More models: see [**SNIFFING.en.md**](SNIFFING.en.md) and report your model via an [issue](../../issues/new/choose).
 
 #### Features
 
@@ -121,7 +129,7 @@ external_components:
 
 > **Recommendation:** If you only have the Truma Cooler without a heater or air conditioner, consider running it on a dedicated **M5Stack Atom Lite**. It's compact, affordable, and supports ESP-IDF — a standalone BLE node just for the cooler. The M5Stack Atom also works excellently as an [ESPHome Bluetooth Proxy](https://esphome.io/components/bluetooth_proxy/), making additional BLE devices accessible via Home Assistant — no extra hardware needed.
 
-A complete example configuration is available in [`ESP32_truma_cooler_example.yaml`](ESP32_truma_cooler_example.yaml).
+Complete example configurations: [`ESP32_truma_cooler_example.yaml`](ESP32_truma_cooler_example.yaml) (C44) and [`ESP32_truma_cooler_C69_example.yaml`](ESP32_truma_cooler_C69_example.yaml) (C69).
 
 ### TPMS — Tire Pressure Monitoring via Bluetooth Proxy
 

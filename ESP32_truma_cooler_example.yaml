@@ -80,6 +80,7 @@ ble_client:
 
 truma_cooler:
   id: cooler
+  model: c44          # single-zone C44 (default). For the dual-zone C69 see ESP32_truma_cooler_C69_example.yaml
   ble_client_id: truma_cooler_ble
 
   climate:

@@ -26,6 +26,24 @@ Getestet mit:
 ---
 
 
+## [1.0.21] — 2026-07-03 — Truma Cooler: C69 (zwei Zonen) via `model:`-Selektor
+
+### Hinzugefügt
+- `truma_cooler`: **Modell-Auswahl `model:`** in der YAML (`c44` = Standard, `c69`). Modellspezifischer Code liegt in eigenen Dateien (`truma_cooler_c44.*`, `truma_cooler_c69.*`) über einer gemeinsamen Basisklasse — der C44-Pfad bleibt unverändert.
+- `truma_cooler` **C69 (zweizonig)**: zwei Climate-Entities (`climate_zone1`/`climate_zone2`) mit je eigener Solltemperatur und Ist-Temperatur, optionale Temperatur-Sensoren je Zone (`temperature_zone1`/`temperature_zone2`), Kompressor- und Gerätestatus. Protokoll aus einem HCI-Snoop der Truma-App (C69, App 2.7.3) rückentwickelt und gegen ein Zeit-/Aktions-Protokoll verifiziert.
+- Beispielkonfiguration [`ESP32_truma_cooler_C69_example.yaml`](ESP32_truma_cooler_C69_example.yaml).
+
+### Geändert
+- `truma_cooler` C69-Status-Dekodierung nutzt Bitfelder (`data[4] & 0x01` Gerät ein, `data[5]` Bitfeld) statt der C44-Exact-Match-Konstanten — der C44 dekodiert weiter per Byte-Gleichheit.
+
+### Einschränkungen (C69)
+- **Power ist global** — das Protokoll kennt kein Ein/Aus je Zone; schaltet man eine Zone aus, geht die ganze Box aus.
+- **Turbo nicht implementiert** — funktioniert schon am C44 nicht zuverlässig; wird bei Gelegenheit erneut angegangen.
+- **Kompressor-Status vorläufig** — das „Idle"-Bit (`data[5] & 0x08`) stammt aus einem einzelnen Post-ON-Spin-up und ist noch nicht an echter Hardware bestätigt.
+
+### Kompatibilität
+- Bestehende C44-Konfigurationen ohne `model:` funktionieren unverändert (`model:` fällt auf `c44` zurück).
+
 ## [1.0.20] — 2026-05-12 — Truma Cooler: Task-Safety + State-Restore
 
 ### Geändert

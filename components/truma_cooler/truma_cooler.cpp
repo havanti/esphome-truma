@@ -11,41 +11,31 @@ namespace truma_cooler {
 
 static const char *const TAG = "truma_cooler";
 
-// Poll command
+// Shared command frames — identical across models, confirmed from HCI snoops
+// of both the C44 and the C69 official app.
 static constexpr uint8_t CMD_POLL[FRAME_LEN] = {
     0xAA, 0xC1, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5C
 };
-// Turn ON:  byte[3]=0x01 — confirmed from HCI log: every OFF→ON transition uses this exact frame
+// Turn ON: byte[3]=0x01 — every OFF->ON transition uses this exact frame.
 static constexpr uint8_t CMD_ON[FRAME_LEN] = {
     0xAA, 0xC1, 0xF1, 0x01, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5E
 };
-// Turn OFF: byte[9]=0x00 — confirmed from HCI log (NOTIF OFF follows immediately)
+// Turn OFF: all-zero payload.
 static constexpr uint8_t CMD_OFF[FRAME_LEN] = {
     0xAA, 0xC1, 0xF1, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5D
 };
-// Turbo ON (device must already be ON): byte[4]=0x01, byte[9]=0x03
-static constexpr uint8_t CMD_TURBO[FRAME_LEN] = {
-    0xAA, 0xC1, 0xF1, 0x00, 0x01, 0x00, 0x00, 0x00,
-    0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x61
-};
-// Turbo OFF (device must already be ON): byte[4]=0x00, byte[9]=0x03
-static constexpr uint8_t CMD_TURBO_OFF[FRAME_LEN] = {
-    0xAA, 0xC1, 0xF1, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60
-};
 
 // ---------------------------------------------------------------------------
-// TrumaCooler
+// TrumaCooler — shared plumbing
 // ---------------------------------------------------------------------------
 
 void TrumaCooler::setup() {
-  ESP_LOGCONFIG(TAG, "TrumaCooler component setup");
-  // HCI snoop analysis shows the TrumaCooler does not require encryption or bonding.
-  // Notifications and commands work without authentication.
-  if (climate_ != nullptr) climate_->apply_restored_state();
+  ESP_LOGCONFIG(TAG, "TrumaCooler component setup (model %s)", model_name_());
+  // HCI snoop analysis shows the cooler requires neither encryption nor bonding.
+  apply_restored_states_();
 }
 
 void TrumaCooler::loop() {
@@ -60,6 +50,7 @@ void TrumaCooler::loop() {
 
 void TrumaCooler::dump_config() {
   ESP_LOGCONFIG(TAG, "TrumaCooler BLE:");
+  ESP_LOGCONFIG(TAG, "  Model: %s", model_name_());
   ESP_LOGCONFIG(TAG, "  MAC: %s", this->parent_->address_str());
   ESP_LOGCONFIG(TAG, "  Service UUID: 0xFFF0");
   ESP_LOGCONFIG(TAG, "  Write Handle: 0x%04X", write_handle_.load());
@@ -67,8 +58,8 @@ void TrumaCooler::dump_config() {
 }
 
 void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
-                                       esp_gatt_if_t gattc_if,
-                                       esp_ble_gattc_cb_param_t *param) {
+                                      esp_gatt_if_t gattc_if,
+                                      esp_ble_gattc_cb_param_t *param) {
   switch (event) {
     case ESP_GATTC_OPEN_EVT:
       if (param->open.status == ESP_GATT_OK) {
@@ -78,18 +69,10 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
         // (publish_state, climate field writes, scheduler ops) to the main loop.
         this->defer([this]() {
           if (connected_sensor_ != nullptr) connected_sensor_->publish_state(true);
-          // Reset sensors to a known baseline until the first notification arrives.
-          if (temperature_sensor_ != nullptr) temperature_sensor_->publish_state(NAN);
-          if (ambient_temperature_sensor_ != nullptr) ambient_temperature_sensor_->publish_state(NAN);
-          if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
-          if (turbo_running_sensor_ != nullptr) turbo_running_sensor_->publish_state(false);
           if (device_on_sensor_ != nullptr) device_on_sensor_->publish_state(false);
-          if (climate_ != nullptr) {
-            climate_->mode = climate::CLIMATE_MODE_OFF;
-            climate_->action = climate::CLIMATE_ACTION_OFF;
-            climate_->current_temperature = NAN;
-            climate_->publish_state();
-          }
+          if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
+          // Reset the model-specific entities to a known baseline.
+          this->reset_entities_();
         });
       }
       break;
@@ -102,19 +85,11 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       device_is_on_.store(false);
       // Defer scheduler op + publishes to main loop (BT task is not the right context).
       this->defer([this]() {
-        this->cancel_timeout("turbo_reset");
+        this->on_disconnect_cleanup_();
         if (connected_sensor_ != nullptr) connected_sensor_->publish_state(false);
-        if (temperature_sensor_ != nullptr) temperature_sensor_->publish_state(NAN);
-        if (ambient_temperature_sensor_ != nullptr) ambient_temperature_sensor_->publish_state(NAN);
-        if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
-        if (turbo_running_sensor_ != nullptr) turbo_running_sensor_->publish_state(false);
         if (device_on_sensor_ != nullptr) device_on_sensor_->publish_state(false);
-        if (turbo_switch_ != nullptr) turbo_switch_->publish_state(false);
-        if (climate_ != nullptr) {
-          climate_->mode = climate::CLIMATE_MODE_OFF;
-          climate_->action = climate::CLIMATE_ACTION_OFF;
-          climate_->publish_state();
-        }
+        if (compressor_running_sensor_ != nullptr) compressor_running_sensor_->publish_state(false);
+        this->reset_entities_();
       });
       break;
 
@@ -124,17 +99,17 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       ESP_LOGI(TAG, "Service discovery done. Registering for notify (no encryption required).");
 
       auto reg_ret = esp_ble_gattc_register_for_notify(gattc_if,
-                                                        this->parent_->get_remote_bda(),
-                                                        NOTIFY_HANDLE);
+                                                       this->parent_->get_remote_bda(),
+                                                       NOTIFY_HANDLE);
       ESP_LOGI(TAG, "register_for_notify handle=0x%04X ret=%d", NOTIFY_HANDLE, reg_ret);
 
       // HCI snoop analysis: cooler uses unauthenticated writes — no bonding needed.
       uint8_t notify_en[] = {0x01, 0x00};
       auto cccd_ret = esp_ble_gattc_write_char_descr(gattc_if,
-                                                      this->parent_->get_conn_id(),
-                                                      CCCD_HANDLE, sizeof(notify_en),
-                                                      notify_en, ESP_GATT_WRITE_TYPE_RSP,
-                                                      ESP_GATT_AUTH_REQ_NONE);
+                                                     this->parent_->get_conn_id(),
+                                                     CCCD_HANDLE, sizeof(notify_en),
+                                                     notify_en, ESP_GATT_WRITE_TYPE_RSP,
+                                                     ESP_GATT_AUTH_REQ_NONE);
       ESP_LOGI(TAG, "CCCD write ret=%d", cccd_ret);
       poll_enabled_.store(true);
       last_poll_ = millis();
@@ -179,45 +154,7 @@ void TrumaCooler::parse_notification_(const uint8_t *data, uint16_t len) {
     return;
   }
 
-  bool device_on = (data[4] == DEVICE_ON);
-  device_is_on_.store(device_on);
-  bool compressor_running = (data[5] == COMPRESSOR_RUNNING || data[5] == COMPRESSOR_TURBO);
-  bool turbo_running = (data[5] == COMPRESSOR_TURBO);
-  float interior_temp = (int8_t)data[6];        // interior temperature in °C (signed)
-  int8_t setpoint = (int8_t)data[7];             // setpoint echoed back from device
-  // Signed: HCI snoops only showed positive ambient temps, but int8_t extends
-  // the range to -12.8..+12.7°C without breaking observed values.
-  float ambient_temp = (int8_t)data[11] * 0.1f;
-
-  ESP_LOGD(TAG, "Status: device=%s compressor=%s turbo=%s (byte5=0x%02X) interior=%.0f°C ambient=%.1f°C setpoint=%d°C",
-           device_on ? "ON" : "OFF",
-           compressor_running ? "RUNNING" : "OFF",
-           turbo_running ? "ON" : "OFF",
-           data[5], interior_temp, ambient_temp, setpoint);
-
-  // Defer entity mutations to the main loop — gattc notifications run on the BT task.
-  this->defer([this, device_on, compressor_running, turbo_running, interior_temp, ambient_temp, setpoint]() {
-    if (temperature_sensor_ != nullptr)
-      temperature_sensor_->publish_state(interior_temp);
-    if (ambient_temperature_sensor_ != nullptr)
-      ambient_temperature_sensor_->publish_state(ambient_temp);
-    if (compressor_running_sensor_ != nullptr)
-      compressor_running_sensor_->publish_state(compressor_running);
-    if (turbo_running_sensor_ != nullptr)
-      turbo_running_sensor_->publish_state(turbo_running);
-    if (device_on_sensor_ != nullptr)
-      device_on_sensor_->publish_state(device_on);
-
-    if (climate_ != nullptr) {
-      climate_->current_temperature = interior_temp;
-      climate_->target_temperature = (float) setpoint;
-      climate_->mode = device_on ? climate::CLIMATE_MODE_COOL : climate::CLIMATE_MODE_OFF;
-      climate_->action = !device_on          ? climate::CLIMATE_ACTION_OFF
-                         : compressor_running ? climate::CLIMATE_ACTION_COOLING
-                                             : climate::CLIMATE_ACTION_IDLE;
-      climate_->publish_state();
-    }
-  });
+  handle_status_(data);
 }
 
 uint8_t TrumaCooler::calculate_checksum_(const uint8_t *data, size_t len) {
@@ -236,50 +173,17 @@ void TrumaCooler::set_mode(bool on) {
     // mode on the display and the ON command is ignored.
     ESP_LOGI(TAG, "control: ON");
     send_command(CMD_ON, sizeof(CMD_ON));
-    // Always reset turbo shortly after ON so it starts in normal mode regardless
-    // of the previously stored turbo state on the device.
-    this->set_timeout("turbo_reset", TURBO_RESET_DELAY_MS, [this]() {
-      ESP_LOGI(TAG, "Turbo reset after ON");
-      send_command(CMD_TURBO_OFF, sizeof(CMD_TURBO_OFF));
-      if (turbo_switch_ != nullptr)
-        turbo_switch_->publish_state(false);
-    });
   } else {
-    // Cancel any pending turbo reset from a recent ON — otherwise a queued
-    // CMD_TURBO_OFF would be sent to an already-off device.
-    this->cancel_timeout("turbo_reset");
-    // Fixed OFF command (byte[4]=0x00, byte[9]=0x00)
     ESP_LOGI(TAG, "control: OFF");
     send_command(CMD_OFF, sizeof(CMD_OFF));
-    if (turbo_switch_ != nullptr)
-      turbo_switch_->publish_state(false);
   }
+  post_power_(on);
 }
 
-void TrumaCooler::set_turbo(bool state) {
-  // Protocol requires device to be ON before turbo commands take effect.
-  if (!device_is_on_.load()) {
-    ESP_LOGW(TAG, "Turbo command ignored — device is OFF");
-    if (turbo_switch_ != nullptr) turbo_switch_->publish_state(false);
-    return;
-  }
-  if (state) {
-    ESP_LOGI(TAG, "Turbo: ON");
-    send_command(CMD_TURBO, sizeof(CMD_TURBO));
-  } else {
-    ESP_LOGI(TAG, "Turbo: OFF");
-    send_command(CMD_TURBO_OFF, sizeof(CMD_TURBO_OFF));
-  }
-}
-
-void TrumaCooler::set_setpoint(float temp_celsius) {
-  if (temp_celsius < SETPOINT_MIN_C) temp_celsius = SETPOINT_MIN_C;
-  if (temp_celsius > SETPOINT_MAX_C) temp_celsius = SETPOINT_MAX_C;
-  int8_t sp = (int8_t)lroundf(temp_celsius);
-  uint8_t cmd[FRAME_LEN] = {0xAA, 0xC1, 0xF1, 0x00, 0x00, 0x00, 0x00, (uint8_t)sp,
-                            0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+void TrumaCooler::send_setpoint_frame_(uint8_t byte7, uint8_t byte8, uint8_t zone_select) {
+  uint8_t cmd[FRAME_LEN] = {0xAA, 0xC1, 0xF1, 0x00, 0x00, 0x00, 0x00, byte7,
+                            byte8, zone_select, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   cmd[FRAME_LEN - 1] = calculate_checksum_(cmd, FRAME_LEN - 1);
-  ESP_LOGI(TAG, "setpoint: %d°C", sp);
   send_command(cmd, sizeof(cmd));
 }
 
@@ -320,7 +224,7 @@ void TrumaCooler::send_command(const uint8_t *cmd, size_t len) {
 }
 
 // ---------------------------------------------------------------------------
-// TrumaCoolerClimate
+// TrumaCoolerClimate — zone-aware (zone 0 = single C44, 1/2 = C69 zones)
 // ---------------------------------------------------------------------------
 
 climate::ClimateTraits TrumaCoolerClimate::traits() {
@@ -348,20 +252,21 @@ void TrumaCoolerClimate::control(const climate::ClimateCall &call) {
   if (has_temp) this->target_temperature = *call.get_target_temperature();
 
   if (has_mode) {
+    // Power is global on both models — turning any zone off powers the whole box.
     bool on = (this->mode != climate::CLIMATE_MODE_OFF);
     this->parent_->set_mode(on);
     // Send setpoint after ON (never before — triggers display input mode and ON is ignored).
     if (on && has_temp)
-      this->parent_->set_setpoint(this->target_temperature);
+      this->parent_->set_zone_setpoint(this->zone_, this->target_temperature);
   } else if (has_temp) {
-    this->parent_->set_setpoint(this->target_temperature);
+    this->parent_->set_zone_setpoint(this->zone_, this->target_temperature);
   }
 
   this->publish_state();
 }
 
 // ---------------------------------------------------------------------------
-// TrumaCoolerSwitch
+// TrumaCoolerSwitch (turbo — C44 only)
 // ---------------------------------------------------------------------------
 
 void TrumaCoolerSwitch::write_state(bool state) {

@@ -15,39 +15,21 @@
 namespace esphome {
 namespace truma_cooler {
 
-// Protocol constants
-// Service UUID: 0xFFF0 (PKOC / vendor)
-// Write characteristic UUID: 0xFFF7 / Handle 0x0012
-// Notify characteristic:     Handle 0x0015 (UUID unknown)
+// ===========================================================================
+// Shared protocol constants (identical across all Truma Cooler models)
+// ===========================================================================
+// Service UUID: 0xFFF0. Write characteristic Handle 0x0012, Notify Handle 0x0015.
+// All frames are 16 bytes, header 0xAA 0xC1, checksum = (sum(byte[0..14]) + 1) % 256.
 //
-// Notification (response) format (16 bytes):
-//   [0]  0xAA  Header
-//   [1]  0xC1  Header
-//   [2]  0xF2  Response type
-//   [3]  0xA0  Fixed
-//   [4]  0x01=on / 0x00=off  Device state
-//   [5]  0x01=running / 0x0D=turbo running / 0x09=idle  Compressor state
-//   [6]  Interior temperature in °C (signed int8_t)
-//   [7]  Setpoint echoed back in °C (signed int8_t)
-//   [8-10] Fixed
-//   [11] Ambient/outside temperature in 0.1°C, signed int8_t (e.g. 0x2B = 43 = 4.3°C; 0xFF = -1 = -0.1°C)
-//   [12-14] Fixed
-//   [15] CHECKSUM = (sum(byte[0..14]) + 1) % 256
+// Command frame (host -> device), 0xAA 0xC1 0xF1 ...:
+//   [3]  0x01 = power ON (global; no per-zone power exists)
+//   [4]  0x01 = turbo (C44 only, device must already be ON)
+//   [7]  Zone 1 setpoint (signed int8, °C)
+//   [8]  Zone 2 setpoint (signed int8, °C) — C69 only
+//   [9]  Zone selector for setpoint writes: 0x01 = zone 1, 0x02 = zone 2
 //
-// Command format (16 bytes):
-//   [0]  0xAA  Header
-//   [1]  0xC1  Header
-//   [2]  0xF0=poll / 0xF1=control  Command type
-//   [3]  0x01=turn on / 0x00=other commands  Power-ON flag (NOT always zero!)
-//   [4]  0x00 for most commands / 0x01=turbo (only when device is already ON)
-//   [5-6] 0x00  Fixed
-//   [7]  Setpoint in °C (signed int8_t)
-//   [8]  0x00  Fixed
-//   [9]  0x03=activate(ON) / 0x01=setpoint/off  Command flag
-//        0x03 REQUIRED when turning ON — device ignores ON command with 0x01
-//        0x01 used for setpoint changes and turning OFF
-//   [10-14] 0x00  Fixed
-//   [15] CHECKSUM = (sum(byte[0..14]) + 1) % 256
+// Status notify (device -> host), 0xAA 0xC1 0xF2 ...:
+//   Byte-level meaning differs per model — decoded in the model subclass.
 
 // GATT handles — hardcoded from HCI snoop / GATT attribute table.
 static constexpr uint16_t WRITE_HANDLE = 0x0012;
@@ -64,22 +46,20 @@ static constexpr uint8_t HEADER_B0 = 0xAA;
 static constexpr uint8_t HEADER_B1 = 0xC1;
 static constexpr uint8_t RESPONSE_TYPE = 0xF2;
 
-// Byte [4] device state.
-static constexpr uint8_t DEVICE_ON = 0x01;
+// Setpoint-write zone selector (command byte [9]).
+static constexpr uint8_t ZONE1_SELECT = 0x01;
+static constexpr uint8_t ZONE2_SELECT = 0x02;
 
-// Byte [5] compressor state markers.
-static constexpr uint8_t COMPRESSOR_RUNNING = 0x01;
-static constexpr uint8_t COMPRESSOR_TURBO = 0x0D;
-
-// Polling cadence (fallback only — device sends unsolicited notifications every ~2 s)
-// and turbo auto-reset delay after device power-on.
+// Polling cadence (fallback only — device sends unsolicited notifications every ~2 s).
 static constexpr uint32_t POLL_INTERVAL_MS = 60000;
-static constexpr uint32_t TURBO_RESET_DELAY_MS = 500;
 
-// Forward declarations
 class TrumaCoolerClimate;
-class TrumaCoolerSwitch;
 
+// ===========================================================================
+// TrumaCooler — shared base: BLE plumbing, framing, power control.
+// Model-specific status decoding and entity wiring live in the C44/C69
+// subclasses (truma_cooler_c44.*, truma_cooler_c69.*).
+// ===========================================================================
 class TrumaCooler : public Component, public ble_client::BLEClientNode {
  public:
   void setup() override;
@@ -89,34 +69,36 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
   void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if,
                            esp_ble_gattc_cb_param_t *param) override;
 
-  // Sensor setters
-  void set_temperature_sensor(sensor::Sensor *s) { temperature_sensor_ = s; }
-  void set_ambient_temperature_sensor(sensor::Sensor *s) { ambient_temperature_sensor_ = s; }
-  void set_compressor_running_sensor(binary_sensor::BinarySensor *s) { compressor_running_sensor_ = s; }
-  void set_turbo_running_sensor(binary_sensor::BinarySensor *s) { turbo_running_sensor_ = s; }
-  void set_device_on_sensor(binary_sensor::BinarySensor *s) { device_on_sensor_ = s; }
+  // Shared entity setters (present on both models).
   void set_connected_sensor(binary_sensor::BinarySensor *s) { connected_sensor_ = s; }
-  void set_climate(TrumaCoolerClimate *c) { climate_ = c; }
-  void set_turbo_switch(TrumaCoolerSwitch *s) { turbo_switch_ = s; }
+  void set_device_on_sensor(binary_sensor::BinarySensor *s) { device_on_sensor_ = s; }
+  void set_compressor_running_sensor(binary_sensor::BinarySensor *s) { compressor_running_sensor_ = s; }
+
+  // Control API (called by the climate / switch entities).
+  void set_mode(bool on);
+  virtual void set_zone_setpoint(uint8_t zone, float temp_celsius) = 0;
+  virtual void set_turbo(bool state) {}  // no-op by default; C44 overrides
 
   void send_poll();
   void send_command(const uint8_t *cmd, size_t len);
-  void set_mode(bool on);
-  void set_setpoint(float temp_celsius);
-  void set_turbo(bool state);
 
  protected:
+  // Model hooks.
+  virtual const char *model_name_() const = 0;
+  virtual void handle_status_(const uint8_t *data) = 0;  // frame already validated
+  virtual void reset_entities_() = 0;                    // baseline on (dis)connect
+  virtual void apply_restored_states_() {}               // restore climate(s) from flash
+  virtual void post_power_(bool on) {}                   // e.g. C44 turbo auto-reset
+  virtual void on_disconnect_cleanup_() {}               // e.g. C44 cancel turbo timeout
+
   void parse_notification_(const uint8_t *data, uint16_t len);
+  // Build and send an 0xF1 setpoint frame with the given payload bytes.
+  void send_setpoint_frame_(uint8_t byte7, uint8_t byte8, uint8_t zone_select);
   static uint8_t calculate_checksum_(const uint8_t *data, size_t len);
 
-  sensor::Sensor *temperature_sensor_{nullptr};
-  sensor::Sensor *ambient_temperature_sensor_{nullptr};
-  binary_sensor::BinarySensor *compressor_running_sensor_{nullptr};
-  binary_sensor::BinarySensor *turbo_running_sensor_{nullptr};
-  binary_sensor::BinarySensor *device_on_sensor_{nullptr};
   binary_sensor::BinarySensor *connected_sensor_{nullptr};
-  TrumaCoolerClimate *climate_{nullptr};
-  TrumaCoolerSwitch *turbo_switch_{nullptr};
+  binary_sensor::BinarySensor *device_on_sensor_{nullptr};
+  binary_sensor::BinarySensor *compressor_running_sensor_{nullptr};
 
   // Written from BT task (gattc_event_handler), read from app task (loop/send_command).
   // std::atomic for cross-task safety — `volatile` does not guarantee atomicity.
@@ -127,13 +109,18 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
   uint32_t last_poll_{0};
 };
 
+// Zone-aware climate. zone_ = 0 for the single-zone C44, 1 / 2 for the C69 zones.
 class TrumaCoolerClimate : public climate::Climate, public Parented<TrumaCooler> {
  public:
+  void set_zone(uint8_t zone) { zone_ = zone; }
   climate::ClimateTraits traits() override;
   void control(const climate::ClimateCall &call) override;
   // Restore last persisted mode/setpoint from flash so HA sees a stable entity
   // before the first BLE notification arrives after reboot.
   void apply_restored_state();
+
+ protected:
+  uint8_t zone_{0};
 };
 
 class TrumaCoolerSwitch : public switch_::Switch, public Parented<TrumaCooler> {

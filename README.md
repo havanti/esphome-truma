@@ -96,7 +96,15 @@ external_components:
     refresh: always
 ```
 
-> **Hinweis:** Das Protokoll wurde ausschließlich am C44 reverse-engineered. Andere Modelle (z. B. der zweizonige **C69**) weichen ab. Hilf mit, weitere Modelle zu unterstützen: siehe [**SNIFFING.md**](SNIFFING.md) für eine Anleitung zum BLE-Mitschnitt und melde dein Modell per [Issue](../../issues/new/choose).
+Das Modell wird in der YAML gewählt:
+
+```yaml
+truma_cooler:
+  model: c44   # Standard: einzoniger C44
+  # model: c69 # zweizoniger C69
+```
+
+> **Modelle:** Der **C44** (einzonig) ist vollständig unterstützt. Der zweizonige **C69** ist seit v1.0.21 dabei (`model: c69`) — beide Zonen mit eigener Solltemperatur und Ist-Temperatur. Einschränkungen beim C69: die **Power ist global** (es gibt kein Ein/Aus je Zone — schaltet man eine Zone aus, geht die ganze Box aus), **Turbo ist nicht implementiert** (funktioniert schon am C44 nicht zuverlässig — wird bei Gelegenheit erneut angegangen) und der **Kompressor-Status ist vorläufig** (aus einem einzelnen Mitschnitt abgeleitet). Weitere Modelle: siehe [**SNIFFING.md**](SNIFFING.md) und melde dein Modell per [Issue](../../issues/new/choose).
 
 #### Features
 
@@ -119,7 +127,7 @@ external_components:
 
 > **Empfehlung:** Wer ausschließlich den Truma Cooler ohne Heizung oder Klimaanlage betreibt, kann einen **M5Stack Atom Lite** als dedizierten ESP32 nutzen. Das Gerät ist kompakt, günstig und unterstützt ESP-IDF — ideal als eigenständiger BLE-Knoten nur für die Kühlbox. Der M5Stack Atom eignet sich gleichzeitig hervorragend als [ESPHome Bluetooth Proxy](https://esphome.io/components/bluetooth_proxy/), sodass weitere BLE-Geräte über Home Assistant erreichbar werden — ohne zusätzliche Hardware.
 
-Eine vollständige Beispielkonfiguration findet sich in [`ESP32_truma_cooler_example.yaml`](ESP32_truma_cooler_example.yaml).
+Vollständige Beispielkonfigurationen: [`ESP32_truma_cooler_example.yaml`](ESP32_truma_cooler_example.yaml) (C44) und [`ESP32_truma_cooler_C69_example.yaml`](ESP32_truma_cooler_C69_example.yaml) (C69).
 
 ### TPMS — Reifendrucküberwachung via Bluetooth Proxy
 

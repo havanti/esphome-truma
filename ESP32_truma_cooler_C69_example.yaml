@@ -1,0 +1,105 @@
+###############################
+# ESPHome Version >= 2026.6.3 #
+# ESP32 (M5Stack Atom Lite)   #
+# Truma Cooler C69 (dual zone)#
+###############################
+
+# Dual-zone Truma Cooler C69. Set `model: c69`. Power is global (there is no
+# per-zone power in the protocol) — turning either zone climate off powers down
+# the whole box. Turbo is not supported on the C69 (see README).
+
+esphome:
+  name: "truma-cooler"
+  friendly_name: "Truma Cooler C69"
+  min_version: "2026.6.3"
+
+esp32:
+  board: m5stack-atom  # Tested with M5Stack Atom Lite; any ESP32 with BLE and ESP-IDF works
+  framework:
+    type: esp-idf
+    version: recommended
+
+logger:
+  level: INFO
+  baud_rate: 0
+
+api:
+  encryption:
+    key: ""  # WARNING: generate a 32-byte base64 key before deploying — esphome.io/components/api.html
+
+ota:
+  platform: esphome
+  password: "12345678901234567890123456789012"  # WARNING: replace with a unique password before deploying
+
+wifi:
+  networks:
+    - ssid: !secret wifi_Mobile_ssid
+      password: !secret wifi_Mobile_password
+    - ssid: !secret wifi_Home_ssid
+      password: !secret wifi_Home_password
+  output_power: 17dB
+  power_save_mode: none
+  reboot_timeout: 0s
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/havanti/esphome-truma
+    components: [truma_cooler]
+    refresh: always
+
+esp32_ble:
+  io_capability: none
+
+ble_client:
+  - mac_address: "XX:XX:XX:XX:XX:XX"  # MAC address of your Truma Cooler C69
+    id: truma_cooler_ble
+    auto_connect: true
+
+truma_cooler:
+  id: cooler
+  model: c69
+  ble_client_id: truma_cooler_ble
+
+  # One climate per zone. Mode OFF/COOL maps to the global power state.
+  climate_zone1:
+    name: "Zone 1"
+    icon: mdi:snowflake
+
+  climate_zone2:
+    name: "Zone 2"
+    icon: mdi:snowflake
+
+  # Optional per-zone interior temperature sensors (same value as the climate's
+  # current_temperature, handy for graphing / automations).
+  temperature_zone1:
+    name: "Zone 1 Temperature"
+    icon: mdi:thermometer
+
+  temperature_zone2:
+    name: "Zone 2 Temperature"
+    icon: mdi:thermometer
+
+  compressor_running:
+    name: "Compressor Running"
+    icon: mdi:engine
+
+  device_on:
+    name: "Device On"
+    icon: mdi:power
+
+  connected:
+    name: "BLE Connected"
+    icon: mdi:bluetooth
+
+web_server:
+  port: 80
+  local: true
+  version: 3
+  include_internal: true
+
+button:
+  - platform: restart
+    name: "Restart"
+    icon: mdi:restart
+    entity_category: config
