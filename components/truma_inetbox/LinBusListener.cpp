@@ -378,10 +378,10 @@ void LinBusListener::process_log_queue(TickType_t xTicksToWait) {
         break;
       case QUEUE_LOG_MSG_TYPE::VERBOSE_LIN_ANSWER_RESPONSE:
         if (!this->observer_mode_) {
-          ESP_LOGV(TAG, "RESPONSE %02X %s", current_PID, format_hex_pretty(log_msg.data, log_msg.len).c_str());
+          ESP_LOGV(TAG, "RESPONSE %02X %s", current_PID, format_hex_pretty((const uint8_t*)log_msg.data, (size_t)log_msg.len).c_str());
         } else {
           ESP_LOGV(TAG, "RESPONSE %02X %s - NOT SEND (OBSERVER MODE)", current_PID,
-                   format_hex_pretty(log_msg.data, log_msg.len).c_str());
+                   format_hex_pretty((const uint8_t*)log_msg.data, (size_t)log_msg.len).c_str());
         }
         break;
       case QUEUE_LOG_MSG_TYPE::ERROR_CHECK_FOR_LIN_FAULT_DETECTED:
@@ -424,11 +424,11 @@ void LinBusListener::process_log_queue(TickType_t xTicksToWait) {
         if (current_PID == 0x20 || current_PID == 0x21 || current_PID == 0x22 ||
             ((current_PID == DIAGNOSTIC_FRAME_MASTER || current_PID == DIAGNOSTIC_FRAME_SLAVE) &&
              log_msg.data[0] == 0x01 /* ID of heater */)) {
-          ESP_LOGVV(TAG, "PID %02X      %s %s %s", current_PID_, format_hex_pretty(log_msg.data, log_msg.len).c_str(),
+          ESP_LOGVV(TAG, "PID %02X      %s %s %s", current_PID_, format_hex_pretty((const uint8_t*)log_msg.data, (size_t)log_msg.len).c_str(),
                     log_msg.message_source_know ? (log_msg.message_from_master ? " - MASTER" : " - SLAVE") : "",
                     log_msg.current_data_valid ? "" : "INVALID");
         } else {
-          ESP_LOGV(TAG, "PID %02X      %s %s %s", current_PID_, format_hex_pretty(log_msg.data, log_msg.len).c_str(),
+          ESP_LOGV(TAG, "PID %02X      %s %s %s", current_PID_, format_hex_pretty((const uint8_t*)log_msg.data, (size_t)log_msg.len).c_str(),
                    log_msg.message_source_know ? (log_msg.message_from_master ? " - MASTER" : " - SLAVE") : "",
                    log_msg.current_data_valid ? "" : "INVALID");
         }
