@@ -19,12 +19,34 @@ ESP-IDF-Builds nicht mehr funktionierte. Zusätzliche Breaking Changes in ESP-ID
 (ESP32-Toolchain) und ESPHome 2026.x API-Änderungen wurden ebenfalls behoben.
 
 Getestet mit:
+- ESPHome **2026.6.5** — ESP-IDF ✅
 - ESPHome **2026.6.4** — ESP-IDF ✅
 - ESPHome **2026.5.3** — ESP-IDF ✅
 - ESPHome **2026.5.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.23] — 2026-07-09 — UART-Startfehler behoben (uninitialisierte Konfiguration)
+
+### Behoben
+- `uart`: **`uart_config_t` wird jetzt genullt initialisiert** — die Struktur wurde bisher
+  uninitialisiert angelegt und nur feldweise befüllt. Neuere ESP-IDF-Versionen haben
+  zusätzliche Felder (Sleep-Retention-Flags); enthielten diese Stack-Müll, schlug
+  `uart_param_config()` mit `ESP_ERR_NOT_SUPPORTED` („not able to power down in light
+  sleep") fehl und die UART-Komponente wurde beim Start als `FAILED` markiert — kein
+  LIN-Verkehr, nur „Cannot update Truma"-Warnungen. Ob der Fehler auftrat, hing vom
+  jeweiligen Build ab (identischer Code konnte je nach Binary-Layout funktionieren oder
+  fehlschlagen). Diagnostiziert in Issue #21. Der Fehlergrund ist nur im **seriellen**
+  Boot-Log sichtbar, nicht in Netzwerk-Logs.
+- `truma_inetbox`: Compile-Fehler bei `logger: level: VERBOSE`/`VERY_VERBOSE` behoben —
+  vier `format_hex_pretty()`-Aufrufe in `LinBusListener.cpp` benötigten explizite Casts
+  (Issue #22).
+
+### Geändert
+- Komponentenversion (`TRUMA_INETBOX_VERSION`) auf 1.0.23 aktualisiert — stand seit
+  1.0.20 fälschlich fest, die Log-Zeile `Component version:` zeigte daher auch bei
+  neueren Releases 1.0.20 an.
 
 ## [1.0.22] — 2026-07-03 — Truma Cooler C69: Master-Power-Schalter + Kompressor bestätigt
 

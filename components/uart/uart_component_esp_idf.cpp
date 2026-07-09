@@ -41,7 +41,10 @@ uart_config_t IDFUARTComponent::get_config_() {
       break;
   }
 
-  uart_config_t uart_config;
+  // Zero-init: newer ESP-IDF versions added fields (e.g. sleep-retention flags) to
+  // uart_config_t — leaving them uninitialized makes uart_param_config() fail with
+  // ESP_ERR_NOT_SUPPORTED ("not able to power down in light sleep") depending on stack garbage.
+  uart_config_t uart_config{};
   uart_config.baud_rate = this->baud_rate_;
   uart_config.data_bits = data_bits;
   uart_config.parity = parity;
