@@ -50,7 +50,14 @@ Die drei häufigsten Ursachen, in dieser Reihenfolge prüfen:
 
 Das CP Plus registriert LIN-Slaves **nur während seiner Initialisierung**. War beim letzten Anlernen keine funktionierende iNet Box am Bus, ist kein Slot reserviert — der ESP kann sich dann nicht registrieren, egal wie korrekt er sendet.
 
-**Lösung:** Die CP-Plus-Initialisierung einmal durchlaufen lassen, während der ESP (mit korrekter `VERSION_2`-Konfiguration) am Bus hängt. Bewährt hat sich, das Anlernen **ohne laufende Heizung** durchzuführen. Die Initialisierung dauert nur wenige Sekunden und darf nicht hängen bleiben.
+**Lösung — Slots leeren und neu anlernen:**
+
+1. **Alle Geräte vom CP Plus trennen** (Heizung, iNet Box/ESP, …)
+2. CP-Plus-Initialisierung durchlaufen lassen → die Slots sind danach leer
+3. **Alles wieder anschließen** (inkl. ESP mit korrekter `VERSION_2`-Konfiguration)
+4. Initialisierung **erneut** durchlaufen lassen
+
+Danach sollten alle Geräte am CP Plus zu sehen sein — sofern alles korrekt angeschlossen ist. Die Initialisierung dauert nur wenige Sekunden und darf nicht hängen bleiben.
 
 ### 1c. Verdrahtung prüfen
 

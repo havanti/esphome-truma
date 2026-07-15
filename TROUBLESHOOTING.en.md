@@ -50,7 +50,14 @@ The three most common causes, check in this order:
 
 The CP Plus registers LIN slaves **only during its initialization**. If no working iNet Box was on the bus during the last pairing, no slot is reserved — the ESP then cannot register, no matter how correctly it transmits.
 
-**Solution:** Run the CP Plus initialization once while the ESP (with a correct `VERSION_2` configuration) is connected to the bus. Doing the pairing **without the heater running** has proven reliable. Initialization only takes a few seconds and must not hang.
+**Solution — clear the slots and re-pair:**
+
+1. **Disconnect all devices from the CP Plus** (heater, iNet Box/ESP, …)
+2. Run the CP Plus initialization → the slots are now empty
+3. **Reconnect everything** (incl. the ESP with a correct `VERSION_2` configuration)
+4. Run the initialization **again**
+
+Afterwards all devices should be visible on the CP Plus — provided everything is wired correctly. Initialization only takes a few seconds and must not hang.
 
 ### 1c. Check the wiring
 
