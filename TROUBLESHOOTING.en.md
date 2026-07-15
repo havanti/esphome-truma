@@ -114,6 +114,6 @@ If nothing helps: [report a bug](https://github.com/havanti/esphome-truma/issues
 
 - [ ] Component version (release tag, e.g. `v1.0.23`) and ESPHome version
 - [ ] Board (exact module: WROOM / WROVER / PICO-D4 / S3)
-- [ ] CP Plus model and software version (readable in the CP Plus service menu)
+- [ ] CP Plus model and software version (printed on the CP Plus circuit board, usually on a sticker)
 - [ ] The YAML you use (secrets removed) — ideally an unmodified example
 - [ ] **Serial** DEBUG boot log from power-on (~30 s)

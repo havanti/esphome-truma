@@ -65,7 +65,7 @@ body:
     id: cpplus-version
     attributes:
       label: "CP Plus model + software version / CP-Plus-Modell + Software-Version"
-      description: "Readable in the CP Plus service menu — for LIN/heater issues / Im CP-Plus-Servicemenü ablesbar — bei LIN-/Heizungsproblemen"
+      description: "Printed on the CP Plus circuit board, usually on a sticker — for LIN/heater issues / Steht auf der Platine des CP Plus, meist als Aufkleber — bei LIN-/Heizungsproblemen"
       placeholder: "e.g. CP Plus, SW C4.01.02 / H1.02.00"
 
   - type: textarea
