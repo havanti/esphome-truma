@@ -1,5 +1,11 @@
 blank_issues_enabled: true
 contact_links:
+  - name: "🔧 Troubleshooting-Guide (DE) — Heizung / LIN-Bus"
+    url: https://github.com/havanti/esphome-truma/blob/main/TROUBLESHOOTING.md
+    about: "Häufigste Probleme bei der Inbetriebnahme — bitte vor einem Bug-Report prüfen."
+  - name: "🔧 Troubleshooting Guide (EN) — Heater / LIN bus"
+    url: https://github.com/havanti/esphome-truma/blob/main/TROUBLESHOOTING.en.md
+    about: "Most common commissioning problems — please check before filing a bug report."
   - name: "📖 Sniffing Guide (DE) — Truma Cooler"
     url: https://github.com/havanti/esphome-truma/blob/main/SNIFFING.md
     about: "Anleitung zum Mitschneiden der BLE-Kommunikation, bevor du ein Cooler-Modell meldest."

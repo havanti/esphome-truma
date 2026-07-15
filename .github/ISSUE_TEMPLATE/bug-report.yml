@@ -1,0 +1,102 @@
+name: "🐛 Bug report / Fehler melden"
+description: "Something does not work as expected / Etwas funktioniert nicht wie erwartet"
+title: "[Bug] <one-line summary>"
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! Please check the **[Troubleshooting Guide](../../blob/main/TROUBLESHOOTING.en.md)** first — it covers the most common problems.
+        Danke für die Meldung! Bitte zuerst den **[Troubleshooting-Guide](../../blob/main/TROUBLESHOOTING.md)** prüfen — er deckt die häufigsten Probleme ab.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: "Affected component / Betroffene Komponente"
+      options:
+        - "truma_inetbox (heater/aircon, LIN bus / Heizung/Klima, LIN-Bus)"
+        - "truma_cooler (BLE)"
+        - "uart"
+        - "TPMS"
+        - "other / Sonstiges"
+    validations:
+      required: true
+
+  - type: input
+    id: component-version
+    attributes:
+      label: "Component version / Komponenten-Version"
+      description: "Release tag or commit / Release-Tag oder Commit"
+      placeholder: "e.g. v1.0.23"
+    validations:
+      required: true
+
+  - type: input
+    id: esphome-version
+    attributes:
+      label: "ESPHome version"
+      placeholder: "e.g. 2026.6.5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: board
+    attributes:
+      label: "Board / ESP module"
+      description: "Exact module matters — see PICO-D4 note in the troubleshooting guide / Genaues Modul wichtig — siehe PICO-D4-Hinweis im Troubleshooting-Guide"
+      options:
+        - "ESP32 WROOM"
+        - "ESP32 WROVER"
+        - "ESP32 PICO-D4"
+        - "ESP32-S3"
+        - "other / unknown / Sonstiges / unbekannt"
+    validations:
+      required: true
+
+  - type: input
+    id: truma-device
+    attributes:
+      label: "Truma device / Truma-Gerät"
+      placeholder: "e.g. Combi 6 E, Combi 6 D, Aventa, Cooler C44"
+    validations:
+      required: true
+
+  - type: input
+    id: cpplus-version
+    attributes:
+      label: "CP Plus model + software version / CP-Plus-Modell + Software-Version"
+      description: "Readable in the CP Plus service menu — for LIN/heater issues / Im CP-Plus-Servicemenü ablesbar — bei LIN-/Heizungsproblemen"
+      placeholder: "e.g. CP Plus, SW C4.01.02 / H1.02.00"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "What happened vs. what did you expect / Was passiert vs. was erwartet"
+    validations:
+      required: true
+
+  - type: textarea
+    id: yaml
+    attributes:
+      label: "Your YAML (secrets removed) / Deine YAML (ohne Secrets)"
+      description: "Ideally based on an unmodified example / Idealerweise auf unverändertem Beispiel basierend"
+      render: yaml
+    validations:
+      required: true
+
+  - type: textarea
+    id: serial-log
+    attributes:
+      label: "Serial DEBUG boot log / Serielles DEBUG-Boot-Log"
+      description: "~30 s from power-on, captured via USB (`logger: level: DEBUG`). Errors in setup() only appear here, not in network logs! / ~30 s ab Einschalten, per USB (`logger: level: DEBUG`). Fehler in setup() erscheinen nur hier, nicht in Netzwerk-Logs!"
+      render: text
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: "Confirmation / Bestätigung"
+      options:
+        - label: "I read the [Troubleshooting Guide](../../blob/main/TROUBLESHOOTING.en.md) / Ich habe den [Troubleshooting-Guide](../../blob/main/TROUBLESHOOTING.md) gelesen"
+          required: true
