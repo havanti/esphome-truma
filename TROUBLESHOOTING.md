@@ -50,7 +50,7 @@ Die drei häufigsten Ursachen, in dieser Reihenfolge prüfen:
 
 Das CP Plus registriert LIN-Slaves **nur während seiner Initialisierung**. War beim letzten Anlernen keine funktionierende iNet Box am Bus, ist kein Slot reserviert — der ESP kann sich dann nicht registrieren, egal wie korrekt er sendet.
 
-**Lösung — Slots leeren und neu anlernen:**
+**Lösung — Slots leeren und neu anlernen** (gilt insbesondere bei der **ersten Inbetriebnahme** des ESP32 als LIN-Slave):
 
 1. **Alle Geräte vom CP Plus trennen** (Heizung, iNet Box/ESP, …)
 2. CP-Plus-Initialisierung durchlaufen lassen → die Slots sind danach leer
