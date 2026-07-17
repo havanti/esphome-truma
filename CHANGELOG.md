@@ -12,11 +12,9 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release stellt die Kompatibilität mit ESPHome 2025.8 bis 2026.6.x wieder her.
-Hauptursache war die Entfernung von `get_uart_event_queue()` aus der upstream
-`IDFUARTComponent` in ESPHome 2025.8, wodurch die LIN-Bus-BREAK-Erkennung bei
-ESP-IDF-Builds nicht mehr funktionierte. Zusätzliche Breaking Changes in ESP-IDF 5.x
-(ESP32-Toolchain) und ESPHome 2026.x API-Änderungen wurden ebenfalls behoben.
+Dieses Release behebt latente Korrektheitsfehler aus einem Code-Audit: falsch
+vorzeichenbehaftete LIN-Byte-Typen im Log-Pfad sowie ein `micros()`-Überlauf-Glitch
+im „CP Plus verbunden"-Sensor (~alle 71 Minuten möglich).
 
 Getestet mit:
 - ESPHome **2026.6.5** — ESP-IDF ✅
@@ -25,6 +23,17 @@ Getestet mit:
 
 ---
 
+
+## [1.0.24] — 2026-07-17 — Korrektheits-Fixes aus Code-Audit
+
+### Behoben
+- `truma_inetbox`: Log-Queue-Struct `QUEUE_LOG_MSG` verwendete `int8_t` für LIN-Bytes
+  (`current_PID`, `data`, `len`) — auf `uint8_t` korrigiert, Rück-Casts beim Logging entfernt
+- `truma_inetbox`: „CP Plus verbunden"-Binary-Sensor nutzte einen `micros()`-Vergleich ohne
+  Überlauf-Schutz — nach jedem 32-Bit-Überlauf des Mikrosekunden-Zählers (~71 Minuten) konnte
+  der Sensor kurzzeitig fälschlich `false` melden. Jetzt überlaufsicheres Subtraktions-Idiom.
+- `truma_inetbox`: `get_last_cp_plus_request()` gab `int64_t` zurück, obwohl der zugrunde
+  liegende Zeitstempel `uint32_t` ist — Returntyp korrigiert (nur intern genutzt)
 
 ## [1.0.23] — 2026-07-09 — UART-Startfehler behoben (uninitialisierte Konfiguration)
 
