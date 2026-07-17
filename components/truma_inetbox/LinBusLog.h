@@ -66,9 +66,9 @@ enum class QUEUE_LOG_MSG_TYPE {
 // Log messages generated during interrupt are pushed to log queue.
 struct QUEUE_LOG_MSG {
   QUEUE_LOG_MSG_TYPE type;
-  int8_t current_PID;
-  int8_t data[9];
-  int8_t len;
+  uint8_t current_PID;
+  uint8_t data[9];
+  uint8_t len;
 #ifdef ESPHOME_LOG_HAS_VERBOSE
   bool current_data_valid;
   bool message_source_know;

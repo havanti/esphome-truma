@@ -14,8 +14,9 @@ void TrumaCpPlusBinarySensor::update() {
     this->publish_state(false);
     return;
   }
-  const auto timeout = this->parent_->get_last_cp_plus_request() + CP_PLUS_TIMEOUT_US;
-  this->publish_state(micros() < timeout);
+  // Subtraction idiom is wraparound-safe for the 32-bit micros() counter (overflows every ~71 min).
+  const uint32_t since_last_request = micros() - this->parent_->get_last_cp_plus_request();
+  this->publish_state(since_last_request < CP_PLUS_TIMEOUT_US);
 }
 
 void TrumaCpPlusBinarySensor::dump_config() { LOG_BINARY_SENSOR("", "Truma CP Plus Binary Sensor", this); }

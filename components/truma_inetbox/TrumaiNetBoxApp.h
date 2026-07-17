@@ -39,7 +39,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   TrumaiNetBoxAppHeater *get_heater() { return &this->heater_; }
   TrumaiNetBoxAppTimer *get_timer() { return &this->timer_; }
 
-  int64_t get_last_cp_plus_request() { return this->device_registered_.load(std::memory_order_relaxed); }
+  uint32_t get_last_cp_plus_request() { return this->device_registered_.load(std::memory_order_relaxed); }
 
 #ifdef USE_TIME
   void set_time(time::RealTimeClock *time) { time_ = time; }
