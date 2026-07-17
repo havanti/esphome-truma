@@ -1,3 +1,8 @@
+> [!TIP]
+> ### ☕ Support
+> If the ongoing maintenance of this fork helps you (new features, fixes, docs and support all happen in my spare time), feel free to buy me a coffee:
+> **[paypal.me/rzaenger](https://paypal.me/rzaenger)** (no obligation, a star ⭐ is just as appreciated).
+
 <div align="center">
 
 

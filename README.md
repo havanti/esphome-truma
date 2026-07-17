@@ -1,3 +1,8 @@
+> [!TIP]
+> ### ☕ Unterstützung
+> Wem die Weiterpflege dieses Forks hilft (neue Features, Fixes, Doku und Support laufen in meiner Freizeit), der darf mir gern einen Kaffee ausgeben:
+> **[paypal.me/rzaenger](https://paypal.me/rzaenger)** (kein Muss, ein Stern ⭐ freut genauso).
+
 <div align="center">
 
 # ESPHOME-TRUMA AND MORE
