@@ -17,7 +17,7 @@ LIN byte types in the logging path and a `micros()` rollover glitch in the
 "CP Plus connected" sensor (possible every ~71 minutes).
 
 Tested against:
-- ESPHome **2026.7.4** — ESP-IDF ✅
+- ESPHome **2026.8.1** — ESP-IDF ✅
 - ESPHome **2026.6.5** — ESP-IDF ✅
 - ESPHome **2026.6.4** — ESP-IDF ✅
 
