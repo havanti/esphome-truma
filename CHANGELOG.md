@@ -17,7 +17,7 @@ vorzeichenbehaftete LIN-Byte-Typen im Log-Pfad sowie ein `micros()`-Überlauf-Gl
 im „CP Plus verbunden"-Sensor (~alle 71 Minuten möglich).
 
 Getestet mit:
-- ESPHome **2026.8.1** — ESP-IDF ✅
+- ESPHome **2026.8.2** — ESP-IDF ✅
 - ESPHome **2026.6.5** — ESP-IDF ✅
 - ESPHome **2026.6.4** — ESP-IDF ✅
 
