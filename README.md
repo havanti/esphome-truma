@@ -461,6 +461,22 @@ Folgende `type`-Werte sind verfügbar:
 - `OPERATING_STATUS`
 - `HEATER_ERROR_CODE`
 
+`OPERATING_STATUS` gibt den Betriebszustand weiter, den die Heizung selbst meldet: 0 heißt aus,
+1 ist eine Warnung, 4 kommt beim Anlauf und beim Nachlauf, ab 5 läuft sie. Darüber lässt sich
+erkennen, ob der Brenner gerade arbeitet. Die Binärsensoren `HEATER_ROOM` und `HEATER_WATER`
+taugen dafür nicht, denn sie zeigen nur eine gesetzte Solltemperatur an und bleiben auch dann
+aktiv, wenn die Heizung ihre Temperatur erreicht hat und pausiert. In den Beispielkonfigurationen
+hat der Sensor deshalb eine `id`:
+
+```yaml
+binary_sensor:
+  - platform: template
+    name: "Brenner aktiv"
+    lambda: return id(operating_status).state >= 5;
+```
+
+Was die Werte ab 5 voneinander unterscheidet, ist bisher nicht entschlüsselt.
+
 ### Text Sensor
 
 Zeigt die installierte Komponentenversion im ESPHome-Webinterface und Home Assistant an.

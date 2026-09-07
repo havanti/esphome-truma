@@ -465,6 +465,22 @@ The following `type` values are available:
 - `OPERATING_STATUS`
 - `HEATER_ERROR_CODE`
 
+`OPERATING_STATUS` passes on the operating state the heater itself reports: 0 means off, 1 is a
+warning, 4 shows up during start-up and cool-down, and from 5 upwards it is running. This is what
+tells you whether the burner is currently working. The binary sensors `HEATER_ROOM` and
+`HEATER_WATER` are not suitable for that, since they only indicate a target temperature being set
+and stay active while the heater has reached its temperature and pauses. That is why the sensor
+carries an `id` in the example configurations:
+
+```yaml
+binary_sensor:
+  - platform: template
+    name: "Burner active"
+    lambda: return id(operating_status).state >= 5;
+```
+
+What distinguishes the values from 5 upwards has not been decoded so far.
+
 ### Text Sensor
 
 Exposes the installed component version in the ESPHome web interface and Home Assistant.
