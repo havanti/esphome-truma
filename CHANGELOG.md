@@ -31,6 +31,9 @@ Getestet mit:
   lässt sich damit in Lambdas referenzieren — etwa für einen Template-Binärsensor, der über
   `state >= 5` anzeigt, dass der Brenner läuft. Betrifft die vier Heizungs-Beispiele
   (ESP32 und ESP32-S3, jeweils Gas und Diesel).
+- README: Der Sensor-Abschnitt erklärt jetzt die Werte von `OPERATING_STATUS` (0 aus, 1 Warnung,
+  4 Anlauf und Nachlauf, ab 5 in Betrieb) und warum `HEATER_ROOM` und `HEATER_WATER` nicht
+  taugen, um den laufenden Brenner zu erkennen
 
 ## [1.0.24] — 2026-07-17 — Korrektheits-Fixes aus Code-Audit
 

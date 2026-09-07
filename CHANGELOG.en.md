@@ -31,6 +31,9 @@ Tested against:
   therefore be referenced from lambdas — for instance in a template binary sensor that reports
   the burner running via `state >= 5`. Affects the four heater examples (ESP32 and ESP32-S3,
   gas and diesel each).
+- README: the sensor section now explains the `OPERATING_STATUS` values (0 off, 1 warning,
+  4 start-up and cool-down, 5 and above running) and why `HEATER_ROOM` and `HEATER_WATER` are
+  not suitable for detecting a running burner
 
 ## [1.0.24] — 2026-07-17 — Correctness fixes from code audit
 
