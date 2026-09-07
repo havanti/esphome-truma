@@ -12,9 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release fixes latent correctness bugs found in a code audit: wrongly signed
-LIN byte types in the logging path and a `micros()` rollover glitch in the
-"CP Plus connected" sensor (possible every ~71 minutes).
+This release only touches the example configurations: the "Operating Status" sensor now
+has an `id` and can be evaluated from lambdas, for example to tell whether the burner is
+currently running. No changes to the component code.
 
 Tested against:
 - ESPHome **2026.8.2** — ESP-IDF ✅

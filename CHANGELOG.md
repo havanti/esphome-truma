@@ -12,9 +12,9 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release behebt latente Korrektheitsfehler aus einem Code-Audit: falsch
-vorzeichenbehaftete LIN-Byte-Typen im Log-Pfad sowie ein `micros()`-Überlauf-Glitch
-im „CP Plus verbunden"-Sensor (~alle 71 Minuten möglich).
+Dieses Release ändert nur die Beispielkonfigurationen: Der Sensor „Operating Status" hat
+jetzt eine `id` und lässt sich damit in Lambdas auswerten, etwa um zu erkennen, ob der
+Brenner gerade läuft. Am Code der Komponenten hat sich nichts geändert.
 
 Getestet mit:
 - ESPHome **2026.8.2** — ESP-IDF ✅
