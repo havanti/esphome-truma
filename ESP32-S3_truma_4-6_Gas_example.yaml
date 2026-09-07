@@ -314,6 +314,7 @@ sensor:
   - platform: truma_inetbox
     name: "Operating Status"
     type: OPERATING_STATUS
+    id: operating_status
   # System
   - platform: internal_temperature
     name: "ESP32 Internal Temperature"
