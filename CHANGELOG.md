@@ -24,6 +24,14 @@ Getestet mit:
 ---
 
 
+## [1.0.25] — 2026-09-07 — Beispiel-YAMLs: `id` für Operating Status
+
+### Dokumentation
+- Beispielkonfigurationen: Der Sensor „Operating Status" hat jetzt `id: operating_status` und
+  lässt sich damit in Lambdas referenzieren — etwa für einen Template-Binärsensor, der über
+  `state >= 5` anzeigt, dass der Brenner läuft. Betrifft die vier Heizungs-Beispiele
+  (ESP32 und ESP32-S3, jeweils Gas und Diesel).
+
 ## [1.0.24] — 2026-07-17 — Korrektheits-Fixes aus Code-Audit
 
 ### Behoben
