@@ -12,9 +12,9 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release ändert nur die Beispielkonfigurationen: Der Sensor „Operating Status" hat
-jetzt eine `id` und lässt sich damit in Lambdas auswerten, etwa um zu erkennen, ob der
-Brenner gerade läuft. Am Code der Komponenten hat sich nichts geändert.
+Dieses Release korrigiert die PID-Angabe im VERBOSE-Log des LIN-Busses und stellt in der
+README richtig, dass `OPERATING_STATUS` nicht anzeigt, ob der Brenner läuft. An der Steuerung
+der Heizung hat sich nichts geändert.
 
 Getestet mit:
 - ESPHome **2026.8.2** — ESP-IDF ✅
@@ -23,6 +23,21 @@ Getestet mit:
 
 ---
 
+
+## [1.0.26] — 2026-09-15 — Log-PID behoben, `OPERATING_STATUS` richtiggestellt
+
+### Behoben
+- `truma_inetbox`: Im VERBOSE- bzw. VERY_VERBOSE-Log stand bei den rohen LIN-Frames
+  (`PID xx …`) nicht die PID des geloggten Frames, sondern die des Frames, der gerade empfangen
+  wurde. Die Log-Queue wird alle 50 ms aus der Hauptschleife geleert, die ausgegebene Variable
+  wurde aber bei jedem neuen Frame überschrieben, dadurch passten PID und Daten nicht zusammen.
+  Der Fehler stammt aus dem Originalprojekt und betraf nur die Log-Ausgabe.
+
+### Dokumentation
+- README: Die Aussage aus 1.0.25, dass `OPERATING_STATUS` ab 5 den laufenden Brenner anzeigt,
+  war falsch. Die Werte ab 5 hängen vom Modell ab (Combi 4: 5, sobald Heizung oder Boiler
+  eingeschaltet sind; Combi D6E: 6 schon ohne Heizung, 7 bei eingestellter Heizung). Das
+  Beispiel „Brenner aktiv" ist entfernt. Rückmeldung aus Issue #25.
 
 ## [1.0.25] — 2026-09-07 — Beispiel-YAMLs: `id` für Operating Status
 

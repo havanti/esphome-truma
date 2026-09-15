@@ -12,9 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release only touches the example configurations: the "Operating Status" sensor now
-has an `id` and can be evaluated from lambdas, for example to tell whether the burner is
-currently running. No changes to the component code.
+This release corrects the PID shown in the VERBOSE log of the LIN bus and sets the README
+straight: `OPERATING_STATUS` does not tell whether the burner is running. No changes to how
+the heater is controlled.
 
 Tested against:
 - ESPHome **2026.8.2** — ESP-IDF ✅
@@ -23,6 +23,21 @@ Tested against:
 
 ---
 
+
+## [1.0.26] — 2026-09-15 — Log PID fixed, `OPERATING_STATUS` corrected
+
+### Fixed
+- `truma_inetbox`: in the VERBOSE and VERY_VERBOSE log, raw LIN frames (`PID xx …`) did not
+  show the PID of the logged frame but that of the frame currently being received. The log
+  queue is drained every 50 ms from the main loop, but the printed variable was overwritten
+  with every new frame, so PID and data did not match. The bug comes from the original project
+  and only affected the log output.
+
+### Documentation
+- README: the statement from 1.0.25 that `OPERATING_STATUS` from 5 upwards indicates a running
+  burner was wrong. The values from 5 upwards depend on the model (Combi 4: 5 as soon as heating
+  or boiler are switched on; Combi D6E: 6 already without heating, 7 with heating set). The
+  "Burner active" example has been removed. Feedback from issue #25.
 
 ## [1.0.25] — 2026-09-07 — Example YAMLs: `id` for Operating Status
 
