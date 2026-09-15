@@ -462,20 +462,16 @@ Folgende `type`-Werte sind verfügbar:
 - `HEATER_ERROR_CODE`
 
 `OPERATING_STATUS` gibt den Betriebszustand weiter, den die Heizung selbst meldet: 0 heißt aus,
-1 ist eine Warnung, 4 kommt beim Anlauf und beim Nachlauf, ab 5 läuft sie. Darüber lässt sich
-erkennen, ob der Brenner gerade arbeitet. Die Binärsensoren `HEATER_ROOM` und `HEATER_WATER`
-taugen dafür nicht, denn sie zeigen nur eine gesetzte Solltemperatur an und bleiben auch dann
-aktiv, wenn die Heizung ihre Temperatur erreicht hat und pausiert. In den Beispielkonfigurationen
-hat der Sensor deshalb eine `id`:
+1 ist eine Warnung, 4 kommt beim Anlauf und beim Nachlauf. Die Werte darüber hängen vom Modell ab:
+Bei einer Combi 4 steht 5, sobald Heizung oder Boiler eingeschaltet sind, in Mitschnitten einer
+Combi D6E steht 7 bei eingestellter Heizung und 6 schon beim Einschalten ohne Heizung. Ob der
+Brenner gerade arbeitet, lässt sich daran nicht erkennen, die Komponente liefert dafür bisher kein
+Signal. Die Binärsensoren `HEATER_ROOM` und `HEATER_WATER` taugen dafür ebenfalls nicht, denn sie
+zeigen nur eine gesetzte Solltemperatur an und bleiben auch dann aktiv, wenn die Heizung ihre
+Temperatur erreicht hat und pausiert.
 
-```yaml
-binary_sensor:
-  - platform: template
-    name: "Brenner aktiv"
-    lambda: return id(operating_status).state >= 5;
-```
-
-Was die Werte ab 5 voneinander unterscheidet, ist bisher nicht entschlüsselt.
+In den Beispielkonfigurationen hat der Sensor die `id: operating_status`, damit er sich in Lambdas
+auswerten lässt.
 
 ### Text Sensor
 

@@ -466,20 +466,16 @@ The following `type` values are available:
 - `HEATER_ERROR_CODE`
 
 `OPERATING_STATUS` passes on the operating state the heater itself reports: 0 means off, 1 is a
-warning, 4 shows up during start-up and cool-down, and from 5 upwards it is running. This is what
-tells you whether the burner is currently working. The binary sensors `HEATER_ROOM` and
-`HEATER_WATER` are not suitable for that, since they only indicate a target temperature being set
-and stay active while the heater has reached its temperature and pauses. That is why the sensor
-carries an `id` in the example configurations:
+warning, 4 shows up during start-up and cool-down. The values above that depend on the model: a
+Combi 4 reports 5 as soon as heating or boiler are switched on, while captures from a Combi D6E
+show 7 with heating set and 6 already at power-on without heating. They do not tell whether the
+burner is currently working, and the component provides no signal for that so far. The binary
+sensors `HEATER_ROOM` and `HEATER_WATER` are not suitable either, since they only indicate a
+target temperature being set and stay active while the heater has reached its temperature and
+pauses.
 
-```yaml
-binary_sensor:
-  - platform: template
-    name: "Burner active"
-    lambda: return id(operating_status).state >= 5;
-```
-
-What distinguishes the values from 5 upwards has not been decoded so far.
+In the example configurations the sensor carries `id: operating_status` so it can be evaluated in
+lambdas.
 
 ### Text Sensor
 
