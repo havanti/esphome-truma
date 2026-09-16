@@ -17,7 +17,7 @@ README richtig, dass `OPERATING_STATUS` nicht anzeigt, ob der Brenner läuft. An
 der Heizung hat sich nichts geändert.
 
 Getestet mit:
-- ESPHome **2026.8.2** — ESP-IDF ✅
+- ESPHome **2026.9.0** — ESP-IDF ✅
 - ESPHome **2026.6.5** — ESP-IDF ✅
 - ESPHome **2026.6.4** — ESP-IDF ✅
 

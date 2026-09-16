@@ -17,7 +17,7 @@ straight: `OPERATING_STATUS` does not tell whether the burner is running. No cha
 the heater is controlled.
 
 Tested against:
-- ESPHome **2026.8.2** — ESP-IDF ✅
+- ESPHome **2026.9.0** — ESP-IDF ✅
 - ESPHome **2026.6.5** — ESP-IDF ✅
 - ESPHome **2026.6.4** — ESP-IDF ✅
 
