@@ -12,17 +12,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release corrects the PID shown in the VERBOSE log of the LIN bus and sets the README
-straight: `OPERATING_STATUS` does not tell whether the burner is running. No changes to how
-the heater is controlled.
+This release makes the Truma actions usable in triggers that pass an argument, such as an
+`api:` action with variables or the `set_action` of a template select. Until now the build
+failed there. No changes to how the heater is controlled.
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
-- ESPHome **2026.6.5** — ESP-IDF ✅
-- ESPHome **2026.6.4** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.27] — 2026-09-19 — Actions in triggers with arguments
+
+### Fixed
+- `truma_inetbox`: the actions `truma_inetbox.heater.*`, `truma_inetbox.timer.*`,
+  `truma_inetbox.aircon.manual.set_target_temperature` and `truma_inetbox.clock.set` could only
+  be used in triggers without arguments, i.e. in buttons, scripts or `interval`. In a trigger
+  with an argument the build failed with `marked 'override', but does not override`, for example
+  in an `api:` action with variables, in the `set_action` of a template select or in `on_value`.
+  The actions overrode `play()` taking their arguments by value, while ESPHome 2026.9 passes them
+  as const references. Without arguments both signatures are the same, which is why the bug did
+  not show up in the example YAMLs.
+- `uart`: the same fix for `uart.write` in the bundled UART component.
 
 ## [1.0.26] — 2026-09-15 — Log PID fixed, `OPERATING_STATUS` corrected
 
