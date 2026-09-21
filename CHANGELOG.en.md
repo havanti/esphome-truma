@@ -12,14 +12,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release removes the format warnings the build reported in the bundled UART
-component. No changes to how the heater is controlled.
+This release removes the `-Wunused-function` warnings for the type names in
+`truma_inetbox`. No changes to how the heater is controlled.
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.29] — 2026-09-21 — Unused function warnings
+
+### Fixed
+- `truma_inetbox`: the `enum_to_c_str()` helpers for sensor, binary sensor, number and select were
+  defined `static` in headers. Every file including the header got its own copy, and where it went
+  unused (for example in `main.cpp`) the build reported `-Wunused-function`. The helpers are now
+  `inline`.
 
 ## [1.0.28] — 2026-09-21 — Format warnings in the UART component
 

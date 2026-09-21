@@ -23,7 +23,7 @@ enum class TRUMA_BINARY_SENSOR_TYPE {
 };
 
 #ifdef ESPHOME_LOG_HAS_CONFIG
-static const char *enum_to_c_str(const TRUMA_BINARY_SENSOR_TYPE val) {
+inline const char *enum_to_c_str(const TRUMA_BINARY_SENSOR_TYPE val) {
   switch (val) {
     case TRUMA_BINARY_SENSOR_TYPE::HEATER_ROOM:
       return "HEATER_ROOM";

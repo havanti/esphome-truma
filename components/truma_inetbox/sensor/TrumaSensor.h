@@ -20,7 +20,7 @@ enum class TRUMA_SENSOR_TYPE {
 };
 
 #ifdef ESPHOME_LOG_HAS_CONFIG
-static const char *enum_to_c_str(const TRUMA_SENSOR_TYPE val) {
+inline const char *enum_to_c_str(const TRUMA_SENSOR_TYPE val) {
   switch (val) {
     case TRUMA_SENSOR_TYPE::CURRENT_ROOM_TEMPERATURE:
       return "CURRENT_ROOM_TEMPERATURE";

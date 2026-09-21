@@ -16,7 +16,7 @@ enum class TRUMA_NUMBER_TYPE {
 };
 
 #ifdef ESPHOME_LOG_HAS_CONFIG
-static const char *enum_to_c_str(const TRUMA_NUMBER_TYPE val) {
+inline const char *enum_to_c_str(const TRUMA_NUMBER_TYPE val) {
   switch (val) {
     case TRUMA_NUMBER_TYPE::TARGET_ROOM_TEMPERATURE:
       return "TARGET_ROOM_TEMPERATURE";

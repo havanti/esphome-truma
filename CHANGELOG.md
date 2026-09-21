@@ -12,14 +12,22 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release beseitigt die Formatwarnungen, die der Build in der mitgelieferten
-UART-Komponente meldete. An der Steuerung der Heizung hat sich nichts geändert.
+Dieses Release beseitigt die `-Wunused-function`-Warnungen für die Typ-Namen in
+`truma_inetbox`. An der Steuerung der Heizung hat sich nichts geändert.
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.29] — 2026-09-21 — Warnungen zu unbenutzten Funktionen
+
+### Behoben
+- `truma_inetbox`: Die Hilfsfunktionen `enum_to_c_str()` für Sensor, Binary Sensor, Number und
+  Select standen als `static` in Headern. Jede Datei, die den Header einbindet, bekam eine eigene
+  Kopie, und wo sie unbenutzt blieb (etwa in `main.cpp`), meldete der Build `-Wunused-function`.
+  Die Funktionen sind jetzt `inline`.
 
 ## [1.0.28] — 2026-09-21 — Formatwarnungen in der UART-Komponente
 
