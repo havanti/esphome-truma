@@ -12,15 +12,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release makes the Truma actions usable in triggers that pass an argument, such as an
-`api:` action with variables or the `set_action` of a template select. Until now the build
-failed there. No changes to how the heater is controlled.
+This release removes the format warnings the build reported in the bundled UART
+component. No changes to how the heater is controlled.
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.28] — 2026-09-21 — Format warnings in the UART component
+
+### Fixed
+- `uart`: The bundled UART component printed the baud rate with `%u`. On the ESP32-S3 `uint32_t`
+  is a `long unsigned int`, so the build reported `-Wformat` warnings in `uart.cpp` and
+  `uart_component_esp_idf.cpp`. The output now uses `PRIu32` like the ESPHome component. The
+  logged values were correct before as well.
 
 ## [1.0.27] — 2026-09-19 — Actions in triggers with arguments
 

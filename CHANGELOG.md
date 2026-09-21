@@ -12,15 +12,22 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release macht die Truma-Actions in Triggern mit Argument nutzbar, etwa in einer
-`api:`-Action mit Variablen oder im `set_action` eines Template-Selects. Bisher brach dort der
-Build ab. An der Steuerung der Heizung hat sich nichts geändert.
+Dieses Release beseitigt die Formatwarnungen, die der Build in der mitgelieferten
+UART-Komponente meldete. An der Steuerung der Heizung hat sich nichts geändert.
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.28] — 2026-09-21 — Formatwarnungen in der UART-Komponente
+
+### Behoben
+- `uart`: Die mitgelieferte UART-Komponente gab die Baudrate mit `%u` aus. Auf dem ESP32-S3 ist
+  `uint32_t` ein `long unsigned int`, deshalb meldete der Build `-Wformat`-Warnungen in
+  `uart.cpp` und `uart_component_esp_idf.cpp`. Die Ausgabe nutzt jetzt `PRIu32` wie die
+  ESPHome-Komponente. Die geloggten Werte waren auch vorher richtig.
 
 ## [1.0.27] — 2026-09-19 — Actions in Triggern mit Argument
 
