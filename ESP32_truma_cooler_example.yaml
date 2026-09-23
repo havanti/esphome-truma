@@ -21,11 +21,11 @@ logger:
 
 api:
   encryption:
-    key: ""  # WARNING: generate a 32-byte base64 key before deploying — esphome.io/components/api.html
+    key: !secret api_encryption_key  # 32-byte base64, see README
 
 ota:
   platform: esphome
-  password: "12345678901234567890123456789012"  # WARNING: replace with a unique password before deploying
+  encryption: {}  # uses the api encryption key
 
 wifi:
   networks:
@@ -47,7 +47,7 @@ external_components:
 # Optional: Onboard RGB LED status indicator (M5Stack Atom Lite: GPIO27)
 # light:
 #   - platform: esp32_rmt_led_strip
-#     rgb_order: GRB
+#     channel_colors: GRB
 #     pin: GPIO27
 #     num_leds: 1
 #     rmt_symbols: 64
@@ -63,8 +63,8 @@ external_components:
 # (passive scanning). Both can run simultaneously on the same ESP32.
 # esp32_ble_tracker:
 #   scan_parameters:
-#     interval: 1100ms
-#     window: 1100ms
+#     interval: 320ms
+#     window: 300ms
 #     active: false
 #
 # bluetooth_proxy:

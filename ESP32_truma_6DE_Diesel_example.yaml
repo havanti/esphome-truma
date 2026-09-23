@@ -32,7 +32,7 @@ logger:
 # Optional: Home Assistant integration
 api:
   encryption:
-    key: ""  # WARNING: generate a 32-byte base64 key before deploying — esphome.io/components/api.html
+    key: !secret api_encryption_key  # 32-byte base64, see README
   on_client_connected:
     - logger.log: "Home Assistant CONNECTED"
   on_client_disconnected:
@@ -40,7 +40,7 @@ api:
 
 ota:
   platform: esphome
-  password: "12345678901234567890123456789012"  # WARNING: replace with a unique password before deploying
+  encryption: {}  # uses the api encryption key
 
 # Two network configurations
 wifi:
@@ -299,8 +299,8 @@ web_server:
 # Optional: Bluetooth Proxy (uncomment to enable)
 # esp32_ble_tracker:
 #   scan_parameters:
-#     interval: 1100ms
-#     window: 1100ms
+#     interval: 320ms
+#     window: 300ms
 #     active: false
 
 # bluetooth_proxy:

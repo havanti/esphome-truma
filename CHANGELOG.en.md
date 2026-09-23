@@ -12,14 +12,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release adds experimental entities for the Combi 4 that show the heat demand from the LIN
-frame with PID 0x22. No changes to how the heater is controlled.
+This release updates the example configurations for ESPHome 2026.9.0: `api` key from
+`secrets.yaml`, encrypted OTA instead of a password. No changes to the component.
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.31] — 2026-09-23 — Example configurations for ESPHome 2026.9.0
+
+### Changed
+- Example YAMLs: `api: encryption: key` now comes from `!secret api_encryption_key`. The empty key
+  `""` is rejected since ESPHome 2026.9.0, so the examples did not build as shipped.
+- Example YAMLs: `ota` uses `encryption: {}` with the `api` key instead of a placeholder password.
+  ESPHome warned that the password only costs flash and RAM next to the `api` key. Migrating from
+  firmware with an OTA password: see README, OTA section.
+- Example YAMLs: BLE scan window from 1100 ms to `interval: 320ms`/`window: 300ms`. ESPHome warns
+  that long windows can cause WiFi disconnects while WiFi is active.
+- Example YAMLs: `rgb_order` replaced with `channel_colors` (`rgb_order` goes away with ESPHome
+  2027.3.0).
+
+### Documentation
+- README: Prerequisites and OTA sections updated to match the examples.
 
 ## [1.0.30] — 2026-09-23 — Heat demand (experimental)
 

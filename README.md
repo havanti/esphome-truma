@@ -275,17 +275,18 @@ Die UART-Pins wurden von GPIO16/17 wegverlegt, die auf S3-Boards für PSRAM rese
 
 ### Voraussetzungen
 
-Alle Konfigurationen verwenden `secrets.yaml` für WLAN-Zugangsdaten. Eine `secrets.yaml` im gleichen Verzeichnis erstellen mit:
+Alle Konfigurationen verwenden `secrets.yaml` für WLAN-Zugangsdaten und den `api`-Schlüssel. Eine `secrets.yaml` im gleichen Verzeichnis erstellen mit:
 
 ```yaml
 wifi_Mobile_ssid: "MobileSSID"
 wifi_Mobile_password: "MobilePasswort"
 wifi_Home_ssid: "HeimSSID"
 wifi_Home_password: "HeimPasswort"
-api_encryption_key: ""
+api_encryption_key: "32-Byte-Base64-Schlüssel"
 ```
 
-Der `api`-Verschlüsselungsschlüssel kann für die lokale Nutzung leer gelassen oder mit einem von ESPHome generierten 32-Byte-Base64-Schlüssel gefüllt werden.
+Der `api`-Schlüssel muss ein 32-Byte-Base64-Schlüssel sein, zum Beispiel erzeugt mit
+`openssl rand -base64 32`. Ein leerer Schlüssel wird seit ESPHome 2026.9.0 abgelehnt.
 
 ### OTA (Over-the-Air Update)
 
@@ -294,10 +295,18 @@ Alle Beispielkonfigurationen enthalten einen `ota`-Block, der Firmware-Updates d
 ```yaml
 ota:
   platform: esphome
-  password: "12345678901234567890123456789012"
+  encryption: {}
 ```
 
-**Wichtig:** Das Passwort in den Beispieldateien ist ein Platzhalter. Vor dem Einsatz durch ein eigenes, langes Passwort ersetzen und sicher aufbewahren. Wer das Passwort vergisst, muss den ESP32 wieder per USB flashen.
+`encryption: {}` verschlüsselt die Übertragung mit dem `api`-Schlüssel, ein eigenes OTA-Passwort
+ist nicht nötig. Den Schlüssel sicher aufbewahren: Wer ihn verliert, muss den ESP32 wieder per USB
+flashen.
+
+Läuft auf dem ESP32 noch eine Firmware, die mit OTA-Passwort gebaut wurde, bricht das Update mit
+`the device did not offer encryption` ab. Dann einmal mit dem bisherigen `password` statt
+`encryption: {}` installieren, der `api`-Schlüssel ist dabei schon gesetzt. Danach den
+`encryption`-Block wieder einfügen. Ist der `api`-Schlüssel neu, fragt Home Assistant ihn beim
+nächsten Verbinden ab.
 
 ### Minimalbeispiel
 

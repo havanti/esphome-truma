@@ -47,11 +47,11 @@ logger:
 
 api:
   encryption:
-    key: ""  # WARNING: generate a 32-byte base64 key before deploying — esphome.io/components/api.html
+    key: !secret api_encryption_key  # 32-byte base64, see README
 
 ota:
   platform: esphome
-  password: "12345678901234567890123456789012"  # WARNING: replace with a unique password before deploying
+  encryption: {}  # uses the api encryption key
 
 wifi:
   networks:

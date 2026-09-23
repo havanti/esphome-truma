@@ -12,14 +12,30 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release bringt experimentelle Entitäten für die Combi 4, die die Heizanforderung aus dem
-LIN-Frame mit der PID 0x22 anzeigen. An der Steuerung der Heizung hat sich nichts geändert.
+Dieses Release passt die Beispielkonfigurationen an ESPHome 2026.9.0 an: `api`-Schlüssel aus
+`secrets.yaml`, verschlüsseltes OTA statt Passwort. An der Komponente hat sich nichts geändert.
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.31] — 2026-09-23 — Beispielkonfigurationen für ESPHome 2026.9.0
+
+### Geändert
+- Beispiel-YAMLs: `api: encryption: key` kommt jetzt aus `!secret api_encryption_key`. Der leere
+  Schlüssel `""` wird seit ESPHome 2026.9.0 abgelehnt, die Beispiele ließen sich so nicht bauen.
+- Beispiel-YAMLs: `ota` nutzt `encryption: {}` mit dem `api`-Schlüssel statt eines
+  Platzhalter-Passworts. ESPHome warnte, dass das Passwort neben dem `api`-Schlüssel nur Flash und
+  RAM kostet. Umstieg von einer Firmware mit OTA-Passwort: siehe README, Abschnitt OTA.
+- Beispiel-YAMLs: BLE-Scanfenster von 1100 ms auf `interval: 320ms`/`window: 300ms`. ESPHome
+  warnt, dass lange Fenster bei gleichzeitigem WLAN zu Verbindungsabbrüchen führen können.
+- Beispiel-YAMLs: `rgb_order` durch `channel_colors` ersetzt (`rgb_order` entfällt mit ESPHome
+  2027.3.0).
+
+### Dokumentation
+- README: Abschnitte Voraussetzungen und OTA an die neuen Beispiele angepasst.
 
 ## [1.0.30] — 2026-09-23 — Heizanforderung (experimentell)
 
