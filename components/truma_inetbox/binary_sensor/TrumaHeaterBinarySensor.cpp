@@ -7,7 +7,16 @@ namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.heater_binary_sensor";
 
+// Experimental: PID 0x22 byte 1 bit 7 (0xD0 heating requested, 0x50 target reached, 0x00 off) — issue #25.
+static constexpr uint8_t STATUS_2_HEATING_DEMAND_MASK = 0x80;
+
 void TrumaHeaterBinarySensor::setup() {
+  if (this->type_ == TRUMA_BINARY_SENSOR_TYPE::HEATING_DEMAND) {
+    this->parent_->add_on_status_2_callback([this](uint8_t /*byte0*/, uint8_t byte1) {
+      this->publish_state((byte1 & STATUS_2_HEATING_DEMAND_MASK) != 0);
+    });
+    return;
+  }
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
     switch (this->type_) {
       case TRUMA_BINARY_SENSOR_TYPE::HEATER_ROOM:

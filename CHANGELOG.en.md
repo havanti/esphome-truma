@@ -12,14 +12,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release removes the `-Wunused-function` warnings for the type names in
-`truma_inetbox`. No changes to how the heater is controlled.
+This release adds experimental entities for the Combi 4 that show the heat demand from the LIN
+frame with PID 0x22. No changes to how the heater is controlled.
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.30] — 2026-09-23 — Heat demand (experimental)
+
+### Added
+- `truma_inetbox`: binary sensor `HEATING_DEMAND` and sensors `PID22_BYTE0`/`PID22_BYTE1`,
+  experimental and for the Combi 4 only (issue #25). They read the first two bytes of the LIN frame
+  with PID 0x22, which the component so far only printed in the VERY_VERBOSE log. `HEATING_DEMAND`
+  is bit 7 of byte 1: 0xD0 while heating is requested, 0x50 once the temperature is reached. The
+  burner ignites a few seconds later, so the sensor shows the demand, not the flame. Values are
+  only reported on change.
 
 ## [1.0.29] — 2026-09-21 — Unused function warnings
 

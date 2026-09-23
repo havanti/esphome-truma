@@ -87,6 +87,17 @@ CONF_SUPPORTED_TYPE = {
         CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
         CONF_ACCURACY_DECIMALS: 0,
     },
+    # Experimental: raw bytes of LIN PID 0x22, Combi 4 bus only (issue #25).
+    "PID22_BYTE0": {
+        CONF_CLASS: TRUMA_SENSOR_TYPE_dummy_ns.PID22_BYTE0,
+        CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
+        CONF_ACCURACY_DECIMALS: 0,
+    },
+    "PID22_BYTE1": {
+        CONF_CLASS: TRUMA_SENSOR_TYPE_dummy_ns.PID22_BYTE1,
+        CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
+        CONF_ACCURACY_DECIMALS: 0,
+    },
 }
 
 

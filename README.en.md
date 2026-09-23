@@ -380,6 +380,7 @@ The following `type` values are available:
 - `HEATER_MIX_2`
 - `HEATER_ELECTRICITY`
 - `HEATER_HAS_ERROR`
+- `HEATING_DEMAND` (experimental, see Sensor)
 - `TIMER_ACTIVE`
 - `TIMER_ROOM`
 - `TIMER_WATER`
@@ -464,6 +465,8 @@ The following `type` values are available:
 - `ENERGY_MIX`
 - `OPERATING_STATUS`
 - `HEATER_ERROR_CODE`
+- `PID22_BYTE0` (experimental)
+- `PID22_BYTE1` (experimental)
 
 `OPERATING_STATUS` passes on the operating state the heater itself reports: 0 means off, 1 is a
 warning, 4 shows up during start-up and cool-down. The values above that depend on the model: a
@@ -476,6 +479,16 @@ pauses.
 
 In the example configurations the sensor carries `id: operating_status` so it can be evaluated in
 lambdas.
+
+Experimental and for the Combi 4 only: the sensors `PID22_BYTE0` and `PID22_BYTE1` expose the
+first two bytes of the LIN frame with PID 0x22 as raw values, and the binary sensor
+`HEATING_DEMAND` reads bit 7 of byte 1. Captures from a Combi D6E do not contain this frame, so
+the entities stay without a value there. In tests on a Combi 4 Gas (issue #25) byte 1 read 0xD0
+(208) while the heater is supposed to heat, 0x50 (80) once the temperature is reached, and 0x00
+with the heater switched off. This matches the blinking display on the CP Plus and held for boiler
+operation as well. The burner ignites a few seconds after the change to 0xD0 and goes out with the
+change to 0x50, so `HEATING_DEMAND` shows the heat demand, not the flame. What byte 0 means is
+still open. Values are only reported when one of the two bytes changes.
 
 ### Text Sensor
 

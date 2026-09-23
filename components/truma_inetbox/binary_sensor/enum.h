@@ -16,6 +16,7 @@ enum class TRUMA_BINARY_SENSOR_TYPE {
   HEATER_MIX_2,
   HEATER_ELECTRICITY,
   HEATER_HAS_ERROR,
+  HEATING_DEMAND,
 
   TIMER_ACTIVE,
   TIMER_ROOM,
@@ -48,6 +49,9 @@ inline const char *enum_to_c_str(const TRUMA_BINARY_SENSOR_TYPE val) {
       break;
     case TRUMA_BINARY_SENSOR_TYPE::HEATER_HAS_ERROR:
       return "HEATER_HAS_ERROR";
+      break;
+    case TRUMA_BINARY_SENSOR_TYPE::HEATING_DEMAND:
+      return "HEATING_DEMAND";
       break;
 
     case TRUMA_BINARY_SENSOR_TYPE::TIMER_ACTIVE:

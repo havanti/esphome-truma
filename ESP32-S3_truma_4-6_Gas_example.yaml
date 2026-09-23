@@ -243,6 +243,10 @@ binary_sensor:
   - platform: truma_inetbox
     name: "Heater Has Error"
     type: HEATER_HAS_ERROR
+  # Experimental, Combi 4 only (issue #25): heat demand, not burner state
+  - platform: truma_inetbox
+    name: "Heating Demand"
+    type: HEATING_DEMAND
   - platform: truma_inetbox
     name: "Room Heater Active"
     type: HEATER_ROOM
@@ -315,6 +319,13 @@ sensor:
     name: "Operating Status"
     type: OPERATING_STATUS
     id: operating_status
+  # Experimental, Combi 4 only (issue #25): raw bytes 0 and 1 of LIN PID 0x22
+  - platform: truma_inetbox
+    name: "PID22 Byte0"
+    type: PID22_BYTE0
+  - platform: truma_inetbox
+    name: "PID22 Byte1"
+    type: PID22_BYTE1
   # System
   - platform: internal_temperature
     name: "ESP32 Internal Temperature"

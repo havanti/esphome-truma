@@ -12,6 +12,7 @@ static const char *const TAG = "truma_inetbox.TrumaiNetBoxApp";
 static constexpr uint32_t CLOCK_SYNC_DELAY_US = 30 * 1000 * 1000;   // 30 seconds after init before syncing time
 static constexpr uint32_t INIT_RETRY_DELAY_US = 5 * 1000 * 1000;    // 5 seconds before retrying init request
 static constexpr uint32_t UPDATE_RETRY_DELAY_US = 5 * 1000 * 1000;  // 5 seconds before retrying update notification
+static constexpr uint8_t STATUS_2_MIN_LENGTH = 2;                   // PID 0x22: only bytes 0 and 1 are exposed
 
 TrumaiNetBoxApp::TrumaiNetBoxApp() {
   this->airconAuto_.set_parent(this);
@@ -33,6 +34,7 @@ void TrumaiNetBoxApp::update() {
   this->config_.update();
   this->heater_.update();
   this->timer_.update();
+  this->publish_status_2_();
 
   LinBusProtocol::update();
 
@@ -105,6 +107,30 @@ bool TrumaiNetBoxApp::answer_lin_order_(const uint8_t pid) {
     return true;
   }
   return LinBusProtocol::answer_lin_order_(pid);
+}
+
+void TrumaiNetBoxApp::lin_message_received_(const uint8_t pid, const uint8_t *message, uint8_t length) {
+  if (pid == LIN_PID_STATUS_2) {
+    if (length >= STATUS_2_MIN_LENGTH) {
+      this->status_2_raw_.store(static_cast<uint16_t>(message[0] | (message[1] << 8)), std::memory_order_relaxed);
+      this->status_2_updated_.store(true, std::memory_order_release);
+    }
+    return;
+  }
+  LinBusProtocol::lin_message_received_(pid, message, length);
+}
+
+void TrumaiNetBoxApp::publish_status_2_() {
+  if (!this->status_2_updated_.exchange(false, std::memory_order_acquire)) {
+    return;
+  }
+  const uint16_t raw = this->status_2_raw_.load(std::memory_order_relaxed);
+  if (this->status_2_published_ && raw == this->status_2_last_published_) {
+    return;
+  }
+  this->status_2_published_ = true;
+  this->status_2_last_published_ = raw;
+  this->status_2_callback_.call(static_cast<uint8_t>(raw & 0xFF), static_cast<uint8_t>(raw >> 8));
 }
 
 bool TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) {

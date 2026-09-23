@@ -12,14 +12,24 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release beseitigt die `-Wunused-function`-Warnungen für die Typ-Namen in
-`truma_inetbox`. An der Steuerung der Heizung hat sich nichts geändert.
+Dieses Release bringt experimentelle Entitäten für die Combi 4, die die Heizanforderung aus dem
+LIN-Frame mit der PID 0x22 anzeigen. An der Steuerung der Heizung hat sich nichts geändert.
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.30] — 2026-09-23 — Heizanforderung (experimentell)
+
+### Hinzugefügt
+- `truma_inetbox`: Binärsensor `HEATING_DEMAND` und Sensoren `PID22_BYTE0`/`PID22_BYTE1`,
+  experimentell und nur für die Combi 4 (Issue #25). Sie werten die ersten beiden Bytes des
+  LIN-Frames mit der PID 0x22 aus, den die Komponente bisher nur im VERY_VERBOSE-Log ausgab.
+  `HEATING_DEMAND` ist Bit 7 von Byte 1: 0xD0, solange geheizt werden soll, 0x50 bei erreichter
+  Temperatur. Der Brenner zündet einige Sekunden später, der Sensor zeigt also die Anforderung,
+  nicht die Flamme. Die Werte werden nur bei Änderung gemeldet.
 
 ## [1.0.29] — 2026-09-21 — Warnungen zu unbenutzten Funktionen
 

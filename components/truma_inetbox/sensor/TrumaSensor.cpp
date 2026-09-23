@@ -8,6 +8,12 @@ namespace truma_inetbox {
 static const char *const TAG = "truma_inetbox.sensor";
 
 void TrumaSensor::setup() {
+  if (this->type_ == TRUMA_SENSOR_TYPE::PID22_BYTE0 || this->type_ == TRUMA_SENSOR_TYPE::PID22_BYTE1) {
+    this->parent_->add_on_status_2_callback([this](uint8_t byte0, uint8_t byte1) {
+      this->publish_state(static_cast<float>(this->type_ == TRUMA_SENSOR_TYPE::PID22_BYTE0 ? byte0 : byte1));
+    });
+    return;
+  }
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
     switch (this->type_) {
       case TRUMA_SENSOR_TYPE::CURRENT_ROOM_TEMPERATURE:

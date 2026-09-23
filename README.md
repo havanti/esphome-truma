@@ -376,6 +376,7 @@ Folgende `type`-Werte sind verfügbar:
 - `HEATER_MIX_2`
 - `HEATER_ELECTRICITY`
 - `HEATER_HAS_ERROR`
+- `HEATING_DEMAND` (experimentell, siehe Sensor)
 - `TIMER_ACTIVE`
 - `TIMER_ROOM`
 - `TIMER_WATER`
@@ -460,6 +461,8 @@ Folgende `type`-Werte sind verfügbar:
 - `ENERGY_MIX`
 - `OPERATING_STATUS`
 - `HEATER_ERROR_CODE`
+- `PID22_BYTE0` (experimentell)
+- `PID22_BYTE1` (experimentell)
 
 `OPERATING_STATUS` gibt den Betriebszustand weiter, den die Heizung selbst meldet: 0 heißt aus,
 1 ist eine Warnung, 4 kommt beim Anlauf und beim Nachlauf. Die Werte darüber hängen vom Modell ab:
@@ -472,6 +475,17 @@ Temperatur erreicht hat und pausiert.
 
 In den Beispielkonfigurationen hat der Sensor die `id: operating_status`, damit er sich in Lambdas
 auswerten lässt.
+
+Experimentell und nur für die Combi 4: Die Sensoren `PID22_BYTE0` und `PID22_BYTE1` geben die
+ersten beiden Bytes des LIN-Frames mit der PID 0x22 als Rohwert aus, der Binärsensor
+`HEATING_DEMAND` wertet Bit 7 von Byte 1 aus. In Mitschnitten einer Combi D6E kommt dieser Frame
+nicht vor, dort bleiben die Entitäten ohne Wert. Bei Tests an einer Combi 4 Gas (Issue #25) stand
+Byte 1 auf 0xD0 (208), solange die Heizung heizen soll, auf 0x50 (80), sobald die Temperatur
+erreicht ist, und auf 0x00 bei ausgeschalteter Heizung. Das passt zum Blinken der Anzeige am
+CP Plus und galt auch im Boilerbetrieb. Der Brenner zündet erst einige Sekunden nach dem Wechsel
+auf 0xD0 und geht mit dem Wechsel auf 0x50 aus. `HEATING_DEMAND` zeigt also die Heizanforderung,
+nicht die Flamme. Was Byte 0 bedeutet, ist offen. Die Werte werden nur gemeldet, wenn sich eines
+der beiden Bytes ändert.
 
 ### Text Sensor
 
