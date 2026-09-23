@@ -493,8 +493,9 @@ the entities stay without a value there. In tests on a Combi 4 Gas (issue #25) b
 (208) while the heater is supposed to heat, 0x50 (80) once the temperature is reached, and 0x00
 with the heater switched off. This matches the blinking display on the CP Plus and held for boiler
 operation as well. The burner ignites a few seconds after the change to 0xD0 and goes out with the
-change to 0x50, so `HEATING_DEMAND` shows the heat demand, not the flame. What byte 0 means is
-still open. Values are only reported when one of the two bytes changes.
+change to 0x50, so `HEATING_DEMAND` shows the heat demand, not the flame. According to inetbox.py,
+byte 0 is the supply voltage in 0.1 V (144 = 14.4 V); a comparison in a vehicle matched the battery
+voltage (13.8 vs. 13.9 V). Values are only reported when one of the two bytes changes.
 
 ### Text Sensor
 

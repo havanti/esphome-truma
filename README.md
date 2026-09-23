@@ -493,8 +493,9 @@ Byte 1 auf 0xD0 (208), solange die Heizung heizen soll, auf 0x50 (80), sobald di
 erreicht ist, und auf 0x00 bei ausgeschalteter Heizung. Das passt zum Blinken der Anzeige am
 CP Plus und galt auch im Boilerbetrieb. Der Brenner zündet erst einige Sekunden nach dem Wechsel
 auf 0xD0 und geht mit dem Wechsel auf 0x50 aus. `HEATING_DEMAND` zeigt also die Heizanforderung,
-nicht die Flamme. Was Byte 0 bedeutet, ist offen. Die Werte werden nur gemeldet, wenn sich eines
-der beiden Bytes ändert.
+nicht die Flamme. Byte 0 ist nach inetbox.py die Versorgungsspannung in 0,1 V (144 = 14,4 V), bei
+einem Vergleich im Fahrzeug stimmte das mit der Batteriespannung überein (13,8 zu 13,9 V). Die Werte
+werden nur gemeldet, wenn sich eines der beiden Bytes ändert.
 
 ### Text Sensor
 
