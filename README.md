@@ -472,6 +472,7 @@ Folgende `type`-Werte sind verfügbar:
 - `HEATER_ERROR_CODE`
 - `PID22_BYTE0` (experimentell)
 - `PID22_BYTE1` (experimentell)
+- `VENT_MODE`
 
 `OPERATING_STATUS` gibt den Betriebszustand weiter, den die Heizung selbst meldet: 0 heißt aus,
 1 ist eine Warnung, 4 kommt beim Anlauf und beim Nachlauf. Die Werte darüber hängen vom Modell ab:
@@ -491,11 +492,20 @@ ersten beiden Bytes des LIN-Frames mit der PID 0x22 als Rohwert aus, der Binärs
 nicht vor, dort bleiben die Entitäten ohne Wert. Bei Tests an einer Combi 4 Gas (Issue #25) stand
 Byte 1 auf 0xD0 (208), solange die Heizung heizen soll, auf 0x50 (80), sobald die Temperatur
 erreicht ist, und auf 0x00 bei ausgeschalteter Heizung. Das passt zum Blinken der Anzeige am
-CP Plus und galt auch im Boilerbetrieb. Der Brenner zündet erst einige Sekunden nach dem Wechsel
-auf 0xD0 und geht mit dem Wechsel auf 0x50 aus. `HEATING_DEMAND` zeigt also die Heizanforderung,
+CP Plus. Der Brenner zündet erst einige Sekunden nach dem Wechsel auf 0xD0 und geht mit dem
+Wechsel auf 0x50 aus. Im reinen Boilerbetrieb (Eco, Hot, Boost) wird Bit 7 nicht gesetzt, auch wenn
+der Brenner kurz für das Wasser läuft. `HEATING_DEMAND` zeigt also die Heizanforderung,
 nicht die Flamme. Byte 0 ist nach inetbox.py die Versorgungsspannung in 0,1 V (144 = 14,4 V), bei
-einem Vergleich im Fahrzeug stimmte das mit der Batteriespannung überein (13,8 zu 13,9 V). Die Werte
-werden nur gemeldet, wenn sich eines der beiden Bytes ändert.
+einem Vergleich im Fahrzeug stimmte das mit der Batteriespannung überein (13,8 zu 13,9 V), eine
+zweite Messung mit einem SmartShunt ebenfalls. Die Werte werden nur gemeldet, wenn sich eines der
+beiden Bytes ändert.
+
+`VENT_MODE` zeigt die Lüfterstufe an, die obere Ziffer von Byte 5 im LIN-Frame mit der PID 0x20:
+0 aus, 1 bis 10 Lüfterstufe im reinen Lüftungsbetrieb (Vent), 11 Heizlüfter Eco, 13 Heizlüfter
+High. Das deckt sich mit inetbox.py und wurde an einer Combi 4 nachgeprüft (Issue #25). Der Sensor
+ist eine reine Anzeige, die Lüftung lässt sich darüber nicht einstellen. Kommt der Frame auf dem
+Bus nicht vor, bleibt der Sensor ohne Wert. Eine weitere Auswertung der PIDs 0x20 bis 0x22 ist
+nicht geplant.
 
 ### Text Sensor
 

@@ -19,6 +19,7 @@ enum class TRUMA_SENSOR_TYPE {
   HEATER_ERROR_CODE,
   PID22_BYTE0,
   PID22_BYTE1,
+  VENT_MODE,
 };
 
 #ifdef ESPHOME_LOG_HAS_CONFIG
@@ -56,6 +57,9 @@ inline const char *enum_to_c_str(const TRUMA_SENSOR_TYPE val) {
       break;
     case TRUMA_SENSOR_TYPE::PID22_BYTE1:
       return "PID22_BYTE1";
+      break;
+    case TRUMA_SENSOR_TYPE::VENT_MODE:
+      return "VENT_MODE";
       break;
     default:
       return "";

@@ -23,6 +23,8 @@ static constexpr uint8_t DIAGNOSTIC_FRAME_MASTER = 0x3c;
 static constexpr uint8_t DIAGNOSTIC_FRAME_SLAVE = 0x3d;
 // Experimental: seen on the Combi 4 bus only (issue #25). Forwarded regardless of master/slave classification.
 static constexpr uint8_t LIN_PID_STATUS_2 = 0x22;
+// Read-only: vent mode in byte 5 (issue #25). Forwarded regardless of master/slave classification.
+static constexpr uint8_t LIN_PID_COMMAND_STATUS = 0x20;
 
 enum class LIN_CHECKSUM { LIN_CHECKSUM_VERSION_1, LIN_CHECKSUM_VERSION_2 };
 

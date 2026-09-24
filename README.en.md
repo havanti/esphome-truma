@@ -473,6 +473,7 @@ The following `type` values are available:
 - `HEATER_ERROR_CODE`
 - `PID22_BYTE0` (experimental)
 - `PID22_BYTE1` (experimental)
+- `VENT_MODE`
 
 `OPERATING_STATUS` passes on the operating state the heater itself reports: 0 means off, 1 is a
 warning, 4 shows up during start-up and cool-down. The values above that depend on the model: a
@@ -491,11 +492,19 @@ first two bytes of the LIN frame with PID 0x22 as raw values, and the binary sen
 `HEATING_DEMAND` reads bit 7 of byte 1. Captures from a Combi D6E do not contain this frame, so
 the entities stay without a value there. In tests on a Combi 4 Gas (issue #25) byte 1 read 0xD0
 (208) while the heater is supposed to heat, 0x50 (80) once the temperature is reached, and 0x00
-with the heater switched off. This matches the blinking display on the CP Plus and held for boiler
-operation as well. The burner ignites a few seconds after the change to 0xD0 and goes out with the
+with the heater switched off. This matches the blinking display on the CP Plus. In pure boiler
+operation (Eco, Hot, Boost) bit 7 is not set, even while the burner briefly runs for the water. The
+burner ignites a few seconds after the change to 0xD0 and goes out with the
 change to 0x50, so `HEATING_DEMAND` shows the heat demand, not the flame. According to inetbox.py,
 byte 0 is the supply voltage in 0.1 V (144 = 14.4 V); a comparison in a vehicle matched the battery
-voltage (13.8 vs. 13.9 V). Values are only reported when one of the two bytes changes.
+voltage (13.8 vs. 13.9 V), and so did a second measurement with a SmartShunt. Values are only
+reported when one of the two bytes changes.
+
+`VENT_MODE` shows the fan level, the upper digit of byte 5 in the LIN frame with PID 0x20: 0 off,
+1 to 10 fan level in pure ventilation mode (Vent), 11 heating fan Eco, 13 heating fan High. This
+matches inetbox.py and was checked on a Combi 4 (issue #25). The sensor is display only; the
+ventilation cannot be set through it. If the frame does not appear on the bus, the sensor stays
+without a value. No further analysis of PIDs 0x20 to 0x22 is planned.
 
 ### Text Sensor
 

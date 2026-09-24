@@ -14,6 +14,11 @@ void TrumaSensor::setup() {
     });
     return;
   }
+  if (this->type_ == TRUMA_SENSOR_TYPE::VENT_MODE) {
+    this->parent_->add_on_vent_mode_callback(
+        [this](uint8_t vent_mode) { this->publish_state(static_cast<float>(vent_mode)); });
+    return;
+  }
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
     switch (this->type_) {
       case TRUMA_SENSOR_TYPE::CURRENT_ROOM_TEMPERATURE:

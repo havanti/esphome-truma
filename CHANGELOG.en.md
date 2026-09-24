@@ -12,14 +12,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release updates the example configurations for ESPHome 2026.9.0: `api` key from
-`secrets.yaml`, encrypted OTA instead of a password. No changes to the component.
+This release adds the `VENT_MODE` sensor for the fan level (issue #25) and corrects the README
+statement on `HEATING_DEMAND` in boiler operation.
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.32] — 2026-09-24 — Fan level
+
+### Added
+- `truma_inetbox`: sensor `VENT_MODE`, the upper digit of byte 5 in the LIN frame with PID 0x20
+  (0 off, 1–10 fan level, 11 heating fan Eco, 13 heating fan High). Display only, checked on a
+  Combi 4 (issue #25). The frame is now evaluated regardless of master/slave classification, like
+  PID 0x22 already.
+
+### Documentation
+- README: `HEATING_DEMAND` stays off in pure boiler operation. The earlier statement that 0xD0 also
+  applies there came from tests with heating and boiler on at the same time.
+- README: byte 0 of PID 0x22 as supply voltage confirmed by a second measurement. No further
+  analysis of PIDs 0x20 to 0x22 is planned.
 
 ## [1.0.31] — 2026-09-23 — Example configurations for ESPHome 2026.9.0
 

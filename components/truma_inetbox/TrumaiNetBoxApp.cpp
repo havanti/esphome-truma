@@ -13,6 +13,8 @@ static constexpr uint32_t CLOCK_SYNC_DELAY_US = 30 * 1000 * 1000;   // 30 second
 static constexpr uint32_t INIT_RETRY_DELAY_US = 5 * 1000 * 1000;    // 5 seconds before retrying init request
 static constexpr uint32_t UPDATE_RETRY_DELAY_US = 5 * 1000 * 1000;  // 5 seconds before retrying update notification
 static constexpr uint8_t STATUS_2_MIN_LENGTH = 2;                   // PID 0x22: only bytes 0 and 1 are exposed
+static constexpr uint8_t COMMAND_STATUS_VENT_BYTE = 5;              // PID 0x20: vent mode in the high nibble
+static constexpr uint8_t VENT_MODE_SHIFT = 4;
 
 TrumaiNetBoxApp::TrumaiNetBoxApp() {
   this->airconAuto_.set_parent(this);
@@ -35,6 +37,7 @@ void TrumaiNetBoxApp::update() {
   this->heater_.update();
   this->timer_.update();
   this->publish_status_2_();
+  this->publish_vent_mode_();
 
   LinBusProtocol::update();
 
@@ -117,6 +120,13 @@ void TrumaiNetBoxApp::lin_message_received_(const uint8_t pid, const uint8_t *me
     }
     return;
   }
+  if (pid == LIN_PID_COMMAND_STATUS) {
+    if (length > COMMAND_STATUS_VENT_BYTE) {
+      this->vent_mode_raw_.store(message[COMMAND_STATUS_VENT_BYTE] >> VENT_MODE_SHIFT, std::memory_order_relaxed);
+      this->vent_mode_updated_.store(true, std::memory_order_release);
+    }
+    return;
+  }
   LinBusProtocol::lin_message_received_(pid, message, length);
 }
 
@@ -131,6 +141,19 @@ void TrumaiNetBoxApp::publish_status_2_() {
   this->status_2_published_ = true;
   this->status_2_last_published_ = raw;
   this->status_2_callback_.call(static_cast<uint8_t>(raw & 0xFF), static_cast<uint8_t>(raw >> 8));
+}
+
+void TrumaiNetBoxApp::publish_vent_mode_() {
+  if (!this->vent_mode_updated_.exchange(false, std::memory_order_acquire)) {
+    return;
+  }
+  const uint8_t vent_mode = this->vent_mode_raw_.load(std::memory_order_relaxed);
+  if (this->vent_mode_published_ && vent_mode == this->vent_mode_last_published_) {
+    return;
+  }
+  this->vent_mode_published_ = true;
+  this->vent_mode_last_published_ = vent_mode;
+  this->vent_mode_callback_.call(vent_mode);
 }
 
 bool TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) {

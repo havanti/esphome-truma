@@ -47,6 +47,12 @@ class TrumaiNetBoxApp : public LinBusProtocol {
     this->status_2_callback_.add(std::move(callback));
   }
 
+  // Read-only: high nibble of LIN PID 0x20 byte 5 (0 off, 1-10 vent level, 11 Eco, 13 High; issue #25).
+  // Callback runs in the main loop and only when the value changed.
+  void add_on_vent_mode_callback(std::function<void(uint8_t vent_mode)> callback) {
+    this->vent_mode_callback_.add(std::move(callback));
+  }
+
 #ifdef USE_TIME
   void set_time(time::RealTimeClock *time) { time_ = time; }
   time::RealTimeClock *get_time() const { return time_; }
@@ -84,6 +90,14 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   uint16_t status_2_last_published_{0};
   CallbackManager<void(uint8_t, uint8_t)> status_2_callback_{};
 
+  // PID 0x20 vent mode. Written from uartEventTask_, read from main loop.
+  std::atomic<uint8_t> vent_mode_raw_{0};
+  std::atomic<bool> vent_mode_updated_{false};
+  // Main loop only.
+  bool vent_mode_published_{false};
+  uint8_t vent_mode_last_published_{0};
+  CallbackManager<void(uint8_t)> vent_mode_callback_{};
+
 #ifdef USE_TIME
   time::RealTimeClock *time_ = nullptr;
 
@@ -94,6 +108,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   bool answer_lin_order_(const uint8_t pid) override;
   void lin_message_received_(const uint8_t pid, const uint8_t *message, uint8_t length) override;
   void publish_status_2_();
+  void publish_vent_mode_();
 
   bool lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) override;
   const uint8_t *lin_multiframe_received(const uint8_t *message, const uint8_t message_len,

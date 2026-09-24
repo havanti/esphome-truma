@@ -12,14 +12,28 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release passt die Beispielkonfigurationen an ESPHome 2026.9.0 an: `api`-Schlüssel aus
-`secrets.yaml`, verschlüsseltes OTA statt Passwort. An der Komponente hat sich nichts geändert.
+Dieses Release ergänzt den Sensor `VENT_MODE` für die Lüfterstufe (Issue #25) und korrigiert die
+README-Angabe zu `HEATING_DEMAND` im Boilerbetrieb.
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.32] — 2026-09-24 — Lüfterstufe
+
+### Hinzugefügt
+- `truma_inetbox`: Sensor `VENT_MODE`, die obere Ziffer von Byte 5 im LIN-Frame mit der PID 0x20
+  (0 aus, 1–10 Lüfterstufe, 11 Heizlüfter Eco, 13 Heizlüfter High). Nur Anzeige, an einer Combi 4
+  nachgeprüft (Issue #25). Der Frame wird jetzt unabhängig von der Master/Slave-Zuordnung
+  ausgewertet, wie schon PID 0x22.
+
+### Dokumentation
+- README: `HEATING_DEMAND` bleibt im reinen Boilerbetrieb aus. Die frühere Angabe, 0xD0 gelte auch
+  dort, stammte aus Tests mit Heizung und Boiler gleichzeitig.
+- README: Byte 0 von PID 0x22 als Versorgungsspannung durch eine zweite Messung bestätigt. Eine
+  weitere Auswertung der PIDs 0x20 bis 0x22 ist nicht geplant.
 
 ## [1.0.31] — 2026-09-23 — Beispielkonfigurationen für ESPHome 2026.9.0
 

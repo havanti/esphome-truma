@@ -326,6 +326,10 @@ sensor:
   - platform: truma_inetbox
     name: "PID22 Byte1"
     type: PID22_BYTE1
+  # Fan level from LIN PID 0x20: 0 off, 1-10 Vent, 11 Eco, 13 High (display only)
+  - platform: truma_inetbox
+    name: "Vent Mode"
+    type: VENT_MODE
   # System
   - platform: internal_temperature
     name: "ESP32 Internal Temperature"

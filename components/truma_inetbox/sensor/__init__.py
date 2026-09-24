@@ -98,6 +98,12 @@ CONF_SUPPORTED_TYPE = {
         CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
         CONF_ACCURACY_DECIMALS: 0,
     },
+    # Read-only: LIN PID 0x20 byte 5 high nibble (issue #25).
+    "VENT_MODE": {
+        CONF_CLASS: TRUMA_SENSOR_TYPE_dummy_ns.VENT_MODE,
+        CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
+        CONF_ACCURACY_DECIMALS: 0,
+    },
 }
 
 
