@@ -12,14 +12,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release adds the `VENT_MODE` sensor for the fan level (issue #25) and corrects the README
-statement on `HEATING_DEMAND` in boiler operation.
+This release fixes switching on the Aventa from Home Assistant when the CP Plus reports an
+invalid fan value while the air conditioner is off (issue #28).
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.33] — 2026-09-28 — Switching on the Aventa
+
+### Fixed
+- `truma_inetbox`: CP Plus C.04.05.02 reports fan value 0xFF while the Aventa is off. When
+  switching on from Home Assistant this value was sent back unchanged, and the CP Plus rejected the
+  command with `StatusFrameResponseAck … FAILED 02` (issue #28). Unknown fan values are now
+  replaced by `Low` before sending, or by `Auto` in Auto mode.
+
+### Documentation
+- README: `VENT_MODE` now notes that PIDs 0x20 to 0x22 do not appear in captures from a
+  Combi D6 E.
 
 ## [1.0.32] — 2026-09-24 — Fan level
 

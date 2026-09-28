@@ -504,7 +504,8 @@ reported when one of the two bytes changes.
 1 to 10 fan level in pure ventilation mode (Vent), 11 heating fan Eco, 13 heating fan High. This
 matches inetbox.py and was checked on a Combi 4 (issue #25). The sensor is display only; the
 ventilation cannot be set through it. If the frame does not appear on the bus, the sensor stays
-without a value. No further analysis of PIDs 0x20 to 0x22 is planned.
+without a value. Captures from a Combi D6 E contain no PIDs 0x20 to 0x22 at all. No further
+analysis of these PIDs is planned.
 
 ### Text Sensor
 

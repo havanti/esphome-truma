@@ -504,8 +504,8 @@ beiden Bytes ändert.
 0 aus, 1 bis 10 Lüfterstufe im reinen Lüftungsbetrieb (Vent), 11 Heizlüfter Eco, 13 Heizlüfter
 High. Das deckt sich mit inetbox.py und wurde an einer Combi 4 nachgeprüft (Issue #25). Der Sensor
 ist eine reine Anzeige, die Lüftung lässt sich darüber nicht einstellen. Kommt der Frame auf dem
-Bus nicht vor, bleibt der Sensor ohne Wert. Eine weitere Auswertung der PIDs 0x20 bis 0x22 ist
-nicht geplant.
+Bus nicht vor, bleibt der Sensor ohne Wert. In den Mitschnitten einer Combi D6 E fehlen die PIDs
+0x20 bis 0x22 ganz. Eine weitere Auswertung dieser PIDs ist nicht geplant.
 
 ### Text Sensor
 

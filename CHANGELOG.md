@@ -12,14 +12,26 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release ergänzt den Sensor `VENT_MODE` für die Lüfterstufe (Issue #25) und korrigiert die
-README-Angabe zu `HEATING_DEMAND` im Boilerbetrieb.
+Dieses Release behebt das Einschalten der Aventa aus Home Assistant, wenn der CP Plus bei
+ausgeschalteter Klimaanlage einen ungültigen Lüfterwert meldet (Issue #28).
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.33] — 2026-09-28 — Aventa einschalten
+
+### Behoben
+- `truma_inetbox`: Der CP Plus C.04.05.02 meldet bei ausgeschalteter Aventa den Lüfterwert 0xFF.
+  Dieser Wert wurde beim Einschalten aus Home Assistant unverändert zurückgeschickt, und der CP Plus
+  lehnte den Befehl mit `StatusFrameResponseAck … FAILED 02` ab (Issue #28). Unbekannte Lüfterwerte
+  werden vor dem Senden jetzt durch `Low` ersetzt, im Modus Auto durch `Auto`.
+
+### Dokumentation
+- README: `VENT_MODE` um den Hinweis ergänzt, dass die PIDs 0x20 bis 0x22 in den Mitschnitten
+  einer Combi D6 E nicht vorkommen.
 
 ## [1.0.32] — 2026-09-24 — Lüfterstufe
 

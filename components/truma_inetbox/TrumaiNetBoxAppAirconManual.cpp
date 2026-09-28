@@ -9,6 +9,19 @@ namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.TrumaiNetBoxAppAirconManual";
 
+static bool is_valid_vent_mode(AirconVentMode vent_mode) {
+  switch (vent_mode) {
+    case AirconVentMode::AIRCON_VENT_LOW:
+    case AirconVentMode::AIRCON_VENT_MID:
+    case AirconVentMode::AIRCON_VENT_HIGH:
+    case AirconVentMode::AIRCON_VENT_NIGHT:
+    case AirconVentMode::AIRCON_VENT_AUTO:
+      return true;
+    default:
+      return false;
+  }
+}
+
 StatusFrameAirconManualResponse *TrumaiNetBoxAppAirconManual::update_prepare() {
   if (this->update_status_prepared_ || this->update_status_stale_) {
     return &this->update_status_;
@@ -34,9 +47,19 @@ void TrumaiNetBoxAppAirconManual::create_update_data(StatusFrame *response, uint
   status_frame_create_empty(response, STATUS_FRAME_AIRCON_MANUAL_RESPONSE, sizeof(StatusFrameAirconManualResponse),
                             command_counter);
 
+  // CP Plus C.04.05.02 reports vent mode 0xFF while the aircon is off (issue #28). Echoing it back
+  // is rejected with ACK 0x02, so replace any unknown value before sending.
+  AirconVentMode vent_mode = this->update_status_.vent_mode;
+  if (!is_valid_vent_mode(vent_mode)) {
+    vent_mode = this->update_status_.mode == AirconMode::AIRCON_MODE_AUTO ? AirconVentMode::AIRCON_VENT_AUTO
+                                                                          : AirconVentMode::AIRCON_VENT_LOW;
+    ESP_LOGD(TAG, "Unknown vent mode 0x%02X replaced by 0x%02X", (uint8_t) this->update_status_.vent_mode,
+             (uint8_t) vent_mode);
+  }
+
   response->airconManualResponse.mode = this->update_status_.mode;
   response->airconManualResponse.unknown_02 = 0x00;
-  response->airconManualResponse.vent_mode = this->update_status_.vent_mode;
+  response->airconManualResponse.vent_mode = vent_mode;
   response->airconManualResponse.aircon_on = 0x01;  // Must always be 1
   response->airconManualResponse.target_temp_aircon = this->update_status_.target_temp_aircon;
   memset(response->airconManualResponse.padding, 0x00, sizeof(response->airconManualResponse.padding));
