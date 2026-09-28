@@ -12,8 +12,9 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release behebt das Einschalten der Aventa aus Home Assistant, wenn der CP Plus bei
-ausgeschalteter Klimaanlage einen ungültigen Lüfterwert meldet (Issue #28).
+Dieses Release soll das Einschalten der Aventa aus Home Assistant beheben, wenn der CP Plus bei
+ausgeschalteter Klimaanlage einen ungültigen Lüfterwert meldet (Issue #28). An einer Aventa ist das
+noch nicht bestätigt.
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
@@ -23,11 +24,12 @@ Getestet mit:
 
 ## [1.0.33] — 2026-09-28 — Aventa einschalten
 
-### Behoben
+### Geändert
 - `truma_inetbox`: Der CP Plus C.04.05.02 meldet bei ausgeschalteter Aventa den Lüfterwert 0xFF.
   Dieser Wert wurde beim Einschalten aus Home Assistant unverändert zurückgeschickt, und der CP Plus
   lehnte den Befehl mit `StatusFrameResponseAck … FAILED 02` ab (Issue #28). Unbekannte Lüfterwerte
-  werden vor dem Senden jetzt durch `Low` ersetzt, im Modus Auto durch `Auto`.
+  werden vor dem Senden jetzt durch `Low` ersetzt, im Modus Auto durch `Auto`. Ob sich die Aventa
+  damit einschalten lässt, ist an der Hardware noch nicht bestätigt.
 
 ### Dokumentation
 - README: `VENT_MODE` um den Hinweis ergänzt, dass die PIDs 0x20 bis 0x22 in den Mitschnitten

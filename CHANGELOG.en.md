@@ -12,8 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release fixes switching on the Aventa from Home Assistant when the CP Plus reports an
-invalid fan value while the air conditioner is off (issue #28).
+This release is meant to fix switching on the Aventa from Home Assistant when the CP Plus reports
+an invalid fan value while the air conditioner is off (issue #28). Not yet confirmed on an Aventa.
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
@@ -23,11 +23,12 @@ Tested against:
 
 ## [1.0.33] — 2026-09-28 — Switching on the Aventa
 
-### Fixed
+### Changed
 - `truma_inetbox`: CP Plus C.04.05.02 reports fan value 0xFF while the Aventa is off. When
   switching on from Home Assistant this value was sent back unchanged, and the CP Plus rejected the
   command with `StatusFrameResponseAck … FAILED 02` (issue #28). Unknown fan values are now
-  replaced by `Low` before sending, or by `Auto` in Auto mode.
+  replaced by `Low` before sending, or by `Auto` in Auto mode. Whether the Aventa can be switched
+  on this way is not yet confirmed on hardware.
 
 ### Documentation
 - README: `VENT_MODE` now notes that PIDs 0x20 to 0x22 do not appear in captures from a
