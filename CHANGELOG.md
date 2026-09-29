@@ -12,15 +12,55 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release soll das Einschalten der Aventa aus Home Assistant beheben, wenn der CP Plus bei
-ausgeschalteter Klimaanlage einen ungültigen Lüfterwert meldet (Issue #28). An einer Aventa ist das
-noch nicht bestätigt.
+Dieses Release behebt mehrere Fehler der Kühlbox-Komponente, getestet an einer C44: Turbo ging
+beim erneuten Senden von „Kühlen“ aus, der Kompressor wurde mit Turbo als aus angezeigt, und
+Änderungen kamen erst nach bis zu einer Minute in Home Assistant an.
+
+Außerdem sichert es die LIN-Kommunikation an Stellen ab, die bei einem Code-Review von
+`truma_inetbox` und `uart` aufgefallen sind. Kein gemeldeter Fehler geht darauf zurück, im normalen
+Betrieb ändert sich nichts. Dieser Teil ist für ESP32 und ESP32-S3 gebaut und auf einem ESP32-S3
+gestartet, aber nicht an einem LIN-Bus getestet. Die Aventa-Änderung aus 1.0.33 ist weiterhin nicht
+bestätigt.
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.34] — 2026-09-29 — Kühlbox-Korrekturen, Absicherung der LIN-Kommunikation
+
+### Geändert
+- `truma_cooler`: Die Anmeldung für Statusmeldungen läuft jetzt über ESPHome
+  (`register_for_notify`), das den CCCD selbst schreibt. Die Komponente schrieb ihn bisher zusätzlich
+  von Hand. ESPHome kann danach den GATT-Cache der Verbindung freigeben.
+- `truma_inetbox`: Antworten an den CP Plus liegen bis zur Abfrage per PID 0x3D in einer
+  Warteschlange. Der LIN-Task legt sie dort ab, der UART-Task holt sie heraus. Die Zugriffe waren
+  nicht abgesichert, und der höher priorisierte UART-Task konnte den LIN-Task mitten im Ablegen
+  unterbrechen. Selten, aber möglich waren dadurch eine fehlerhafte Antwort oder ein Absturz. Die
+  Warteschlange ist jetzt eine FreeRTOS-Queue mit 16 Plätzen.
+- `truma_inetbox`: Die Wartezeit auf das nächste Datenbyte eines LIN-Frames war beim Überlauf des
+  Mikrosekundenzählers (etwa alle 71 Minuten) für rund 5 ms falsch berechnet. Die Prüfung ist jetzt
+  überlaufsicher, wie beim Sensor „CP Plus verbunden“ seit 1.0.24.
+- `truma_inetbox`: Die UART-Interrupt-Einstellungen für den LIN-Empfang werden mit Nullen
+  vorbelegt, ein Fehler beim Setzen erscheint jetzt im Log.
+- `uart`: `uart_event_queue_` beginnt mit `nullptr` und `uart_num_` mit `UART_NUM_MAX`, wie in der
+  UART-Komponente von ESPHome. Schlägt die UART-Einrichtung fehl, meldet der UART-Task das
+  zuverlässig nach 5 s im Log.
+
+### Behoben
+- `truma_cooler`: Wurde „Kühlen“ an eine schon laufende Box erneut gesendet, etwa von einer
+  Automation, ging wieder der Einschaltbefehl raus. Beim C44 schaltete der anschließende
+  Turbo-Reset einen laufenden Turbo ab. Der Einschaltbefehl geht jetzt nur noch bei einem echten
+  Wechsel zwischen aus und an raus.
+- `truma_cooler`: Der Turbo-Schalter blieb auf „an“ stehen, wenn er bei ausgeschalteter Box betätigt
+  wurde, obwohl der Befehl verworfen wurde. Er bleibt jetzt aus.
+- `truma_cooler`: Ein C44, der mit Turbo kühlt, meldet den Status 0x05 und nicht 0x0D wie in den
+  HCI-Mitschnitten. Kompressor und Turbo wurden dann als aus angezeigt. 0x05 gilt jetzt als Turbo.
+- `truma_cooler`: Die Kühlbox sendet ihren Status nur als Antwort auf eine Abfrage. Die Komponente
+  fragte alle 60 s ab und schob die nächste Abfrage nach jedem Befehl wieder um 60 s hinaus, deshalb
+  kamen Änderungen erst nach bis zu einer Minute in Home Assistant an. Jetzt wird 1 s nach einem
+  Befehl und sonst alle 10 s abgefragt.
 
 ## [1.0.33] — 2026-09-28 — Aventa einschalten
 
