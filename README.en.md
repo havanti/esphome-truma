@@ -89,6 +89,8 @@ Fan speeds: Low / Mid / High / Night / Auto
 
 Temperature range: 16–31 °C, step 1 °C
 
+If AUTO is selected on the CP Plus, the CP Plus reports it in a separate frame (0x37) that the component does not evaluate. The Aventa entities then show "Off" (issue #28).
+
 Example configuration: [`ESP32-S3_truma_Aventa_example.yaml`](ESP32-S3_truma_Aventa_example.yaml)
 
 ### Truma Cooler C(XX) — Cooling Box

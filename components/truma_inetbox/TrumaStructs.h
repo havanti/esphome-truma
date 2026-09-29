@@ -192,10 +192,8 @@ struct StatusFrameAirconManual {  // NOLINT(altera-struct-pack-align)
   uint8_t unknown_08;
   // No idea why two current_temp
   TargetTemp current_temp_aircon;
-  // 0x00
-  uint8_t unknown_11;
-  // 0x00
-  uint8_t unknown_12;
+  // Same value as target_temp_water in the heater frame (issue #28)
+  TargetTemp target_temp_water;
   ElectricPowerLevel el_power_level;
   // 0x00
   uint8_t unknown_15;
@@ -212,7 +210,9 @@ struct StatusFrameAirconManualResponse {  // NOLINT(altera-struct-pack-align)
   AirconVentMode vent_mode;
   uint8_t aircon_on;  // Must be 0x01 for commands to be accepted
   TargetTemp target_temp_aircon;
-  uint8_t padding[6];  // Required padding to make message 12 bytes
+  uint8_t padding[4];
+  // CP Plus applies this as the water target, sending 0 switches the water heater off (issue #28)
+  TargetTemp target_temp_water;
 } __attribute__((packed));
 
 // Length 22 (0x16)

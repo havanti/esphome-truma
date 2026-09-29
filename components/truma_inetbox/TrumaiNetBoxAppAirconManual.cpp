@@ -63,6 +63,8 @@ void TrumaiNetBoxAppAirconManual::create_update_data(StatusFrame *response, uint
   response->airconManualResponse.aircon_on = 0x01;  // Must always be 1
   response->airconManualResponse.target_temp_aircon = this->update_status_.target_temp_aircon;
   memset(response->airconManualResponse.padding, 0x00, sizeof(response->airconManualResponse.padding));
+  // Echo the water target from the last aircon status frame, otherwise the write turns the water heater off.
+  response->airconManualResponse.target_temp_water = this->data_.target_temp_water;
 
   status_frame_calculate_checksum(response);
   (*response_len) = sizeof(StatusFrameHeader) + sizeof(StatusFrameAirconManualResponse);

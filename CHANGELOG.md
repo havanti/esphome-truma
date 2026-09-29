@@ -12,21 +12,32 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release behebt mehrere Fehler der Kühlbox-Komponente, getestet an einer C44: Turbo ging
-beim erneuten Senden von „Kühlen“ aus, der Kompressor wurde mit Turbo als aus angezeigt, und
-Änderungen kamen erst nach bis zu einer Minute in Home Assistant an.
-
-Außerdem sichert es die LIN-Kommunikation an Stellen ab, die bei einem Code-Review von
-`truma_inetbox` und `uart` aufgefallen sind. Kein gemeldeter Fehler geht darauf zurück, im normalen
-Betrieb ändert sich nichts. Dieser Teil ist für ESP32 und ESP32-S3 gebaut und auf einem ESP32-S3
-gestartet, aber nicht an einem LIN-Bus getestet. Die Aventa-Änderung aus 1.0.33 ist weiterhin nicht
-bestätigt.
+Dieses Release ändert den Schreibbefehl für die Aventa. Er schaltete bisher das Warmwasser ab,
+weil an der Stelle des Warmwasser-Solls Nullen gesendet wurden. Die Änderung ist gebaut, aber an der
+Hardware noch nicht bestätigt. Das Einschalten der Aventa aus 1.0.33 ist inzwischen bestätigt. Die
+Absicherung der LIN-Kommunikation aus 1.0.34 ist weiterhin nicht an einem LIN-Bus getestet.
 
 Getestet mit:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.35] — 2026-09-29 — Warmwasser bei Aventa-Befehlen
+
+### Geändert
+- `truma_inetbox`: Befehle an die Aventa aus Home Assistant schalteten das Warmwasser ab, gemeldet
+  für Lüfterstufe, AUTO und Ausschalten (Issue #16, #28). Im Aventa-Statusframe 0x35 steht in
+  Byte 10–11 das Warmwasser-Soll, und der CP Plus übernimmt diese Stelle auch aus dem Schreibframe
+  0x34. Die Komponente schickte dort bisher Nullen, jetzt spiegelt sie den zuletzt gemeldeten Wert
+  zurück. An der Hardware noch nicht bestätigt.
+
+### Behoben
+- `truma_inetbox`: Das Einschalten der Aventa aus Home Assistant (Änderung aus 1.0.33) ist an einer
+  Aventa Compact Plus 2nd Gen mit CP Plus C.04.05.02 bestätigt (Issue #28).
+
+### Dokumentation
+- README: Hinweis, dass die Komponente den am CP Plus gewählten AUTO-Betrieb nicht auswertet.
 
 ## [1.0.34] — 2026-09-29 — Kühlbox-Korrekturen, Absicherung der LIN-Kommunikation
 

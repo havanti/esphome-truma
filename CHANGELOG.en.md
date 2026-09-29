@@ -12,20 +12,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release fixes several bugs in the cooler component, tested on a C44: turbo went off when
-"cool" was sent again, the compressor showed as off while running with turbo, and changes took up
-to a minute to reach Home Assistant.
-
-It also hardens LIN communication in places found during a code review of `truma_inetbox` and
-`uart`. No reported problem traces back to them, and normal operation does not change. This part
-was built for ESP32 and ESP32-S3 and started on an ESP32-S3, but not tested on a LIN bus. The
-Aventa change from 1.0.33 is still not confirmed.
+This release changes the write command for the Aventa. It switched the water heater off so far,
+because zeros were sent in the place of the water target. The change is built, but not yet
+confirmed on hardware. Switching on the Aventa from 1.0.33 is confirmed now. The LIN communication
+hardening from 1.0.34 is still not tested on a LIN bus.
 
 Tested against:
 - ESPHome **2026.9.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.35] — 2026-09-29 — Water heater on Aventa commands
+
+### Changed
+- `truma_inetbox`: Aventa commands from Home Assistant switched the water heater off, reported for
+  fan level, AUTO and switching off (issue #16, #28). In the Aventa status frame 0x35, bytes 10–11
+  hold the water target, and the CP Plus also takes this field from the write frame 0x34. The
+  component sent zeros there so far, now it echoes the last reported value. Not yet confirmed on
+  hardware.
+
+### Fixed
+- `truma_inetbox`: Switching on the Aventa from Home Assistant (change from 1.0.33) is confirmed on
+  an Aventa Compact Plus 2nd Gen with CP Plus C.04.05.02 (issue #28).
+
+### Documentation
+- README: note that the component does not evaluate AUTO selected on the CP Plus.
 
 ## [1.0.34] — 2026-09-29 — Cooler fixes, LIN communication hardening
 

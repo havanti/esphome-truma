@@ -87,6 +87,8 @@ Lüftergeschwindigkeiten: Low / Mid / High / Night / Auto
 
 Temperaturbereich: 16–31 °C, Schrittweite 1 °C
 
+Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37), den die Komponente nicht auswertet. Die Aventa-Entitäten zeigen dann „Off“ (Issue #28).
+
 Beispielkonfiguration: [`ESP32-S3_truma_Aventa_example.yaml`](ESP32-S3_truma_Aventa_example.yaml)
 
 ### Truma Cooler C(XX) — Kühlbox
