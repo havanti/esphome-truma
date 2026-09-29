@@ -41,7 +41,7 @@ void TrumaCooler::setup() {
 void TrumaCooler::loop() {
   if (!connected_.load() || write_handle_.load() == 0) return;
 
-  // Poll as fallback — device sends unsolicited notifications every ~2 s.
+  // The device reports status only in reply to a poll.
   if (poll_enabled_.load() && millis() - last_poll_.load() > POLL_INTERVAL_MS) {
     send_poll();
     last_poll_.store(millis());
@@ -105,7 +105,7 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       auto reg_ret = this->parent_->register_for_notify(NOTIFY_HANDLE);
       ESP_LOGI(TAG, "register_for_notify handle=0x%04X ret=%d", NOTIFY_HANDLE, reg_ret);
       poll_enabled_.store(true);
-      last_poll_.store(millis());
+      schedule_poll_(POLL_FOLLOWUP_MS);
       break;
     }
 
@@ -212,10 +212,9 @@ void TrumaCooler::send_command(const uint8_t *cmd, size_t len) {
   if (status != ESP_OK) {
     ESP_LOGW(TAG, "Write failed: 0x%X", status);
   } else {
-    // Reset poll timer so next poll happens after full POLL_INTERVAL_MS.
-    // The device sends unsolicited notifications every ~2 s, so state
-    // updates arrive automatically without needing an immediate poll.
-    last_poll_.store(millis());
+    // Poll shortly after the command so the new state reaches HA without waiting for the
+    // regular interval. loop() overwrites this again right after its own polls.
+    schedule_poll_(POLL_FOLLOWUP_MS);
   }
 }
 

@@ -50,8 +50,11 @@ static constexpr uint8_t RESPONSE_TYPE = 0xF2;
 static constexpr uint8_t ZONE1_SELECT = 0x01;
 static constexpr uint8_t ZONE2_SELECT = 0x02;
 
-// Polling cadence (fallback only — device sends unsolicited notifications every ~2 s).
-static constexpr uint32_t POLL_INTERVAL_MS = 60000;
+// Polling cadence. The device only sends a status notification in reply to a poll
+// (seen on a C44: no unsolicited notifications), so this sets the update rate.
+static constexpr uint32_t POLL_INTERVAL_MS = 10000;
+// Delay of the extra poll after a command or connect, so HA sees the result quickly.
+static constexpr uint32_t POLL_FOLLOWUP_MS = 1000;
 
 class TrumaCoolerClimate;
 
@@ -112,6 +115,8 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
   std::atomic<bool> poll_enabled_{false};
   std::atomic<bool> device_is_on_{false};
   std::atomic<uint32_t> last_poll_{0};
+  // Makes loop() send the next poll `delay_ms` from now.
+  void schedule_poll_(uint32_t delay_ms) { last_poll_.store(millis() - POLL_INTERVAL_MS + delay_ms); }
 };
 
 // Zone-aware climate. zone_ = 0 for the single-zone C44, 1 / 2 for the C69 zones.
