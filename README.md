@@ -111,13 +111,16 @@ truma_cooler:
   # model: c69 # zweizoniger C69
 ```
 
-> **Modelle:** Der **C44** (einzonig) ist vollständig unterstützt. Der zweizonige **C69** ist seit v1.0.21 dabei (`model: c69`) — beide Zonen mit eigener Solltemperatur und Ist-Temperatur, auf echter Hardware verifiziert (inkl. Kompressor-Status). Beim C69 ist die **Power global** (es gibt kein Ein/Aus je Zone): ein einzelner **Master-Schalter `power`** schaltet die ganze Box ein/aus, die Zonen-Climates sind **nur Kühlen** und setzen je Zone nur die Solltemperatur. **Turbo ist beim C69 nicht implementiert** (funktioniert schon am C44 nicht zuverlässig — wird bei Gelegenheit erneut angegangen). Weitere Modelle: siehe [**SNIFFING.md**](SNIFFING.md) und melde dein Modell per [Issue](../../issues/new/choose).
+> **Modelle:** Der **C44** (einzonig) ist vollständig unterstützt. Der zweizonige **C69** ist seit v1.0.21 dabei (`model: c69`) — beide Zonen mit eigener Solltemperatur und Ist-Temperatur, auf echter Hardware verifiziert (inkl. Kompressor-Status). Beim C69 ist die **Power global** (es gibt kein Ein/Aus je Zone): ein einzelner **Master-Schalter `power`** schaltet die ganze Box ein/aus, die Zonen-Climates sind **nur Kühlen** und setzen je Zone nur die Solltemperatur. **Turbo ist beim C69 nicht implementiert.** Am C44 ist Turbo seit v1.0.34 an echter Hardware geprüft. Weitere Modelle: siehe [**SNIFFING.md**](SNIFFING.md) und melde dein Modell per [Issue](../../issues/new/choose).
 
 #### Features
 
 - **Klimasteuerung** — Ein/Aus und Solltemperatur (−22 °C bis +10 °C) direkt aus Home Assistant oder dem integrierten Web-Portal
 - **Turbo-Schalter** — Turbo-Modus ein/ausschalten (Gerät muss eingeschaltet sein); wird beim Einschalten automatisch zurückgesetzt
 - **Innentemperatur** — gemessene Temperatur im Inneren der Kühlbox (mit Glättungsfilter)
+- **Umgebungstemperatur (nur C44)** — Wert aus Byte 11 der Statusmeldung, Bedeutung ungeklärt: An
+  einer ausgeschalteten C44 mit offenem Deckel bei 19 °C Raumtemperatur lag er bei etwa 4 °C. Nicht
+  als Außentemperatur verwenden.
 - **Kompressor-Status** — Anzeige ob der Kompressor gerade läuft
 - **Gerätestatus** — Anzeige ob die Kühlbox eingeschaltet ist
 - **BLE-Verbindungsstatus** — Anzeige der aktuellen BLE-Verbindung zum ESP

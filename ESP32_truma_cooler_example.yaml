@@ -107,6 +107,7 @@ truma_cooler:
     #     - light.turn_off:
     #         id: status_led
 
+  # Byte 11 of the C44 status message. Meaning unclear, not the outside temperature (see README).
   ambient_temperature:
     name: "Ambient Temperature"
     icon: mdi:thermometer-lines

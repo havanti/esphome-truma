@@ -113,13 +113,16 @@ truma_cooler:
   # model: c69 # dual-zone C69
 ```
 
-> **Models:** The **C44** (single zone) is fully supported. The dual-zone **C69** is included since v1.0.21 (`model: c69`) — both zones with their own setpoint and interior temperature, verified on real hardware (including compressor status). On the C69 **power is global** (there is no per-zone on/off): a single **master `power` switch** turns the whole box on/off, and the zone climates are **cool-only**, setting just each zone's target temperature. **Turbo is not implemented on the C69** (it does not work reliably even on the C44 — to be revisited later). More models: see [**SNIFFING.en.md**](SNIFFING.en.md) and report your model via an [issue](../../issues/new/choose).
+> **Models:** The **C44** (single zone) is fully supported. The dual-zone **C69** is included since v1.0.21 (`model: c69`) — both zones with their own setpoint and interior temperature, verified on real hardware (including compressor status). On the C69 **power is global** (there is no per-zone on/off): a single **master `power` switch** turns the whole box on/off, and the zone climates are **cool-only**, setting just each zone's target temperature. **Turbo is not implemented on the C69.** On the C44, turbo has been checked on real hardware since v1.0.34. More models: see [**SNIFFING.en.md**](SNIFFING.en.md) and report your model via an [issue](../../issues/new/choose).
 
 #### Features
 
 - **Climate control** — On/Off and setpoint (−22 °C to +10 °C) directly from Home Assistant or the built-in web portal
 - **Turbo switch** — toggle turbo mode (device must be on); automatically resets on power-up
 - **Interior temperature** — measured inside the cooling box (with smoothing filter)
+- **Ambient temperature (C44 only)** — value from byte 11 of the status message, meaning unclear: on
+  a C44 that was off with the lid open at 19 °C room temperature it read about 4 °C. Do not use it
+  as outside temperature.
 - **Compressor status** — indicates whether the compressor is currently running
 - **Device status** — indicates whether the cooler is powered on
 - **BLE connection status** — current BLE connection state to the ESP
