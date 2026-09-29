@@ -42,9 +42,9 @@ void TrumaCooler::loop() {
   if (!connected_.load() || write_handle_.load() == 0) return;
 
   // Poll as fallback — device sends unsolicited notifications every ~2 s.
-  if (poll_enabled_.load() && millis() - last_poll_ > POLL_INTERVAL_MS) {
+  if (poll_enabled_.load() && millis() - last_poll_.load() > POLL_INTERVAL_MS) {
     send_poll();
-    last_poll_ = millis();
+    last_poll_.store(millis());
   }
 }
 
@@ -100,27 +100,21 @@ void TrumaCooler::gattc_event_handler(esp_gattc_cb_event_t event,
       poll_enabled_.store(false);
       ESP_LOGI(TAG, "Service discovery done. Registering for notify (no encryption required).");
 
-      auto reg_ret = esp_ble_gattc_register_for_notify(gattc_if,
-                                                       this->parent_->get_remote_bda(),
-                                                       NOTIFY_HANDLE);
+      // Via the parent so BLEClientBase tracks the pending registration and writes the CCCD itself
+      // on REG_FOR_NOTIFY_EVT. HCI snoop analysis: cooler uses unauthenticated writes — no bonding needed.
+      auto reg_ret = this->parent_->register_for_notify(NOTIFY_HANDLE);
       ESP_LOGI(TAG, "register_for_notify handle=0x%04X ret=%d", NOTIFY_HANDLE, reg_ret);
-
-      // HCI snoop analysis: cooler uses unauthenticated writes — no bonding needed.
-      uint8_t notify_en[] = {0x01, 0x00};
-      auto cccd_ret = esp_ble_gattc_write_char_descr(gattc_if,
-                                                     this->parent_->get_conn_id(),
-                                                     CCCD_HANDLE, sizeof(notify_en),
-                                                     notify_en, ESP_GATT_WRITE_TYPE_RSP,
-                                                     ESP_GATT_AUTH_REQ_NONE);
-      ESP_LOGI(TAG, "CCCD write ret=%d", cccd_ret);
       poll_enabled_.store(true);
-      last_poll_ = millis();
+      last_poll_.store(millis());
       break;
     }
 
     case ESP_GATTC_REG_FOR_NOTIFY_EVT:
       ESP_LOGI(TAG, "register_for_notify complete: status=%d handle=0x%04X",
                param->reg_for_notify.status, param->reg_for_notify.handle);
+      // Lets BLEClient release the GATT service cache once all nodes are established.
+      if (param->reg_for_notify.handle == NOTIFY_HANDLE && param->reg_for_notify.status == ESP_GATT_OK)
+        this->node_state = esp32_ble_tracker::ClientState::ESTABLISHED;
       break;
 
     case ESP_GATTC_WRITE_DESCR_EVT:
@@ -221,7 +215,7 @@ void TrumaCooler::send_command(const uint8_t *cmd, size_t len) {
     // Reset poll timer so next poll happens after full POLL_INTERVAL_MS.
     // The device sends unsolicited notifications every ~2 s, so state
     // updates arrive automatically without needing an immediate poll.
-    last_poll_ = millis();
+    last_poll_.store(millis());
   }
 }
 
@@ -273,7 +267,9 @@ void TrumaCoolerClimate::control(const climate::ClimateCall &call) {
   if (has_mode) {
     // Power is global on both models — turning any zone off powers the whole box.
     bool on = (this->mode != climate::CLIMATE_MODE_OFF);
-    this->parent_->set_mode(on);
+    // Only on a real change: CMD_ON to a running C44 re-arms the turbo reset.
+    if (on != this->parent_->is_device_on())
+      this->parent_->set_mode(on);
     // Send setpoint after ON (never before — triggers display input mode and ON is ignored).
     if (on && has_temp)
       this->parent_->set_zone_setpoint(this->zone_, this->target_temperature);
@@ -289,8 +285,9 @@ void TrumaCoolerClimate::control(const climate::ClimateCall &call) {
 // ---------------------------------------------------------------------------
 
 void TrumaCoolerSwitch::write_state(bool state) {
-  this->parent_->set_turbo(state);
-  this->publish_state(state);
+  // A rejected command already published false — don't overwrite it with the requested state.
+  if (this->parent_->set_turbo(state))
+    this->publish_state(state);
 }
 
 // ---------------------------------------------------------------------------

@@ -88,12 +88,12 @@ void TrumaCoolerC44::set_zone_setpoint(uint8_t zone, float temp_celsius) {
   send_setpoint_frame_((uint8_t) sp, 0x00, ZONE1_SELECT);
 }
 
-void TrumaCoolerC44::set_turbo(bool state) {
+bool TrumaCoolerC44::set_turbo(bool state) {
   // Protocol requires device to be ON before turbo commands take effect.
   if (!device_is_on_.load()) {
     ESP_LOGW(TAG, "Turbo command ignored — device is OFF");
     if (turbo_switch_ != nullptr) turbo_switch_->publish_state(false);
-    return;
+    return false;
   }
   if (state) {
     ESP_LOGI(TAG, "Turbo: ON");
@@ -102,6 +102,7 @@ void TrumaCoolerC44::set_turbo(bool state) {
     ESP_LOGI(TAG, "Turbo: OFF");
     send_command(CMD_TURBO_OFF, sizeof(CMD_TURBO_OFF));
   }
+  return true;
 }
 
 void TrumaCoolerC44::post_power_(bool on) {

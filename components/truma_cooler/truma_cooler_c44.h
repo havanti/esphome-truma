@@ -36,7 +36,7 @@ class TrumaCoolerC44 : public TrumaCooler {
   void set_turbo_switch(TrumaCoolerSwitch *s) { turbo_switch_ = s; }
 
   void set_zone_setpoint(uint8_t zone, float temp_celsius) override;
-  void set_turbo(bool state) override;
+  bool set_turbo(bool state) override;
 
  protected:
   const char *model_name_() const override { return "C44"; }

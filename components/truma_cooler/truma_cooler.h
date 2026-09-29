@@ -32,9 +32,9 @@ namespace truma_cooler {
 //   Byte-level meaning differs per model — decoded in the model subclass.
 
 // GATT handles — hardcoded from HCI snoop / GATT attribute table.
+// The CCCD (0x0016) is written by BLEClientBase after register_for_notify().
 static constexpr uint16_t WRITE_HANDLE = 0x0012;
 static constexpr uint16_t NOTIFY_HANDLE = 0x0015;
-static constexpr uint16_t CCCD_HANDLE = NOTIFY_HANDLE + 1;  // 0x0016
 
 // Setpoint range supported by the device (also exposed via climate traits).
 static constexpr float SETPOINT_MIN_C = -22.0f;
@@ -78,8 +78,10 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
 
   // Control API (called by the climate / switch entities).
   void set_mode(bool on);
+  bool is_device_on() const { return device_is_on_.load(); }
   virtual void set_zone_setpoint(uint8_t zone, float temp_celsius) = 0;
-  virtual void set_turbo(bool state) {}  // no-op by default; C44 overrides
+  // Returns false when the command was not sent. No-op by default; C44 overrides.
+  virtual bool set_turbo(bool state) { return false; }
 
   void send_poll();
   void send_command(const uint8_t *cmd, size_t len);
@@ -109,7 +111,7 @@ class TrumaCooler : public Component, public ble_client::BLEClientNode {
   std::atomic<bool> connected_{false};
   std::atomic<bool> poll_enabled_{false};
   std::atomic<bool> device_is_on_{false};
-  uint32_t last_poll_{0};
+  std::atomic<uint32_t> last_poll_{0};
 };
 
 // Zone-aware climate. zone_ = 0 for the single-zone C44, 1 / 2 for the C69 zones.
