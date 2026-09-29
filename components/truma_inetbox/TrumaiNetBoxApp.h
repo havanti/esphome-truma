@@ -68,7 +68,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
 
   // Truma heater connected to CP Plus.
   TRUMA_COMPANY company_ = TRUMA_COMPANY::TRUMA;
-  // Written from uartEventTask_, read from main loop — must be atomic.
+  // Written from lin_event_task, read from main loop — must be atomic.
   std::atomic<TRUMA_DEVICE> heater_device_{TRUMA_DEVICE::UNKNOWN};
   std::atomic<TRUMA_DEVICE> aircon_device_{TRUMA_DEVICE::UNKNOWN};
 
@@ -82,7 +82,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   // last time CP plus was informed I got an update msg.
   std::atomic<uint32_t> update_time_{0};
 
-  // PID 0x22 bytes 0 (low) and 1 (high). Written from uartEventTask_, read from main loop.
+  // PID 0x22 bytes 0 (low) and 1 (high). Written from lin_event_task, read from main loop.
   std::atomic<uint16_t> status_2_raw_{0};
   std::atomic<bool> status_2_updated_{false};
   // Main loop only.
@@ -90,7 +90,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   uint16_t status_2_last_published_{0};
   CallbackManager<void(uint8_t, uint8_t)> status_2_callback_{};
 
-  // PID 0x20 vent mode. Written from uartEventTask_, read from main loop.
+  // PID 0x20 vent mode. Written from lin_event_task, read from main loop.
   std::atomic<uint8_t> vent_mode_raw_{0};
   std::atomic<bool> vent_mode_updated_{false};
   // Main loop only.

@@ -25,17 +25,20 @@ static constexpr uint8_t LIN_TP_CONSECUTIVE_FRAME_DATA_LEN = 6;
 
 void LinBusProtocol::lin_reset_device(){
     // clear any messages in send queue of LinBus Protocol handler.
-  while (!this->updates_to_send_.empty()) {
-    this->updates_to_send_.pop();
+  xQueueReset(this->updates_to_send_);
+}
+
+void LinBusProtocol::prepare_update_msg_(const std::array<uint8_t, 8> &message) {
+  if (xQueueSend(this->updates_to_send_, message.data(), 0) != pdPASS) {
+    ESP_LOGE(TAG, "LIN answer queue full - answer dropped.");
   }
 }
 
 bool LinBusProtocol::answer_lin_order_(const uint8_t pid) {
   // Send requested answer
   if (pid == DIAGNOSTIC_FRAME_SLAVE) {
-    if (!this->updates_to_send_.empty()) {
-      auto update_to_send_ = this->updates_to_send_.front();
-      this->updates_to_send_.pop();
+    std::array<uint8_t, 8> update_to_send_;
+    if (xQueueReceive(this->updates_to_send_, update_to_send_.data(), 0) == pdPASS) {
       this->write_lin_answer_(update_to_send_.data(), (uint8_t) update_to_send_.size());
       return true;
     }

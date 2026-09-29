@@ -33,8 +33,9 @@ class IDFUARTComponent : public UARTComponent, public Component {
 
  protected:
   void check_logger_conflict() override;
-  uart_port_t uart_num_;
-  volatile QueueHandle_t uart_event_queue_;
+  uart_port_t uart_num_{UART_NUM_MAX};
+  // LinBusListener::uartEventTask_ waits for this to become non-null, so it must start as nullptr.
+  volatile QueueHandle_t uart_event_queue_{nullptr};
   uart_config_t get_config_();
 
   bool has_peek_{false};

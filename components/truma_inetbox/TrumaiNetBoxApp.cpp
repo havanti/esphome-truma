@@ -103,7 +103,7 @@ bool TrumaiNetBoxApp::answer_lin_order_(const uint8_t pid) {
   if (pid == LIN_PID_TRUMA_INET_BOX) {
     std::array<uint8_t, 8> response = this->lin_empty_response_;
 
-    if (this->updates_to_send_.empty() && !this->has_update_to_submit_()) {
+    if (!this->has_update_to_send_() && !this->has_update_to_submit_()) {
       response[0] = 0xFE;
     }
     this->write_lin_answer_(response.data(), (uint8_t) sizeof(response));
