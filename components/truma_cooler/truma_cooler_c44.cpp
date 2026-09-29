@@ -24,8 +24,8 @@ static constexpr uint8_t CMD_TURBO_OFF[FRAME_LEN] = {
 void TrumaCoolerC44::handle_status_(const uint8_t *data) {
   bool device_on = (data[4] == C44_DEVICE_ON);
   device_is_on_.store(device_on);
-  bool compressor_running = (data[5] == C44_COMPRESSOR_RUNNING || data[5] == C44_COMPRESSOR_TURBO);
-  bool turbo_running = (data[5] == C44_COMPRESSOR_TURBO);
+  bool turbo_running = (data[5] == C44_COMPRESSOR_TURBO || data[5] == C44_COMPRESSOR_TURBO_ALT);
+  bool compressor_running = (data[5] == C44_COMPRESSOR_RUNNING || turbo_running);
   float interior_temp = (int8_t) data[6];  // interior temperature in °C (signed)
   int8_t setpoint = (int8_t) data[7];      // setpoint echoed back from device
   // Signed: HCI snoops only showed positive ambient temps, but int8_t extends

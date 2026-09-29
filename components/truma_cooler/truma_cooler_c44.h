@@ -11,7 +11,7 @@ namespace truma_cooler {
 // TrumaCoolerC44 — single-zone Truma Cooler C44.
 // Status notify (0xAA 0xC1 0xF2 0xA0 ...):
 //   [4]  0x01 = on / 0x00 = off              device state
-//   [5]  0x01 = running / 0x0D = turbo        compressor state
+//   [5]  0x01 = running / 0x05, 0x0D = turbo  compressor state
 //   [6]  interior temperature (signed int8, °C)
 //   [7]  setpoint echoed back (signed int8, °C)
 //   [11] ambient/outside temperature in 0.1 °C (signed int8)
@@ -21,9 +21,11 @@ namespace truma_cooler {
 
 // Byte [4] device state.
 static constexpr uint8_t C44_DEVICE_ON = 0x01;
-// Byte [5] compressor state markers.
+// Byte [5] compressor state markers. Turbo: 0x0D from HCI snoops, 0x05 seen on a C44
+// cooling with turbo on (2026-09-29). Both mean the compressor is running.
 static constexpr uint8_t C44_COMPRESSOR_RUNNING = 0x01;
 static constexpr uint8_t C44_COMPRESSOR_TURBO = 0x0D;
+static constexpr uint8_t C44_COMPRESSOR_TURBO_ALT = 0x05;
 // Turbo auto-reset delay after device power-on.
 static constexpr uint32_t C44_TURBO_RESET_DELAY_MS = 500;
 
