@@ -11,7 +11,7 @@ static const char *const TAG = "truma_inetbox.TrumaiNetBoxAppTimer";
 
 StatusFrameTimerResponse *TrumaiNetBoxAppTimer::update_prepare() {
   // An update is currently going on.
-  if (this->update_status_prepared_ || this->update_status_stale_) {
+  if (this->update_status_prepared_.load() || this->update_status_stale_.load()) {
     return &this->update_status_;
   }
 
@@ -30,7 +30,7 @@ StatusFrameTimerResponse *TrumaiNetBoxAppTimer::update_prepare() {
   this->update_status_.timer_resp_stop_minutes = this->data_.timer_stop_minutes;
   this->update_status_.timer_resp_stop_hours = this->data_.timer_stop_hours;
 
-  this->update_status_prepared_ = true;
+  this->update_status_prepared_.store(true);
   return &this->update_status_;
 }
 

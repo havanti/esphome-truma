@@ -18,7 +18,7 @@
 namespace esphome {
 namespace truma_inetbox {
 
-#define LIN_PID_TRUMA_INET_BOX 0x18
+static constexpr uint8_t LIN_PID_TRUMA_INET_BOX = 0x18;
 
 class TrumaiNetBoxApp : public LinBusProtocol {
  public:

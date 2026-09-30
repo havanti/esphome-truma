@@ -24,7 +24,6 @@ from esphome.components.uart import (
     CONF_PARITY,
     KEY_UART_DEVICES,
 )
-from esphome.core import CORE
 from .entity_helpers import count_id_usage  # noqa: F401
 
 DEPENDENCIES = ["uart"]
@@ -171,12 +170,6 @@ FINAL_VALIDATE_SCHEMA = cv.All(
 )
 
 async def to_code(config):
-    if CORE.is_esp32 and not CORE.using_arduino:
-        # Run interrupt on core 0. ESP Home runs on core 1.
-        cg.add_build_flag("-DARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE=0")
-        # Default Stack Size is 2048. Not enough for my operation.
-        cg.add_build_flag("-DARDUINO_SERIAL_EVENT_TASK_STACK_SIZE=4096")
-
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)

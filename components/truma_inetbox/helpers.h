@@ -8,9 +8,10 @@ namespace truma_inetbox {
 // First byte is service identifier and to be ignored. Last three bytes can be `xFF` or `x00` (see
 // <https://github.com/Fabian-Schmidt/esphome-truma_inetbox/issues/25>).
 // `truma_message_header` and `alde_message_header` must have the same size!
-const std::array<uint8_t, 11> truma_message_header = {0x00, 0x00, 0x1F, 0x00, 0x1E, 0x00,
-                                                       0x00, 0x22, 0xFF, 0xFF, 0xFF};
-const std::array<uint8_t, 11> alde_message_header = {0x00, 0x00, 0x1F, 0x00, 0x1A, 0x00, 0x00, 0x22, 0xFF, 0xFF, 0xFF};
+inline constexpr std::array<uint8_t, 11> truma_message_header = {0x00, 0x00, 0x1F, 0x00, 0x1E, 0x00,
+                                                                  0x00, 0x22, 0xFF, 0xFF, 0xFF};
+inline constexpr std::array<uint8_t, 11> alde_message_header = {0x00, 0x00, 0x1F, 0x00, 0x1A, 0x00,
+                                                                 0x00, 0x22, 0xFF, 0xFF, 0xFF};
 
 uint8_t addr_parity(const uint8_t pid);
 uint8_t data_checksum(const uint8_t *message, uint8_t length, uint16_t sum);

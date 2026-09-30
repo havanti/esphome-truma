@@ -4,14 +4,17 @@
 #include "soc/uart_reg.h"
 #ifdef CUSTOM_ESPHOME_UART
 #include "esphome/components/uart/truma_uart_component_esp_idf.h"
-#define ESPHOME_UART uart::truma_IDFUARTComponent
-#else
-#define ESPHOME_UART uart::IDFUARTComponent
 #endif // CUSTOM_ESPHOME_UART
 #include "esphome/components/uart/uart_component_esp_idf.h"
 
 namespace esphome {
 namespace truma_inetbox {
+
+#ifdef CUSTOM_ESPHOME_UART
+using EsphomeUart = uart::truma_IDFUARTComponent;
+#else
+using EsphomeUart = uart::IDFUARTComponent;
+#endif  // CUSTOM_ESPHOME_UART
 
 static const char *const TAG = "truma_inetbox.LinBusListener";
 
@@ -20,18 +23,16 @@ static constexpr UBaseType_t UART_EVENT_TASK_PRIORITY = 24;
 // Priority 2: low — LIN message processing runs after time-critical UART task.
 static constexpr UBaseType_t LIN_EVENT_TASK_PRIORITY = 2;
 
-#define QUEUE_WAIT_BLOCKING (TickType_t) portMAX_DELAY
+static constexpr TickType_t QUEUE_WAIT_BLOCKING = portMAX_DELAY;
 
-#ifndef ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE
-#define ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE 4096
-#endif
-#ifndef ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE
-#define ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE 0
-#endif
+// Default stack size of 2048 is not enough for the LIN processing.
+static constexpr uint32_t LIN_TASK_STACK_SIZE = 4096;
+// Run the UART and LIN tasks on core 0, ESPHome runs on core 1.
+static constexpr BaseType_t LIN_TASK_CORE = 0;
 
 void LinBusListener::setup_framework() {
   // uartSetFastReading
-  auto uartComp = static_cast<ESPHOME_UART *>(this->parent_);
+  auto uartComp = static_cast<EsphomeUart *>(this->parent_);
 
   auto uart_num = uartComp->get_hw_serial_number();
 
@@ -53,11 +54,11 @@ void LinBusListener::setup_framework() {
   // Creating UART event Task
   xTaskCreatePinnedToCore(LinBusListener::uartEventTask_,
                           "uart_event_task",                      // name
-                          ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE,   // stack size (in words)
+                          LIN_TASK_STACK_SIZE,                    // stack size (in words)
                           this,                                   // input params
                           UART_EVENT_TASK_PRIORITY,               // priority
                           &this->uartEventTaskHandle_,            // handle
-                          ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE  // core
+                          LIN_TASK_CORE                           // core
   );
   if (this->uartEventTaskHandle_ == NULL) {
     ESP_LOGE(TAG, " -- UART%d Event Task not created!", uart_num);
@@ -66,11 +67,11 @@ void LinBusListener::setup_framework() {
   // Creating LIN msg event Task
   xTaskCreatePinnedToCore(LinBusListener::eventTask_,
                           "lin_event_task",                       // name
-                          ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE,   // stack size (in words)
+                          LIN_TASK_STACK_SIZE,                    // stack size (in words)
                           this,                                   // input params
                           LIN_EVENT_TASK_PRIORITY,                // priority
                           &this->eventTaskHandle_,                // handle
-                          ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE  // core
+                          LIN_TASK_CORE                           // core
   );
 
   if (this->eventTaskHandle_ == NULL) {
@@ -80,7 +81,7 @@ void LinBusListener::setup_framework() {
 
 void LinBusListener::uartEventTask_(void *args) {
   LinBusListener *instance = (LinBusListener *) args;
-  auto uartComp = static_cast<ESPHOME_UART *>(instance->parent_);
+  auto uartComp = static_cast<EsphomeUart *>(instance->parent_);
   auto uart_num = uartComp->get_hw_serial_number();
   auto uartEventQueue = uartComp->get_uart_event_queue();
   // Wait for UART event queue to be initialized.
@@ -128,8 +129,5 @@ void LinBusListener::eventTask_(void *args) {
 
 }  // namespace truma_inetbox
 }  // namespace esphome
-
-#undef QUEUE_WAIT_BLOCKING
-#undef ESPHOME_UART
 
 #endif  // USE_ESP32_FRAMEWORK_ESP_IDF

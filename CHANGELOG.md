@@ -12,15 +12,33 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release schaltet den Webserver in den Beispielkonfigurationen aus, weil er ohne Anmeldung
-jedem im selben WLAN die Steuerung erlaubt. Die Warmwasser-Änderung für die Aventa aus 1.0.35 ist
-inzwischen an der Hardware bestätigt. Die Absicherung der LIN-Kommunikation aus 1.0.34 ist weiterhin
-nicht an einem LIN-Bus getestet.
+Dieses Release räumt den Code auf, am Verhalten soll sich nichts ändern. Es ist für ESP32 und
+ESP32-S3 gebaut, aber nicht an einem LIN-Bus getestet. Das gilt weiterhin auch für die Absicherung
+der LIN-Kommunikation aus 1.0.34.
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
+
+
+## [1.0.37] — 2026-09-30 — Code aufgeräumt
+
+### Geändert
+- `truma_inetbox`: Konstanten sind `constexpr` statt `#define` (LIN-SIDs, Frame-Typen, Queue-Längen,
+  Stack und Kern der LIN-Tasks). Die globalen Build-Flags `ARDUINO_SERIAL_EVENT_TASK_*` entfallen,
+  die Werte stehen jetzt im Code. Der Checksum-Beginn der Statusframes ist eine benannte Konstante
+  statt zweimal `10`.
+- `truma_inetbox`: `xQueueSendFromISR()` bekommt als letztes Argument `nullptr`. Dort stand bisher
+  die Timeout-Konstante 0, die der Compiler als Nullzeiger durchgehen ließ, übergeben wurde also schon
+  immer `NULL`.
+- `truma_inetbox`: Die atomaren Update-Flags in `update_prepare()` werden explizit mit `.load()` und
+  `.store()` gelesen und gesetzt, die Header-Arrays in `helpers.h` sind `inline constexpr`.
+- `uart`: Die Member in `uart_component.h` haben Default-Werte.
+- `truma_inetbox`: Kommentar zu `check_for_lin_fault_()`, das Main-Loop und UART-Task ohne Sperre
+  aufrufen. Der Zustand wird dort nur bei einem Busfehler mit gesetztem `fault_pin` zurückgesetzt.
+
+Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`, am LIN-Bus nicht getestet.
 
 
 ## [1.0.36] — 2026-09-30 — Webserver optional

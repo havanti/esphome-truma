@@ -23,9 +23,10 @@ namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.LinBusListener";
 
-#define LIN_BREAK 0x00
-#define LIN_SYNC 0x55
-#define QUEUE_WAIT_DONT_BLOCK (TickType_t) 0
+static constexpr uint8_t LIN_BREAK = 0x00;
+static constexpr uint8_t LIN_SYNC = 0x55;
+// Also used by the truma_log macros in LinBusLog.h.
+static constexpr TickType_t QUEUE_WAIT_DONT_BLOCK = 0;
 
 void LinBusListener::dump_config() {
   ESP_LOGCONFIG(TAG, "LinBusListener:");
@@ -117,6 +118,9 @@ void LinBusListener::write_lin_answer_(const uint8_t *data, uint8_t len) {
   TRUMA_LOGV(log_msg);
 }
 
+// Called from the main loop (update()) and from uartEventTask_ (onReceive_()) without a lock. The state reset
+// below only runs while a fault is reported, which needs a configured fault_pin. Frames on a faulty bus are
+// dropped anyway, so the unsynchronized access is accepted.
 bool LinBusListener::check_for_lin_fault_() {
   // Check if Lin Bus is faulty.
   if (this->fault_pin_ != nullptr) {
@@ -344,7 +348,7 @@ void LinBusListener::read_lin_frame_() {
       for (uint8_t i = 0; i < lin_msg.len; i++) {
         lin_msg.data[i] = this->current_data_[i];
       }
-      if (xQueueSendFromISR(this->lin_msg_queue_, (void *) &lin_msg, QUEUE_WAIT_DONT_BLOCK) != pdPASS) {
+      if (xQueueSendFromISR(this->lin_msg_queue_, (void *) &lin_msg, nullptr) != pdPASS) {
         ESP_LOGW(TAG, "LIN message queue full — frame dropped (PID 0x%02X)", this->current_PID_);
       }
     }
@@ -440,10 +444,6 @@ void LinBusListener::process_log_queue(TickType_t xTicksToWait) {
   }
 #endif  // ESPHOME_LOG_LEVEL > ESPHOME_LOG_LEVEL_NONE
 }
-
-#undef LIN_BREAK
-#undef LIN_SYNC
-#undef QUEUE_WAIT_DONT_BLOCK
 
 }  // namespace truma_inetbox
 }  // namespace esphome

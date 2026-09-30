@@ -78,13 +78,13 @@ class UARTComponent {
   virtual void check_logger_conflict() = 0;
   bool check_read_timeout_(size_t len = 1);
 
-  InternalGPIOPin *tx_pin_;
-  InternalGPIOPin *rx_pin_;
-  size_t rx_buffer_size_;
-  uint32_t baud_rate_;
-  uint8_t stop_bits_;
-  uint8_t data_bits_;
-  UARTParityOptions parity_;
+  InternalGPIOPin *tx_pin_{nullptr};
+  InternalGPIOPin *rx_pin_{nullptr};
+  size_t rx_buffer_size_{0};
+  uint32_t baud_rate_{0};
+  uint8_t stop_bits_{0};
+  uint8_t data_bits_{0};
+  UARTParityOptions parity_{UART_CONFIG_PARITY_NONE};
 #ifdef USE_UART_DEBUGGER
   CallbackManager<void(UARTDirection, uint8_t)> debug_callback_{};
 #endif

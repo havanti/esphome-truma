@@ -23,7 +23,7 @@ static bool is_valid_vent_mode(AirconVentMode vent_mode) {
 }
 
 StatusFrameAirconManualResponse *TrumaiNetBoxAppAirconManual::update_prepare() {
-  if (this->update_status_prepared_ || this->update_status_stale_) {
+  if (this->update_status_prepared_.load() || this->update_status_stale_.load()) {
     return &this->update_status_;
   }
 
@@ -38,7 +38,7 @@ StatusFrameAirconManualResponse *TrumaiNetBoxAppAirconManual::update_prepare() {
     this->update_status_.target_temp_aircon = TargetTemp::TARGET_TEMP_22C;
   }
 
-  this->update_status_prepared_ = true;
+  this->update_status_prepared_.store(true);
   return &this->update_status_;
 }
 

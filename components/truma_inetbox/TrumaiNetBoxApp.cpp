@@ -254,7 +254,8 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
   auto statusFrame = reinterpret_cast<const StatusFrame *>(message);
   auto header = &statusFrame->genericHeader;
   // Validate Truma frame checksum
-  if (header->checksum != data_checksum(&statusFrame->raw[10], sizeof(StatusFrame) - 10, (0xFF - header->checksum)) ||
+  if (header->checksum != data_checksum(&statusFrame->raw[STATUS_FRAME_CHECKSUM_START],
+                                        sizeof(StatusFrame) - STATUS_FRAME_CHECKSUM_START, (0xFF - header->checksum)) ||
       header->header_2 != 'T' || header->header_3 != 0x01) {
     ESP_LOGE(TAG, "Truma checksum fail.");
     return nullptr;

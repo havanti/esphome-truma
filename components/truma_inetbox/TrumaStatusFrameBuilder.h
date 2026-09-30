@@ -22,7 +22,8 @@ inline void status_frame_create_empty(StatusFrame *response, uint8_t message_typ
 
 inline void status_frame_calculate_checksum(StatusFrame *response) {
   response->genericHeader.checksum = 0x0;
-  response->genericHeader.checksum = data_checksum(&response->raw[10], sizeof(StatusFrame) - 10, 0);
+  response->genericHeader.checksum = data_checksum(&response->raw[STATUS_FRAME_CHECKSUM_START],
+                                                   sizeof(StatusFrame) - STATUS_FRAME_CHECKSUM_START, 0);
 }
 
 inline void status_frame_create_init(StatusFrame *response, uint8_t *response_len, uint8_t command_counter) {

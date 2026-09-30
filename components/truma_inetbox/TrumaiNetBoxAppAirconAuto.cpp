@@ -11,7 +11,7 @@ static const char *const TAG = "truma_inetbox.TrumaiNetBoxAppAirconAuto";
 
 StatusFrameAirconAutoResponse *TrumaiNetBoxAppAirconAuto::update_prepare() {
   // An update is currently going on.
-  if (this->update_status_prepared_ || this->update_status_stale_) {
+  if (this->update_status_prepared_.load() || this->update_status_stale_.load()) {
     return &this->update_status_;
   }
 
@@ -29,7 +29,7 @@ StatusFrameAirconAutoResponse *TrumaiNetBoxAppAirconAuto::update_prepare() {
   this->update_status_.unknown_12 = this->data_.unknown_12;
   this->update_status_.el_power_level_b = this->data_.el_power_level_b;
 
-  this->update_status_prepared_ = true;
+  this->update_status_prepared_.store(true);
   return &this->update_status_;
 }
 

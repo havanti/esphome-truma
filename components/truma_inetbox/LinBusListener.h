@@ -9,15 +9,11 @@
 #include <freertos/semphr.h>
 #endif  // USE_ESP32
 
-#ifndef  TRUMA_MSG_QUEUE_LENGTH
-#define TRUMA_MSG_QUEUE_LENGTH 6
-#endif
-#ifndef  TRUMA_LOG_QUEUE_LENGTH
-#define TRUMA_LOG_QUEUE_LENGTH 6
-#endif
-
 namespace esphome {
 namespace truma_inetbox {
+
+static constexpr size_t TRUMA_MSG_QUEUE_LENGTH = 6;
+static constexpr size_t TRUMA_LOG_QUEUE_LENGTH = 6;
 
 static constexpr uint8_t DIAGNOSTIC_FRAME_MASTER = 0x3c;
 static constexpr uint8_t DIAGNOSTIC_FRAME_SLAVE = 0x3d;

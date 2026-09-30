@@ -14,14 +14,14 @@ static const char *const TAG = "truma_inetbox.LinBusProtocol";
 static constexpr uint8_t LIN_TP_FIRST_FRAME_DATA_LEN = 5;
 static constexpr uint8_t LIN_TP_CONSECUTIVE_FRAME_DATA_LEN = 6;
 
-#define LIN_NAD_BROADCAST 0x7F
-#define LIN_SID_RESPONSE 0x40
-#define LIN_SID_ASSIGN_NAD 0xB0
-#define LIN_SID_ASSIGN_NAD_RESPONSE (LIN_SID_ASSIGN_NAD | LIN_SID_RESPONSE)
-#define LIN_SID_READ_BY_IDENTIFIER 0xB2
-#define LIN_SID_READ_BY_IDENTIFIER_RESPONSE (LIN_SID_READ_BY_IDENTIFIER | LIN_SID_RESPONSE)
-#define LIN_SID_HEARTBEAT 0xB9
-#define LIN_SID_HEARTBEAT_RESPONSE (LIN_SID_HEARTBEAT | LIN_SID_RESPONSE)
+static constexpr uint8_t LIN_NAD_BROADCAST = 0x7F;
+static constexpr uint8_t LIN_SID_RESPONSE = 0x40;
+static constexpr uint8_t LIN_SID_ASSIGN_NAD = 0xB0;
+static constexpr uint8_t LIN_SID_ASSIGN_NAD_RESPONSE = LIN_SID_ASSIGN_NAD | LIN_SID_RESPONSE;
+static constexpr uint8_t LIN_SID_READ_BY_IDENTIFIER = 0xB2;
+static constexpr uint8_t LIN_SID_READ_BY_IDENTIFIER_RESPONSE = LIN_SID_READ_BY_IDENTIFIER | LIN_SID_RESPONSE;
+static constexpr uint8_t LIN_SID_HEARTBEAT = 0xB9;
+static constexpr uint8_t LIN_SID_HEARTBEAT_RESPONSE = LIN_SID_HEARTBEAT | LIN_SID_RESPONSE;
 
 void LinBusProtocol::lin_reset_device(){
     // clear any messages in send queue of LinBus Protocol handler.

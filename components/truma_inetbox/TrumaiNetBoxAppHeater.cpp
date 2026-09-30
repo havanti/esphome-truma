@@ -11,7 +11,7 @@ static const char *const TAG = "truma_inetbox.TrumaiNetBoxAppHeater";
 
 StatusFrameHeaterResponse *TrumaiNetBoxAppHeater::update_prepare() {
   // An update is currently going on.
-  if (this->update_status_prepared_ || this->update_status_stale_) {
+  if (this->update_status_prepared_.load() || this->update_status_stale_.load()) {
     return &this->update_status_;
   }
 
@@ -25,7 +25,7 @@ StatusFrameHeaterResponse *TrumaiNetBoxAppHeater::update_prepare() {
   this->update_status_.energy_mix_a = this->data_.energy_mix_a;
   this->update_status_.energy_mix_b = this->data_.energy_mix_b;
 
-  this->update_status_prepared_ = true;
+  this->update_status_prepared_.store(true);
   return &this->update_status_;
 }
 

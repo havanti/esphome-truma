@@ -4,7 +4,7 @@
 
 #define truma_log(_log_msg_) xQueueSend(this->log_queue_, (void *) &_log_msg_, QUEUE_WAIT_DONT_BLOCK);
 
-#define truma_logfromisr(_log_msg_) xQueueSendFromISR(this->log_queue_, (void *) &_log_msg_, QUEUE_WAIT_DONT_BLOCK);
+#define truma_logfromisr(_log_msg_) xQueueSendFromISR(this->log_queue_, (void *) &_log_msg_, nullptr);
 
 #if ESPHOME_LOG_LEVEL >= ESPHOME_LOG_LEVEL_VERY_VERBOSE
 #define TRUMA_LOGVV(_log_msg_) truma_log(_log_msg_)
