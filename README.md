@@ -65,7 +65,7 @@ In Home Assistant werden zwei Schaltflächen bereitgestellt:
 | Start Diesel De-coking | Startet den 45-minütigen Entkokungszyklus |
 | Abort Diesel De-coking | Bricht den Zyklus ab und schaltet das Heizgerät aus |
 
-Ein Template-Sensor (Diesel De-coking Remaining Time, Einheit: min) zeigt die verbleibende Zeit an und ist im Home-Assistant-Dashboard sowie in der integrierten Web-UI sichtbar.
+Ein Template-Sensor (Diesel De-coking Remaining Time, Einheit: min) zeigt die verbleibende Zeit an und ist im Home-Assistant-Dashboard sowie, falls eingeschaltet, in der Web-UI sichtbar.
 
 ### Truma Aventa Gen 2 — Klimaanlage
 
@@ -117,7 +117,7 @@ truma_cooler:
 
 #### Features
 
-- **Klimasteuerung** — Ein/Aus und Solltemperatur (−22 °C bis +10 °C) direkt aus Home Assistant oder dem integrierten Web-Portal
+- **Klimasteuerung** — Ein/Aus und Solltemperatur (−22 °C bis +10 °C) direkt aus Home Assistant oder dem optionalen Web-Portal
 - **Turbo-Schalter** — Turbo-Modus ein/ausschalten (Gerät muss eingeschaltet sein); wird beim Einschalten automatisch zurückgesetzt
 - **Innentemperatur** — gemessene Temperatur im Inneren der Kühlbox (mit Glättungsfilter)
 - **Umgebungstemperatur (nur C44)** — Wert aus Byte 11 der Statusmeldung, Bedeutung ungeklärt: An
@@ -127,7 +127,7 @@ truma_cooler:
 - **Gerätestatus** — Anzeige ob die Kühlbox eingeschaltet ist
 - **BLE-Verbindungsstatus** — Anzeige der aktuellen BLE-Verbindung zum ESP
 - **OTA-Update** — kabellose Firmware-Updates direkt über WLAN
-- **Web-Portal** — lokale Oberfläche auf Port 80 (ESPHome Web Server v3), kein Home Assistant erforderlich
+- **Web-Portal (optional)** — lokale Oberfläche auf Port 80 (ESPHome Web Server v3), kein Home Assistant erforderlich; in den Beispielen ausgeschaltet, siehe [Webserver (optional)](#webserver-optional)
 - **ESP-Neustart** — Schaltfläche zum Neustarten des ESP aus Home Assistant
 
 #### Voraussetzungen
@@ -200,7 +200,7 @@ Systemdiagnose — Folgende Sensoren sind in Home Assistant immer verfügbar:
 
 Home-Assistant-Zeitsynchronisation — Die ESP-Uhr wird über die Home-Assistant-Zeitplattform synchron gehalten, was für das korrekte Funktionieren der Timer-Aktionen erforderlich ist.
 
-Integrierte Web-UI — Ein lokaler Webserver läuft auf Port 80 (ESPHome Web Server v3) mit `include_internal: true`, sodass alle Entitäten einschließlich interner Diagnosedaten direkt im Browser sichtbar sind, ohne Home Assistant zu benötigen.
+Optionale Web-UI — Ein lokaler Webserver auf Port 80 (ESPHome Web Server v3) mit `include_internal: true` zeigt alle Entitäten einschließlich interner Diagnosedaten direkt im Browser, ohne Home Assistant. In den Beispielen ist er ausgeschaltet, zu den Risiken siehe [Webserver (optional)](#webserver-optional).
 
 Template-Schalter — Fertige Ein/Aus-Schalter für die Raumheizung, den Wasserboiler und den integrierten Timer sind enthalten, was die Automatisierung und Dashboard-Integration vereinfacht.
 
@@ -312,6 +312,26 @@ Läuft auf dem ESP32 noch eine Firmware, die mit OTA-Passwort gebaut wurde, bric
 `encryption: {}` installieren, der `api`-Schlüssel ist dabei schon gesetzt. Danach den
 `encryption`-Block wieder einfügen. Ist der `api`-Schlüssel neu, fragt Home Assistant ihn beim
 nächsten Verbinden ab.
+
+### Webserver (optional)
+
+In den Beispielkonfigurationen ist der `web_server`-Block auskommentiert. Eingeschaltet stellt der
+ESP32 auf Port 80 eine eigene Weboberfläche bereit, über die sich alle Entitäten ohne Home Assistant
+anzeigen und schalten lassen. Mit `include_internal: true` erscheinen dort auch die internen
+Entitäten.
+
+Ohne `auth` ist diese Oberfläche nicht geschützt. Jeder im selben WLAN kann sie im Browser öffnen,
+Heizung, Klima oder Kühlbox schalten, Solltemperaturen ändern, den ESP neu starten und die Logs
+mitlesen. Im Wohnmobil ist das vor allem auf Campingplätzen oder in fremden WLANs ein Risiko. Der
+`api`-Schlüssel hilft dabei nicht, er sichert nur die Verbindung zu Home Assistant, die
+Weboberfläche läuft daneben unverschlüsselt über HTTP. Eine Firmware lässt sich über den Webserver
+nicht aufspielen, solange unter `ota` kein Eintrag `platform: web_server` steht.
+
+Wer den Webserver nutzen will, sollte ihn mindestens mit Benutzername und Passwort absichern, dafür
+im Beispiel die `auth`-Zeilen mit einkommentieren und `web_username` und `web_password` in
+`secrets.yaml` eintragen. `type: digest` schickt das Passwort nicht im Klartext, die Seiten selbst
+bleiben aber unverschlüsselt. Den Webserver deshalb nur im eigenen Netz betreiben und Port 80 nicht
+über den Router nach außen freigeben. Wer ohnehin Home Assistant nutzt, braucht ihn nicht.
 
 ### Minimalbeispiel
 

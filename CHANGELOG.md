@@ -12,15 +12,31 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release ändert den Schreibbefehl für die Aventa. Er schaltete bisher das Warmwasser ab,
-weil an der Stelle des Warmwasser-Solls Nullen gesendet wurden. Die Änderung ist gebaut, aber an der
-Hardware noch nicht bestätigt. Das Einschalten der Aventa aus 1.0.33 ist inzwischen bestätigt. Die
-Absicherung der LIN-Kommunikation aus 1.0.34 ist weiterhin nicht an einem LIN-Bus getestet.
+Dieses Release schaltet den Webserver in den Beispielkonfigurationen aus, weil er ohne Anmeldung
+jedem im selben WLAN die Steuerung erlaubt. Die Warmwasser-Änderung für die Aventa aus 1.0.35 ist
+inzwischen an der Hardware bestätigt. Die Absicherung der LIN-Kommunikation aus 1.0.34 ist weiterhin
+nicht an einem LIN-Bus getestet.
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
+
+
+## [1.0.36] — 2026-09-30 — Webserver optional
+
+### Geändert
+- Beispiel-YAMLs: Der `web_server`-Block ist auskommentiert und als optional gekennzeichnet. Ohne
+  `auth` konnte jeder im selben WLAN über Port 80 alle Entitäten schalten. Der auskommentierte Block
+  enthält `auth` mit `type: digest` und Zugangsdaten aus `secrets.yaml`.
+
+### Behoben
+- `truma_inetbox`: Aventa-Befehle aus Home Assistant schalten das Warmwasser nicht mehr ab
+  (Änderung aus 1.0.35), bestätigt an einer Aventa Compact Plus 2nd Gen (Issue #16, #28).
+
+### Dokumentation
+- README: neuer Abschnitt „Webserver (optional)“ zu den Risiken ohne Anmeldung und zur Absicherung,
+  Hinweise auf das Web-Portal angepasst.
 
 
 ## [1.0.35] — 2026-09-29 — Warmwasser bei Aventa-Befehlen

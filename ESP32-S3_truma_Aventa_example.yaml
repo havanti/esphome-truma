@@ -156,11 +156,17 @@ text_sensor:
   - platform: truma_inetbox
     name: "ESPHome Truma Version"
 
-web_server:
-  port: 80
-  local: true
-  version: 3
-  include_internal: true
+# Optional: local web UI on port 80 (uncomment to enable)
+# Without auth, anyone on the same Wi-Fi can view and switch all entities, see README.
+# web_server:
+#   port: 80
+#   local: true
+#   version: 3
+#   include_internal: true
+#   auth:
+#     type: digest
+#     username: !secret web_username
+#     password: !secret web_password
 
 button:
   - platform: restart

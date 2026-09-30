@@ -12,15 +12,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release changes the write command for the Aventa. It switched the water heater off so far,
-because zeros were sent in the place of the water target. The change is built, but not yet
-confirmed on hardware. Switching on the Aventa from 1.0.33 is confirmed now. The LIN communication
-hardening from 1.0.34 is still not tested on a LIN bus.
+This release switches the web server off in the example configurations, because without login it
+lets anyone on the same Wi-Fi control the device. The water heater change for the Aventa from
+1.0.35 is confirmed on hardware now. The LIN communication hardening from 1.0.34 is still not tested
+on a LIN bus.
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
+
+
+## [1.0.36] — 2026-09-30 — Web server optional
+
+### Changed
+- Example YAMLs: the `web_server` block is commented out and marked as optional. Without `auth`
+  anyone on the same Wi-Fi could switch all entities over port 80. The commented block contains
+  `auth` with `type: digest` and credentials from `secrets.yaml`.
+
+### Fixed
+- `truma_inetbox`: Aventa commands from Home Assistant no longer switch the water heater off
+  (change from 1.0.35), confirmed on an Aventa Compact Plus 2nd Gen (issue #16, #28).
+
+### Documentation
+- README: new section "Web server (optional)" on the risks without login and how to protect it,
+  references to the web portal updated.
 
 
 ## [1.0.35] — 2026-09-29 — Water heater on Aventa commands

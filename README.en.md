@@ -67,7 +67,7 @@ Two buttons are exposed in Home Assistant:
 | Start Diesel De-coking | Starts the 45-minute de-coking cycle |
 | Abort Diesel De-coking | Aborts the cycle and turns off the heater |
 
-A template sensor (Diesel De-coking Remaining Time, unit: min) counts down the remaining time and is visible in the Home Assistant dashboard and the built-in web UI.
+A template sensor (Diesel De-coking Remaining Time, unit: min) counts down the remaining time and is visible in the Home Assistant dashboard and, if enabled, in the web UI.
 
 ### Truma Aventa Gen 2 — Air Conditioning
 
@@ -119,7 +119,7 @@ truma_cooler:
 
 #### Features
 
-- **Climate control** — On/Off and setpoint (−22 °C to +10 °C) directly from Home Assistant or the built-in web portal
+- **Climate control** — On/Off and setpoint (−22 °C to +10 °C) directly from Home Assistant or the optional web portal
 - **Turbo switch** — toggle turbo mode (device must be on); automatically resets on power-up
 - **Interior temperature** — measured inside the cooling box (with smoothing filter)
 - **Ambient temperature (C44 only)** — value from byte 11 of the status message, meaning unclear: on
@@ -129,7 +129,7 @@ truma_cooler:
 - **Device status** — indicates whether the cooler is powered on
 - **BLE connection status** — current BLE connection state to the ESP
 - **OTA update** — wireless firmware updates over WiFi
-- **Web portal** — local UI on port 80 (ESPHome Web Server v3), no Home Assistant required
+- **Web portal (optional)** — local UI on port 80 (ESPHome Web Server v3), no Home Assistant required; off in the examples, see [Web server (optional)](#web-server-optional)
 - **ESP restart** — button to restart the ESP from Home Assistant
 
 #### Requirements
@@ -202,7 +202,7 @@ System diagnostics — The following sensors are always available in Home Assist
 
 Home Assistant time sync — The ESP clock is kept in sync via the Home Assistant time platform, which is required for the timer actions to work correctly.
 
-Built-in web UI — A local web server runs on port 80 (ESPHome Web Server v3) with `include_internal: true`, so all entities including internal diagnostics are visible directly in the browser without needing Home Assistant.
+Optional web UI — A local web server on port 80 (ESPHome Web Server v3) with `include_internal: true` shows all entities including internal diagnostics directly in the browser, without Home Assistant. It is off in the examples, for the risks see [Web server (optional)](#web-server-optional).
 
 Template switches — Ready-to-use on/off switches for the room heater, water heater, and the built-in timer are included, making automation and dashboard integration straightforward.
 
@@ -313,6 +313,25 @@ If the ESP32 still runs firmware built with an OTA password, the update aborts w
 `the device did not offer encryption`. Install once with the previous `password` instead of
 `encryption: {}`, with the `api` key already set. Then add the `encryption` block back. If the
 `api` key is new, Home Assistant asks for it on the next connection.
+
+### Web server (optional)
+
+The `web_server` block is commented out in the example configurations. When enabled, the ESP32
+serves its own web UI on port 80, where all entities can be viewed and switched without Home
+Assistant. With `include_internal: true` the internal entities show up there as well.
+
+Without `auth` this UI is not protected. Anyone on the same Wi-Fi can open it in a browser, switch
+heater, air conditioning or cooler, change target temperatures, restart the ESP and read the logs.
+In a motorhome this is mainly a risk on campsites or in other foreign Wi-Fi networks. The `api` key
+does not help here, it only secures the connection to Home Assistant, the web UI runs next to it
+unencrypted over HTTP. Firmware cannot be uploaded through the web server as long as there is no
+`platform: web_server` entry under `ota`.
+
+If you want to use the web server, protect it at least with username and password: uncomment the
+`auth` lines in the example as well and add `web_username` and `web_password` to `secrets.yaml`.
+`type: digest` does not send the password in plain text, but the pages themselves stay unencrypted.
+So run the web server only in your own network and do not forward port 80 on the router. If you use
+Home Assistant anyway, you do not need it.
 
 ### Minimal example
 
