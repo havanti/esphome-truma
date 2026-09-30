@@ -18,7 +18,7 @@ confirmed on hardware. Switching on the Aventa from 1.0.33 is confirmed now. The
 hardening from 1.0.34 is still not tested on a LIN bus.
 
 Tested against:
-- ESPHome **2026.9.0** — ESP-IDF ✅
+- ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
 

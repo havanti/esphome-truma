@@ -18,7 +18,7 @@ Hardware noch nicht bestätigt. Das Einschalten der Aventa aus 1.0.33 ist inzwis
 Absicherung der LIN-Kommunikation aus 1.0.34 ist weiterhin nicht an einem LIN-Bus getestet.
 
 Getestet mit:
-- ESPHome **2026.9.0** — ESP-IDF ✅
+- ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
 
