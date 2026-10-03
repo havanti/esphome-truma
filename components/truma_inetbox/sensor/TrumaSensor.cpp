@@ -19,6 +19,12 @@ void TrumaSensor::setup() {
         [this](uint8_t vent_mode) { this->publish_state(static_cast<float>(vent_mode)); });
     return;
   }
+  if (this->type_ == TRUMA_SENSOR_TYPE::AIRCON_AUTO_TARGET_TEMPERATURE) {
+    this->parent_->get_aircon_auto()->add_on_message_callback([this](const StatusFrameAirconAuto *status) {
+      this->publish_state(temp_code_to_decimal(status->target_temp_aircon_auto, 0));
+    });
+    return;
+  }
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
     switch (this->type_) {
       case TRUMA_SENSOR_TYPE::CURRENT_ROOM_TEMPERATURE:

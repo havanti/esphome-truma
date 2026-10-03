@@ -87,7 +87,9 @@ Lüftergeschwindigkeiten: Low / Mid / High / Night / Auto
 
 Temperaturbereich: 16–31 °C, Schrittweite 1 °C
 
-Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37), den die Komponente nicht auswertet. Die Aventa-Entitäten zeigen dann „Off“ (Issue #28).
+Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37). Der Aventa-Frame bleibt dabei auf Aus, deshalb zeigen die Klima-Entität und die Selects weiter „Off“. Ob AUTO am CP Plus läuft und mit welchem Soll, zeigen der Binärsensor `AIRCON_AUTO_ACTIVE` und der Sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. Ausgewertet ist das anhand von Logs einer Aventa Compact Plus 2. Generation (Issue #28), nach dem Einschalten steht im Frame das Soll, nach dem Ausschalten 0. Gesetzt werden kann AUTO am CP Plus über die Komponente nicht.
+
+Licht: Die Number `AIRCON_LIGHT` zeigt die Lichtstufe der Aventa (0 = aus, 1–5) und stellt sie ein, ausgewertet wird dafür Byte 6–7 des Aventa-Frames. Jeder Schreibbefehl an die Aventa schickt die zuletzt gemeldete Lichtstufe mit, bis 1.0.37 stand dort 0. An einer Aventa ist beides noch nicht bestätigt.
 
 Beispielkonfiguration: [`ESP32-S3_truma_Aventa_example.yaml`](ESP32-S3_truma_Aventa_example.yaml)
 
@@ -414,6 +416,7 @@ Folgende `type`-Werte sind verfügbar:
 - `TIMER_ACTIVE`
 - `TIMER_ROOM`
 - `TIMER_WATER`
+- `AIRCON_AUTO_ACTIVE` — AUTO am CP Plus gewählt (Aventa)
 
 ### Climate
 
@@ -452,6 +455,7 @@ Folgende `type`-Werte sind verfügbar:
 - `TARGET_WATER_TEMPERATURE`
 - `ELECTRIC_POWER_LEVEL`
 - `AIRCON_MANUAL_TEMPERATURE`
+- `AIRCON_LIGHT` — Lichtstufe Aventa, 0 = aus, 1–5
 
 ### Select
 
@@ -498,6 +502,7 @@ Folgende `type`-Werte sind verfügbar:
 - `PID22_BYTE0` (experimentell)
 - `PID22_BYTE1` (experimentell)
 - `VENT_MODE`
+- `AIRCON_AUTO_TARGET_TEMPERATURE` — AUTO-Soll vom CP Plus, 0 = AUTO aus (Aventa)
 
 `OPERATING_STATUS` gibt den Betriebszustand weiter, den die Heizung selbst meldet: 0 heißt aus,
 1 ist eine Warnung, 4 kommt beim Anlauf und beim Nachlauf. Die Werte darüber hängen vom Modell ab:

@@ -32,6 +32,7 @@ StatusFrameAirconManualResponse *TrumaiNetBoxAppAirconManual::update_prepare() {
   this->update_status_.vent_mode = this->data_.vent_mode;
   this->update_status_.aircon_on = 0x01;  // Must be 1 for commands to be accepted
   this->update_status_.target_temp_aircon = this->data_.target_temp_aircon;
+  this->update_status_.light = this->data_.light;
 
   if (this->update_status_.target_temp_aircon == TargetTemp::TARGET_TEMP_OFF ||
       static_cast<uint16_t>(this->update_status_.target_temp_aircon) == 0) {
@@ -62,6 +63,8 @@ void TrumaiNetBoxAppAirconManual::create_update_data(StatusFrame *response, uint
   response->airconManualResponse.vent_mode = vent_mode;
   response->airconManualResponse.aircon_on = 0x01;  // Must always be 1
   response->airconManualResponse.target_temp_aircon = this->update_status_.target_temp_aircon;
+  // Copied from the last status frame in update_prepare(), so other commands keep the light as it is.
+  response->airconManualResponse.light = this->update_status_.light;
   memset(response->airconManualResponse.padding, 0x00, sizeof(response->airconManualResponse.padding));
   // Echo the water target from the last aircon status frame, otherwise the write turns the water heater off.
   response->airconManualResponse.target_temp_water = this->data_.target_temp_water;
@@ -156,6 +159,24 @@ bool TrumaiNetBoxAppAirconManual::action_aircon_manual(uint8_t temperature, Airc
   } else if (update_data->vent_mode == AirconVentMode::AIRCON_VENT_AUTO) {
     update_data->vent_mode = AirconVentMode::AIRCON_VENT_LOW;
   }
+
+  this->update_submit();
+  return true;
+}
+
+// The light position is not confirmed on hardware yet.
+bool TrumaiNetBoxAppAirconManual::action_set_light(uint8_t level) {
+  if (!this->can_update()) {
+    ESP_LOGW(TAG, "Cannot update Truma aircon.");
+    return false;
+  }
+
+  if (level > AIRCON_LIGHT_LEVEL_MAX) {
+    level = AIRCON_LIGHT_LEVEL_MAX;
+  }
+
+  auto update_data = this->update_prepare();
+  update_data->light = level * AIRCON_LIGHT_STEP;
 
   this->update_submit();
   return true;

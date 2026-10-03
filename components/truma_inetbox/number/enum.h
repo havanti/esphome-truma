@@ -13,6 +13,7 @@ enum class TRUMA_NUMBER_TYPE {
   ELECTRIC_POWER_LEVEL,
   
   AIRCON_MANUAL_TEMPERATURE,
+  AIRCON_LIGHT,
 };
 
 #ifdef ESPHOME_LOG_HAS_CONFIG
@@ -30,6 +31,9 @@ inline const char *enum_to_c_str(const TRUMA_NUMBER_TYPE val) {
 
     case TRUMA_NUMBER_TYPE::AIRCON_MANUAL_TEMPERATURE:
       return "AIRCON_MANUAL_TEMPERATURE";
+      break;
+    case TRUMA_NUMBER_TYPE::AIRCON_LIGHT:
+      return "AIRCON_LIGHT";
       break;
 
     default:

@@ -21,6 +21,8 @@ enum class TRUMA_BINARY_SENSOR_TYPE {
   TIMER_ACTIVE,
   TIMER_ROOM,
   TIMER_WATER,
+
+  AIRCON_AUTO_ACTIVE,
 };
 
 #ifdef ESPHOME_LOG_HAS_CONFIG
@@ -62,6 +64,10 @@ inline const char *enum_to_c_str(const TRUMA_BINARY_SENSOR_TYPE val) {
       break;
     case TRUMA_BINARY_SENSOR_TYPE::TIMER_WATER:
       return "TIMER_WATER";
+      break;
+
+    case TRUMA_BINARY_SENSOR_TYPE::AIRCON_AUTO_ACTIVE:
+      return "AIRCON_AUTO_ACTIVE";
       break;
     default:
       return "";

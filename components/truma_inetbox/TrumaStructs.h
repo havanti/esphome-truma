@@ -38,6 +38,10 @@ static constexpr uint8_t STATUS_FRAME_AIRCON_AUTO_INIT_RESPONSE = STATUS_FRAME_A
 // The status frame checksum covers the frame from this byte offset to its end.
 static constexpr size_t STATUS_FRAME_CHECKSUM_START = 10;
 
+// Aventa light in the aircon frames: raw value = level * AIRCON_LIGHT_STEP, level 0 (off) to AIRCON_LIGHT_LEVEL_MAX.
+static constexpr uint16_t AIRCON_LIGHT_STEP = 20;
+static constexpr uint8_t AIRCON_LIGHT_LEVEL_MAX = 5;
+
 struct StatusFrameHeader {  // NOLINT(altera-struct-pack-align)
   // sid
   uint8_t service_identifier;
@@ -189,11 +193,8 @@ struct StatusFrameAirconManual {  // NOLINT(altera-struct-pack-align)
   AirconVentMode vent_mode;
   EnergyMix energy_mix;
   TargetTemp target_temp_aircon;
-  // 0x00
-  uint8_t unknown_07;
-  // 0x00
-  uint8_t unknown_08;
-  // No idea why two current_temp
+  // Aventa light: 0 = off, AIRCON_LIGHT_STEP per level 1-5, not confirmed on hardware yet
+  uint16_t light;
   TargetTemp current_temp_aircon;
   // Same value as target_temp_water in the heater frame (issue #28)
   TargetTemp target_temp_water;
@@ -202,7 +203,8 @@ struct StatusFrameAirconManual {  // NOLINT(altera-struct-pack-align)
   uint8_t unknown_15;
   // 0x00
   uint8_t unknown_16;
-  TargetTemp current_temp_room;
+  // Same value as current_temp_water in the heater frame (issue #28 logs)
+  TargetTemp current_temp_water;
 } __attribute__((packed));
 
 // Length 12 (0x0C) - Must match expected message length from CP Plus
@@ -213,7 +215,9 @@ struct StatusFrameAirconManualResponse {  // NOLINT(altera-struct-pack-align)
   AirconVentMode vent_mode;
   uint8_t aircon_on;  // Must be 0x01 for commands to be accepted
   TargetTemp target_temp_aircon;
-  uint8_t padding[4];
+  // Same position as in the status frame, sending 0 presumably switches the light off
+  uint16_t light;
+  uint8_t padding[2];
   // CP Plus applies this as the water target, sending 0 switches the water heater off (issue #28)
   TargetTemp target_temp_water;
 } __attribute__((packed));
@@ -252,13 +256,14 @@ struct StatusFrameAirconAuto {  // NOLINT(altera-struct-pack-align)
   uint8_t unknown_04;  // 0x00
   uint8_t unknown_05;  // 0x00
   uint8_t unknown_06;  // 0x00
+  // AUTO selected on the CP Plus, 0 while AUTO is off (issue #28 logs)
   TargetTemp target_temp_aircon_auto;
   ElectricPowerLevel el_power_level_a;
-  uint8_t unknown_11;  // 0x00
-  uint8_t unknown_12;  // 0x00
+  // Same value as target_temp_water in the heater frame (issue #28 logs)
+  TargetTemp target_temp_water;
   ElectricPowerLevel el_power_level_b;
-  TargetTemp current_temp;
-  TargetTemp target_temp;
+  TargetTemp current_temp_room;
+  TargetTemp current_temp_water;
 } __attribute__((packed));
 
 struct StatusFrameAirconAutoResponse {  // NOLINT(altera-struct-pack-align)
@@ -270,8 +275,7 @@ struct StatusFrameAirconAutoResponse {  // NOLINT(altera-struct-pack-align)
   uint8_t unknown_06;  // 0x00
   TargetTemp target_temp_aircon_auto;
   ElectricPowerLevel el_power_level_a;
-  uint8_t unknown_11;  // 0x00
-  uint8_t unknown_12;  // 0x00
+  TargetTemp target_temp_water;
   ElectricPowerLevel el_power_level_b;
 } __attribute__((packed));
 

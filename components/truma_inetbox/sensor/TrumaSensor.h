@@ -20,6 +20,7 @@ enum class TRUMA_SENSOR_TYPE {
   PID22_BYTE0,
   PID22_BYTE1,
   VENT_MODE,
+  AIRCON_AUTO_TARGET_TEMPERATURE,
 };
 
 #ifdef ESPHOME_LOG_HAS_CONFIG
@@ -60,6 +61,9 @@ inline const char *enum_to_c_str(const TRUMA_SENSOR_TYPE val) {
       break;
     case TRUMA_SENSOR_TYPE::VENT_MODE:
       return "VENT_MODE";
+      break;
+    case TRUMA_SENSOR_TYPE::AIRCON_AUTO_TARGET_TEMPERATURE:
+      return "AIRCON_AUTO_TARGET_TEMPERATURE";
       break;
     default:
       return "";

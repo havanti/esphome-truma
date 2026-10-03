@@ -38,6 +38,9 @@ CONF_SUPPORTED_TYPE = {
     "TIMER_ACTIVE": (truma_inetbox_ns.class_("TrumaTimerBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.TIMER_ACTIVE),
     "TIMER_ROOM": (truma_inetbox_ns.class_("TrumaTimerBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.TIMER_ROOM),
     "TIMER_WATER": (truma_inetbox_ns.class_("TrumaTimerBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.TIMER_WATER),
+    # TrumaAirconBinarySensor
+    # AUTO selected on the CP Plus, from the AUTO status frame 0x37 (issue #28).
+    "AIRCON_AUTO_ACTIVE": (truma_inetbox_ns.class_("TrumaAirconBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.AIRCON_AUTO_ACTIVE),
 }
 
 

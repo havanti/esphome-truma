@@ -118,9 +118,20 @@ number:
     name: "Aircon Temperature"
     type: AIRCON_MANUAL_TEMPERATURE
 
-# ─── Diagnostics ─────────────────────────────────────────────────────────────
+  # Aventa light: 0 = off, 1-5 = level (not yet confirmed)
+  - platform: truma_inetbox
+    truma_inetbox_id: truma_inetbox_id
+    name: "Aircon Light"
+    type: AIRCON_LIGHT
 
 sensor:
+  # AUTO target selected on the CP Plus, 0 while AUTO is off
+  - platform: truma_inetbox
+    truma_inetbox_id: truma_inetbox_id
+    name: "Aircon Auto Temperature Status"
+    type: AIRCON_AUTO_TARGET_TEMPERATURE
+
+  # Diagnostics
   - platform: internal_temperature
     name: "ESP32 Internal Temperature"
     update_interval: 60s
@@ -145,6 +156,12 @@ sensor:
     entity_category: diagnostic
 
 binary_sensor:
+  # AUTO selected on the CP Plus
+  - platform: truma_inetbox
+    truma_inetbox_id: truma_inetbox_id
+    name: "Aircon Auto Active"
+    type: AIRCON_AUTO_ACTIVE
+
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
     name: "CP Plus Connected"

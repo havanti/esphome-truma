@@ -13,6 +13,9 @@ void TrumaAirconManualNumber::setup() {
       case TRUMA_NUMBER_TYPE::AIRCON_MANUAL_TEMPERATURE:
         this->publish_state(temp_code_to_decimal(status->target_temp_aircon, 0));
         break;
+      case TRUMA_NUMBER_TYPE::AIRCON_LIGHT:
+        this->publish_state(static_cast<float>(status->light / AIRCON_LIGHT_STEP));
+        break;
       default:
         break;
     }
@@ -23,6 +26,9 @@ void TrumaAirconManualNumber::control(float value) {
   switch (this->type_) {
     case TRUMA_NUMBER_TYPE::AIRCON_MANUAL_TEMPERATURE:
       this->parent_->get_aircon_manual()->action_set_temp(static_cast<uint8_t>(value));
+      break;
+    case TRUMA_NUMBER_TYPE::AIRCON_LIGHT:
+      this->parent_->get_aircon_manual()->action_set_light(static_cast<uint8_t>(value));
       break;
     default:
       break;

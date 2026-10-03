@@ -89,7 +89,9 @@ Fan speeds: Low / Mid / High / Night / Auto
 
 Temperature range: 16–31 °C, step 1 °C
 
-If AUTO is selected on the CP Plus, the CP Plus reports it in a separate frame (0x37) that the component does not evaluate. The Aventa entities then show "Off" (issue #28).
+If AUTO is selected on the CP Plus, the CP Plus reports it in a separate frame (0x37). The Aventa frame stays on off, so the climate entity and the selects still show "Off". Whether AUTO is running on the CP Plus and with which target is shown by the binary sensor `AIRCON_AUTO_ACTIVE` and the sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. This is based on logs of an Aventa Compact Plus 2nd Gen (issue #28), after switching on the frame holds the target, after switching off 0. The component cannot set AUTO on the CP Plus.
+
+Light: The number `AIRCON_LIGHT` shows the light level of the Aventa (0 = off, 1–5) and sets it, using bytes 6–7 of the Aventa frame. Every write command to the Aventa sends the last reported light level along, up to 1.0.37 there was 0. Neither is confirmed on an Aventa yet.
 
 Example configuration: [`ESP32-S3_truma_Aventa_example.yaml`](ESP32-S3_truma_Aventa_example.yaml)
 
@@ -414,6 +416,7 @@ The following `type` values are available:
 - `TIMER_ACTIVE`
 - `TIMER_ROOM`
 - `TIMER_WATER`
+- `AIRCON_AUTO_ACTIVE` — AUTO selected on the CP Plus (Aventa)
 
 ### Climate
 
@@ -452,6 +455,7 @@ The following `type` values are available:
 - `TARGET_WATER_TEMPERATURE`
 - `ELECTRIC_POWER_LEVEL`
 - `AIRCON_MANUAL_TEMPERATURE`
+- `AIRCON_LIGHT` — Aventa light level, 0 = off, 1–5
 
 ### Select
 
@@ -498,6 +502,7 @@ The following `type` values are available:
 - `PID22_BYTE0` (experimental)
 - `PID22_BYTE1` (experimental)
 - `VENT_MODE`
+- `AIRCON_AUTO_TARGET_TEMPERATURE` — AUTO target from the CP Plus, 0 = AUTO off (Aventa)
 
 `OPERATING_STATUS` passes on the operating state the heater itself reports: 0 means off, 1 is a
 warning, 4 shows up during start-up and cool-down. The values above that depend on the model: a

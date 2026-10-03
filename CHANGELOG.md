@@ -12,12 +12,39 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release räumt den Code auf, am Verhalten soll sich nichts ändern. Es ist für ESP32 und
-ESP32-S3 gebaut, aber nicht an einem LIN-Bus getestet. Das gilt weiterhin auch für die Absicherung
-der LIN-Kommunikation aus 1.0.34.
+Dieses Release ergänzt bei der Aventa das Licht und AUTO vom CP Plus. Es ist für ESP32 und ESP32-S3
+gebaut, aber an keiner Aventa getestet. Die Absicherung der LIN-Kommunikation aus 1.0.34 ist
+weiterhin nicht an einem LIN-Bus getestet.
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
+
+---
+
+
+## [1.0.38] — 2026-10-03 — Aventa: Licht und AUTO vom CP Plus
+
+### Hinzugefügt
+- `truma_inetbox`: Number `AIRCON_LIGHT` für das Licht der Aventa, 0 ist aus, 1–5 die Stufe. Gelesen
+  wird Byte 6–7 des Aventa-Statusframes 0x35 (Stufe × 20), geschrieben an derselben Stelle im 0x34.
+  An einer Aventa ist das noch nicht getestet.
+- `truma_inetbox`: Binärsensor `AIRCON_AUTO_ACTIVE` und Sensor `AIRCON_AUTO_TARGET_TEMPERATURE` für
+  AUTO am CP Plus. Beide werten den Frame 0x37 aus, in dem der CP Plus nach dem Einschalten das
+  AUTO-Soll meldet und nach dem Ausschalten 0 (Logs aus Issue #28).
+
+### Geändert
+- `truma_inetbox`: Schreibbefehle an die Aventa (0x34) schicken die zuletzt gemeldete Lichtstufe mit.
+  Bisher stand dort 0, das hat das Licht bei jedem Befehl aus HA vermutlich ausgeschaltet. In den Logs
+  aus Issue #28 entspricht der Schreibframe 0x34 dem Anfang des Statusframes 0x35, beim Warmwasser
+  (Byte 10–11) hat das Zurückschicken des gemeldeten Werts in 1.0.35 den Fehler behoben. Noch nicht
+  bestätigt.
+- `truma_inetbox`: Feldnamen in den Aventa-Structs korrigiert. Byte 16–17 im 0x35 ist die
+  Ist-Temperatur des Warmwassers, nicht des Raums, im 0x37 stehen Warmwasser-Soll sowie Raum- und
+  Warmwasser-Ist. Keines dieser Felder wurde bisher ausgegeben, am Verhalten ändert sich dadurch nichts.
+
+### Dokumentation
+- README: Abschnitt zur Aventa um Licht und AUTO ergänzt, die Einschränkung zu AUTO am CP Plus
+  angepasst. Das Aventa-Beispiel enthält die neuen Entitäten.
 
 ---
 

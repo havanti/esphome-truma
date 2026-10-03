@@ -12,12 +12,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release cleans up the code, the behavior is not meant to change. It is built for ESP32 and
-ESP32-S3, but not tested on a LIN bus. The same still applies to the LIN communication hardening from
-1.0.34.
+This release adds the light and AUTO from the CP Plus for the Aventa. It is built for ESP32 and
+ESP32-S3, but not tested on any Aventa. The LIN communication hardening from 1.0.34 is still not
+tested on a LIN bus.
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
+
+---
+
+
+## [1.0.38] — 2026-10-03 — Aventa: light and AUTO from the CP Plus
+
+### Added
+- `truma_inetbox`: Number `AIRCON_LIGHT` for the Aventa light, 0 is off, 1–5 the level. It reads
+  bytes 6–7 of the Aventa status frame 0x35 (level × 20) and writes the same position in 0x34. Not
+  yet tested on an Aventa.
+- `truma_inetbox`: Binary sensor `AIRCON_AUTO_ACTIVE` and sensor `AIRCON_AUTO_TARGET_TEMPERATURE` for
+  AUTO on the CP Plus. Both evaluate frame 0x37, in which the CP Plus reports the AUTO target after
+  switching on and 0 after switching off (logs from issue #28).
+
+### Changed
+- `truma_inetbox`: Write commands to the Aventa (0x34) send the last reported light level along. So
+  far there was 0, which presumably switched the light off with every command from HA. In the logs
+  from issue #28 the write frame 0x34 matches the start of the status frame 0x35, for the water
+  heater (bytes 10–11) sending back the reported value fixed the problem in 1.0.35. Not yet
+  confirmed.
+- `truma_inetbox`: Field names in the Aventa structs corrected. Bytes 16–17 in 0x35 are the actual
+  water temperature, not the room, 0x37 holds the water target as well as room and water actual
+  values. None of these fields was exposed so far, the behavior does not change.
+
+### Documentation
+- README: Aventa section extended with light and AUTO, the limitation about AUTO on the CP Plus
+  adjusted. The Aventa example contains the new entities.
 
 ---
 

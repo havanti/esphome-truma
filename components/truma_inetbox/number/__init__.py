@@ -16,6 +16,9 @@ from esphome.const import (
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_STEP,
+    UNIT_EMPTY,
+    ICON_LIGHTBULB,
+    DEVICE_CLASS_EMPTY,
 )
 from .. import truma_inetbox_ns, CONF_TRUMA_INETBOX_ID, TrumaINetBoxApp
 
@@ -73,6 +76,17 @@ CONF_SUPPORTED_TYPE = {
         CONF_MAX_VALUE: 31,
         # Values between 0 and 16 are handled as off.
         CONF_MIN_VALUE: 15,
+        CONF_STEP: 1,
+    },
+    # Aventa light level, 0 = off. Not confirmed on hardware yet.
+    "AIRCON_LIGHT": {
+        CONF_CLASS: truma_inetbox_ns.class_("TrumaAirconManualNumber", number.Number, cg.Component),
+        CONF_TYPE: TRUMA_NUMBER_TYPE_dummy_ns.AIRCON_LIGHT,
+        CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
+        CONF_ICON: ICON_LIGHTBULB,
+        CONF_DEVICE_CLASS: DEVICE_CLASS_EMPTY,
+        CONF_MAX_VALUE: 5,
+        CONF_MIN_VALUE: 0,
         CONF_STEP: 1,
     },
 }
