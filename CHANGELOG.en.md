@@ -12,12 +12,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release adds the light and AUTO from the CP Plus for the Aventa. It is built for ESP32 and
-ESP32-S3, but not tested on any Aventa. The LIN communication hardening from 1.0.34 is still not
-tested on a LIN bus.
+This release adds an experimental binary sensor for 230 V shore power at the Combi D, not yet
+confirmed on a heater. The Aventa AUTO target shows "unknown" instead of 0 °C while AUTO is off.
+Light and AUTO for the Aventa from 1.0.38 are still not confirmed on an Aventa, the LIN
+communication hardening from 1.0.34 not on a LIN bus.
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
+
+---
+
+
+## [1.0.39] — 2026-10-07 — Combi D: shore power at the heater (experimental)
+
+### Added
+- `truma_inetbox`: binary sensor `HEATER_MAINS_POWER` (Combi D only), shows 230 V shore power at the
+  heater. Experimental: without shore power the evaluated bit is cleared, but the change when
+  plugging in is not confirmed yet. Not suitable for automations yet.
+
+### Changed
+- `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` shows "unknown" instead of 0 °C while AUTO is
+  off. Whether AUTO is running is shown by `AIRCON_AUTO_ACTIVE`. Not yet tested on an Aventa.
+
+### Documentation
+- README: `HEATER_MAINS_POWER` described, capturing bus traffic with `logger: VERBOSE` and
+  `observer_mode`.
 
 ---
 

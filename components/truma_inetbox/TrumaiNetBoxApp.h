@@ -53,6 +53,12 @@ class TrumaiNetBoxApp : public LinBusProtocol {
     this->vent_mode_callback_.add(std::move(callback));
   }
 
+  // Experimental: flag byte 1 of LIN PID 0x16 (Combi D legacy protocol only), bit 1 = 230 V present.
+  // Frames with the idle temperature sentinel are skipped. Callback runs in the main loop on change.
+  void add_on_heater_flags_callback(std::function<void(uint8_t flags)> callback) {
+    this->heater_flags_callback_.add(std::move(callback));
+  }
+
 #ifdef USE_TIME
   void set_time(time::RealTimeClock *time) { time_ = time; }
   time::RealTimeClock *get_time() const { return time_; }
@@ -98,6 +104,14 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   uint8_t vent_mode_last_published_{0};
   CallbackManager<void(uint8_t)> vent_mode_callback_{};
 
+  // PID 0x16 flag byte. Written from lin_event_task, read from main loop.
+  std::atomic<uint8_t> heater_flags_raw_{0};
+  std::atomic<bool> heater_flags_updated_{false};
+  // Main loop only.
+  bool heater_flags_published_{false};
+  uint8_t heater_flags_last_published_{0};
+  CallbackManager<void(uint8_t)> heater_flags_callback_{};
+
 #ifdef USE_TIME
   time::RealTimeClock *time_ = nullptr;
 
@@ -109,6 +123,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   void lin_message_received_(const uint8_t pid, const uint8_t *message, uint8_t length) override;
   void publish_status_2_();
   void publish_vent_mode_();
+  void publish_heater_flags_();
 
   bool lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) override;
   const uint8_t *lin_multiframe_received(const uint8_t *message, const uint8_t message_len,

@@ -34,6 +34,8 @@ CONF_SUPPORTED_TYPE = {
     "HEATER_HAS_ERROR": (truma_inetbox_ns.class_("TrumaHeaterBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.HEATER_HAS_ERROR),
     # Experimental: LIN PID 0x22 byte 1 bit 7, Combi 4 bus only (issue #25).
     "HEATING_DEMAND": (truma_inetbox_ns.class_("TrumaHeaterBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.HEATING_DEMAND),
+    # Experimental: LIN PID 0x16 byte 1 bit 1 (230 V present), Combi D legacy protocol only.
+    "HEATER_MAINS_POWER": (truma_inetbox_ns.class_("TrumaHeaterBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.HEATER_MAINS_POWER),
     # TrumaTimerBinarySensor
     "TIMER_ACTIVE": (truma_inetbox_ns.class_("TrumaTimerBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.TIMER_ACTIVE),
     "TIMER_ROOM": (truma_inetbox_ns.class_("TrumaTimerBinarySensor", binary_sensor.BinarySensor, cg.Component), TRUMA_BINARY_SENSOR_TYPE_dummy_ns.TIMER_ROOM),

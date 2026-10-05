@@ -109,7 +109,7 @@ void LinBusProtocol::lin_msg_diag_single_(const uint8_t *message, uint8_t length
       // - 0x00 - response lin_identifier[0:4] + 0x00 /* Hardware revision*/
       // my_node_address:
       // - 0x20 - displayed version
-      // - 0x22 - unknown
+      // - 0x22 - unknown, read by newer CP Plus firmware only (03.00.01 reads 0x00 and 0x20)
       auto identifier = message[3];
       std::array<uint8_t, 8> response = this->lin_empty_response_;
       response[0] = this->lin_node_address_;

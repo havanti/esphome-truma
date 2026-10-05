@@ -341,7 +341,8 @@ void LinBusListener::read_lin_frame_() {
 #endif  // ESPHOME_LOG_HAS_VERBOSE
 
     if (this->current_data_valid && (message_from_master || this->current_PID_ == LIN_PID_STATUS_2 ||
-                                     this->current_PID_ == LIN_PID_COMMAND_STATUS)) {
+                                     this->current_PID_ == LIN_PID_COMMAND_STATUS ||
+                                     this->current_PID_ == LIN_PID_HEATER_STATUS_LEGACY)) {
       QUEUE_LIN_MSG lin_msg;
       lin_msg.current_PID = this->current_PID_;
       lin_msg.len = this->current_data_count_ - 1;

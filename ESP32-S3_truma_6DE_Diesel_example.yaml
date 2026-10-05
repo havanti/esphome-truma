@@ -277,6 +277,10 @@ binary_sensor:
   - platform: truma_inetbox
     name: "Heater Mode Electric"
     type: HEATER_ELECTRICITY
+  # Experimental, Combi D only: 230 V shore power present at the heater (LIN PID 0x16), not confirmed yet
+  - platform: truma_inetbox
+    name: "Heater Mains Power"
+    type: HEATER_MAINS_POWER
   - platform: truma_inetbox
     name: "Timer Active"
     type: TIMER_ACTIVE

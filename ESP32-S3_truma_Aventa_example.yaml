@@ -125,7 +125,7 @@ number:
     type: AIRCON_LIGHT
 
 sensor:
-  # AUTO target selected on the CP Plus, 0 while AUTO is off
+  # AUTO target selected on the CP Plus, unknown while AUTO is off
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
     name: "Aircon Auto Temperature Status"

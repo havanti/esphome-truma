@@ -12,12 +12,31 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Dieses Release ergänzt bei der Aventa das Licht und AUTO vom CP Plus. Es ist für ESP32 und ESP32-S3
-gebaut, aber an keiner Aventa getestet. Die Absicherung der LIN-Kommunikation aus 1.0.34 ist
-weiterhin nicht an einem LIN-Bus getestet.
+Neu ist ein experimenteller Binärsensor für 230 V Landstrom an der Combi D, an einer Heizung noch
+nicht bestätigt. Das AUTO-Soll der Aventa zeigt bei AUTO aus „Unbekannt“ statt 0 °C. Licht und AUTO
+der Aventa aus 1.0.38 sind weiterhin nicht an einer Aventa bestätigt, die Absicherung der
+LIN-Kommunikation aus 1.0.34 nicht an einem LIN-Bus.
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
+
+---
+
+
+## [1.0.39] — 2026-10-07 — Combi D: Landstrom an der Heizung (experimentell)
+
+### Hinzugefügt
+- `truma_inetbox`: Binärsensor `HEATER_MAINS_POWER` (nur Combi D), zeigt 230 V Landstrom an der
+  Heizung. Experimentell: Ohne Landstrom ist das ausgewertete Bit gelöscht, das Umschalten beim
+  Einstecken ist aber noch nicht bestätigt. Für Automationen noch nicht geeignet.
+
+### Geändert
+- `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` zeigt bei AUTO aus „Unbekannt“ statt 0 °C. Ob
+  AUTO läuft, zeigt `AIRCON_AUTO_ACTIVE`. An einer Aventa noch nicht getestet.
+
+### Dokumentation
+- README: `HEATER_MAINS_POWER` beschrieben, Busverkehr mitschneiden mit `logger: VERBOSE` und
+  `observer_mode`.
 
 ---
 

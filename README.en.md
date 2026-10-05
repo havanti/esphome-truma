@@ -89,7 +89,7 @@ Fan speeds: Low / Mid / High / Night / Auto
 
 Temperature range: 16–31 °C, step 1 °C
 
-If AUTO is selected on the CP Plus, the CP Plus reports it in a separate frame (0x37). The Aventa frame stays on off, so the climate entity and the selects still show "Off". Whether AUTO is running on the CP Plus and with which target is shown by the binary sensor `AIRCON_AUTO_ACTIVE` and the sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. This is based on logs of an Aventa Compact Plus 2nd Gen (issue #28), after switching on the frame holds the target, after switching off 0. The component cannot set AUTO on the CP Plus.
+If AUTO is selected on the CP Plus, the CP Plus reports it in a separate frame (0x37). The Aventa frame stays on off, so the climate entity and the selects still show "Off". Whether AUTO is running on the CP Plus and with which target is shown by the binary sensor `AIRCON_AUTO_ACTIVE` and the sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. This is based on logs of an Aventa Compact Plus 2nd Gen (issue #28), after switching on the frame holds the target, after switching off 0, and the sensor then shows "unknown". The component cannot set AUTO on the CP Plus.
 
 Light: The number `AIRCON_LIGHT` shows the light level of the Aventa (0 = off, 1–5) and sets it, using bytes 6–7 of the Aventa frame. Every write command to the Aventa sends the last reported light level along, up to 1.0.37 there was 0. Neither is confirmed on an Aventa yet.
 
@@ -209,6 +209,19 @@ Optional web UI — A local web server on port 80 (ESPHome Web Server v3) with `
 Template switches — Ready-to-use on/off switches for the room heater, water heater, and the built-in timer are included, making automation and dashboard integration straightforward.
 
 Restart button — A one-click ESP restart button is exposed in Home Assistant for remote maintenance.
+
+Capturing bus traffic — esphome-truma listens to the whole LIN bus, not just its own frames. To see what the CP Plus sends, for example when the recirculation fan is switched, raise the log level:
+
+```yaml
+logger:
+  level: VERBOSE          # every received frame as "PID xx  <bytes>"
+  # level: VERY_VERBOSE   # also the 0x3C/0x3D transport frames to the heater
+
+truma_inetbox:
+  observer_mode: true     # listen only, never transmit on the bus
+```
+
+Use `observer_mode: true` when a real iNet box is already on the bus and the ESP must not interfere. The fan stage is in `PID 07`, byte 0: `01` is Eco, `02` is High (captured on a Combi D6E; the CP Plus emits nothing beyond Eco/High there). VERBOSE is very chatty, so turn it on only while measuring.
 
 ---
 
@@ -413,6 +426,7 @@ The following `type` values are available:
 - `HEATER_ELECTRICITY`
 - `HEATER_HAS_ERROR`
 - `HEATING_DEMAND` (experimental, see Sensor)
+- `HEATER_MAINS_POWER` — 230 V shore power at the heater (experimental, Combi D only, see Sensor)
 - `TIMER_ACTIVE`
 - `TIMER_ROOM`
 - `TIMER_WATER`
@@ -502,7 +516,7 @@ The following `type` values are available:
 - `PID22_BYTE0` (experimental)
 - `PID22_BYTE1` (experimental)
 - `VENT_MODE`
-- `AIRCON_AUTO_TARGET_TEMPERATURE` — AUTO target from the CP Plus, 0 = AUTO off (Aventa)
+- `AIRCON_AUTO_TARGET_TEMPERATURE` — AUTO target from the CP Plus, "unknown" while AUTO is off (Aventa)
 
 `OPERATING_STATUS` passes on the operating state the heater itself reports: 0 means off, 1 is a
 warning, 4 shows up during start-up and cool-down. The values above that depend on the model: a
@@ -535,6 +549,12 @@ matches inetbox.py and was checked on a Combi 4 (issue #25). The sensor is displ
 ventilation cannot be set through it. If the frame does not appear on the bus, the sensor stays
 without a value. Captures from a Combi D6 E contain no PIDs 0x20 to 0x22 at all. No further
 analysis of these PIDs is planned.
+
+Experimental and for the Combi D only: the binary sensor `HEATER_MAINS_POWER` shows whether 230 V
+shore power is present at the heater. It evaluates bit 1 of byte 1 in LIN frame 0x16, which the
+Combi D sends to the CP Plus. Without shore power the bit is cleared, but the change when plugging
+in is not confirmed yet, so the sensor is not suitable for automations yet. Feedback from Combi D
+owners is welcome as an issue.
 
 ### Text Sensor
 

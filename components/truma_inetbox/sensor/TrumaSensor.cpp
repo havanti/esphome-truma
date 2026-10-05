@@ -21,7 +21,7 @@ void TrumaSensor::setup() {
   }
   if (this->type_ == TRUMA_SENSOR_TYPE::AIRCON_AUTO_TARGET_TEMPERATURE) {
     this->parent_->get_aircon_auto()->add_on_message_callback([this](const StatusFrameAirconAuto *status) {
-      this->publish_state(temp_code_to_decimal(status->target_temp_aircon_auto, 0));
+      this->publish_state(temp_code_to_decimal(status->target_temp_aircon_auto));
     });
     return;
   }

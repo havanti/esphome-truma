@@ -87,7 +87,7 @@ Lüftergeschwindigkeiten: Low / Mid / High / Night / Auto
 
 Temperaturbereich: 16–31 °C, Schrittweite 1 °C
 
-Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37). Der Aventa-Frame bleibt dabei auf Aus, deshalb zeigen die Klima-Entität und die Selects weiter „Off“. Ob AUTO am CP Plus läuft und mit welchem Soll, zeigen der Binärsensor `AIRCON_AUTO_ACTIVE` und der Sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. Ausgewertet ist das anhand von Logs einer Aventa Compact Plus 2. Generation (Issue #28), nach dem Einschalten steht im Frame das Soll, nach dem Ausschalten 0. Gesetzt werden kann AUTO am CP Plus über die Komponente nicht.
+Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37). Der Aventa-Frame bleibt dabei auf Aus, deshalb zeigen die Klima-Entität und die Selects weiter „Off“. Ob AUTO am CP Plus läuft und mit welchem Soll, zeigen der Binärsensor `AIRCON_AUTO_ACTIVE` und der Sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. Ausgewertet ist das anhand von Logs einer Aventa Compact Plus 2. Generation (Issue #28), nach dem Einschalten steht im Frame das Soll, nach dem Ausschalten 0, der Sensor zeigt dann „Unbekannt“. Gesetzt werden kann AUTO am CP Plus über die Komponente nicht.
 
 Licht: Die Number `AIRCON_LIGHT` zeigt die Lichtstufe der Aventa (0 = aus, 1–5) und stellt sie ein, ausgewertet wird dafür Byte 6–7 des Aventa-Frames. Jeder Schreibbefehl an die Aventa schickt die zuletzt gemeldete Lichtstufe mit, bis 1.0.37 stand dort 0. An einer Aventa ist beides noch nicht bestätigt.
 
@@ -207,6 +207,19 @@ Optionale Web-UI — Ein lokaler Webserver auf Port 80 (ESPHome Web Server v3) m
 Template-Schalter — Fertige Ein/Aus-Schalter für die Raumheizung, den Wasserboiler und den integrierten Timer sind enthalten, was die Automatisierung und Dashboard-Integration vereinfacht.
 
 Neustart-Schaltfläche — Eine Ein-Klick-ESP-Neustart-Schaltfläche ist in Home Assistant für die Fernwartung verfügbar.
+
+Busverkehr mitschneiden — esphome-truma liest den gesamten LIN-Bus mit, nicht nur die eigenen Frames. Wer sehen will, was das CP Plus sendet, etwa beim Umschalten der Umluft, hebt das Log-Level an:
+
+```yaml
+logger:
+  level: VERBOSE          # jeder empfangene Frame als "PID xx  <bytes>"
+  # level: VERY_VERBOSE   # zusätzlich die Transportframes 0x3C/0x3D zur Heizung
+
+truma_inetbox:
+  observer_mode: true     # nur mithören, nichts auf den Bus senden
+```
+
+`observer_mode: true` passt, wenn schon eine echte iNet Box am Bus hängt und der ESP nicht dazwischenfunken soll. Die Lüfterstufe steht in `PID 07`, Byte 0: `01` ist Eco, `02` ist High (an einer Combi D6E mitgeschnitten; mehr als Eco/High gibt das CP Plus dort nicht aus). VERBOSE ist sehr gesprächig, also nur zum Messen einschalten.
 
 ---
 
@@ -413,6 +426,7 @@ Folgende `type`-Werte sind verfügbar:
 - `HEATER_ELECTRICITY`
 - `HEATER_HAS_ERROR`
 - `HEATING_DEMAND` (experimentell, siehe Sensor)
+- `HEATER_MAINS_POWER` — 230 V Landstrom an der Heizung (experimentell, nur Combi D, siehe Sensor)
 - `TIMER_ACTIVE`
 - `TIMER_ROOM`
 - `TIMER_WATER`
@@ -502,7 +516,7 @@ Folgende `type`-Werte sind verfügbar:
 - `PID22_BYTE0` (experimentell)
 - `PID22_BYTE1` (experimentell)
 - `VENT_MODE`
-- `AIRCON_AUTO_TARGET_TEMPERATURE` — AUTO-Soll vom CP Plus, 0 = AUTO aus (Aventa)
+- `AIRCON_AUTO_TARGET_TEMPERATURE` — AUTO-Soll vom CP Plus, „Unbekannt“ bei AUTO aus (Aventa)
 
 `OPERATING_STATUS` gibt den Betriebszustand weiter, den die Heizung selbst meldet: 0 heißt aus,
 1 ist eine Warnung, 4 kommt beim Anlauf und beim Nachlauf. Die Werte darüber hängen vom Modell ab:
@@ -536,6 +550,12 @@ High. Das deckt sich mit inetbox.py und wurde an einer Combi 4 nachgeprüft (Iss
 ist eine reine Anzeige, die Lüftung lässt sich darüber nicht einstellen. Kommt der Frame auf dem
 Bus nicht vor, bleibt der Sensor ohne Wert. In den Mitschnitten einer Combi D6 E fehlen die PIDs
 0x20 bis 0x22 ganz. Eine weitere Auswertung dieser PIDs ist nicht geplant.
+
+Experimentell und nur für die Combi D: Der Binärsensor `HEATER_MAINS_POWER` zeigt, ob an der
+Heizung 230 V Landstrom anliegen. Ausgewertet wird Bit 1 von Byte 1 im LIN-Frame 0x16, den die
+Combi D an den CP Plus schickt. Ohne Landstrom ist das Bit gelöscht, das Umschalten beim Einstecken
+ist aber noch nicht bestätigt. Für Automationen ist der Sensor deshalb noch nicht geeignet.
+Rückmeldungen mit einer Combi D gern als Issue.
 
 ### Text Sensor
 

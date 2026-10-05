@@ -15,6 +15,15 @@ static constexpr uint32_t UPDATE_RETRY_DELAY_US = 5 * 1000 * 1000;  // 5 seconds
 static constexpr uint8_t STATUS_2_MIN_LENGTH = 2;                   // PID 0x22: only bytes 0 and 1 are exposed
 static constexpr uint8_t COMMAND_STATUS_VENT_BYTE = 5;              // PID 0x20: vent mode in the high nibble
 static constexpr uint8_t VENT_MODE_SHIFT = 4;
+// PID 0x16 (Combi D legacy protocol): byte 1 flags, bytes 2-3 room temperature (LE, Kelvin x10).
+static constexpr uint8_t HEATER_STATUS_LEGACY_LENGTH = 8;
+static constexpr uint8_t HEATER_STATUS_LEGACY_FLAGS_BYTE = 1;
+static constexpr uint8_t HEATER_STATUS_LEGACY_ROOM_LOW = 2;
+static constexpr uint8_t HEATER_STATUS_LEGACY_ROOM_HIGH = 3;
+// Idle frames carry these instead of a room temperature; their flags say nothing about the supply.
+static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_0AAA = 0x0AAA;
+static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_AAAA = 0xAAAA;
+static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_ZERO = 0x0000;
 
 TrumaiNetBoxApp::TrumaiNetBoxApp() {
   this->airconAuto_.set_parent(this);
@@ -38,6 +47,7 @@ void TrumaiNetBoxApp::update() {
   this->timer_.update();
   this->publish_status_2_();
   this->publish_vent_mode_();
+  this->publish_heater_flags_();
 
   LinBusProtocol::update();
 
@@ -59,13 +69,13 @@ void TrumaiNetBoxApp::update() {
 
 const std::array<uint8_t, 4> TrumaiNetBoxApp::lin_identifier() {
   // Supplier Id: 0x4617 - Truma (Phone: +49 (0)89 4617-0)
-  // Unknown:
-  // 17.46.01.03 - old Combi model
-  // 17.46.10.03 - Unknown more comms required for init.
-  // 17.46.20.03 - Unknown more comms required for init.
-  // Heater:
+  // Heater (CP Plus 03.00.01 searches 0301 and 0310 for its heater slot):
+  // 17.46.01.03 - old Combi model (Combi 6 in WomoLIN init captures)
+  // 17.46.10.03 - Combi D (a Combi D 6 E answers requests for 0310)
   // 17.46.40.03 - H2.00.01 - 0340.xx Combi 4/6
-  // Aircon:
+  // Unknown:
+  // 17.46.20.03 - Unknown more comms required for init.
+  // Aircon (CP Plus 03.00.01 searches 0C00..0C05, newer firmware up to 0C07):
   // 17.46.00.0C - A23.70.0 - 0C00.xx (with light option: OFF/1..5)
   // 17.46.01.0C - A23.70.0 - 0C01.xx
   // 17.46.02.0C
@@ -74,7 +84,7 @@ const std::array<uint8_t, 4> TrumaiNetBoxApp::lin_identifier() {
   // 17.46.05.0C - A23.70.0 - 0C05.xx
   // 17.46.06.0C - A23.70.0 - 0C06.xx (with light option: OFF/1..5)
   // 17.46.07.0C - A23.70.0 - 0C07.xx (with light option: OFF/1..5)
-  // iNet Box:
+  // iNet Box (CP Plus assigns NAD 0x03, which is already our initial NAD):
   // 17.46.00.1F - T23.70.0 - 1F00.xx iNet Box
   return {0x17 /*Supplied Id*/, 0x46 /*Supplied Id*/, 0x00 /*Function Id*/, 0x1F /*Function Id*/};
 }
@@ -127,6 +137,18 @@ void TrumaiNetBoxApp::lin_message_received_(const uint8_t pid, const uint8_t *me
     }
     return;
   }
+  if (pid == LIN_PID_HEATER_STATUS_LEGACY) {
+    if (length >= HEATER_STATUS_LEGACY_LENGTH) {
+      const uint16_t room = static_cast<uint16_t>(message[HEATER_STATUS_LEGACY_ROOM_LOW] |
+                                                  (message[HEATER_STATUS_LEGACY_ROOM_HIGH] << 8));
+      if (room != HEATER_STATUS_LEGACY_IDLE_0AAA && room != HEATER_STATUS_LEGACY_IDLE_AAAA &&
+          room != HEATER_STATUS_LEGACY_IDLE_ZERO) {
+        this->heater_flags_raw_.store(message[HEATER_STATUS_LEGACY_FLAGS_BYTE], std::memory_order_relaxed);
+        this->heater_flags_updated_.store(true, std::memory_order_release);
+      }
+    }
+    return;
+  }
   LinBusProtocol::lin_message_received_(pid, message, length);
 }
 
@@ -154,6 +176,19 @@ void TrumaiNetBoxApp::publish_vent_mode_() {
   this->vent_mode_published_ = true;
   this->vent_mode_last_published_ = vent_mode;
   this->vent_mode_callback_.call(vent_mode);
+}
+
+void TrumaiNetBoxApp::publish_heater_flags_() {
+  if (!this->heater_flags_updated_.exchange(false, std::memory_order_acquire)) {
+    return;
+  }
+  const uint8_t flags = this->heater_flags_raw_.load(std::memory_order_relaxed);
+  if (this->heater_flags_published_ && flags == this->heater_flags_last_published_) {
+    return;
+  }
+  this->heater_flags_published_ = true;
+  this->heater_flags_last_published_ = flags;
+  this->heater_flags_callback_.call(flags);
 }
 
 bool TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) {

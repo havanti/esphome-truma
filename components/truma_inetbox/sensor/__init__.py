@@ -104,7 +104,7 @@ CONF_SUPPORTED_TYPE = {
         CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
         CONF_ACCURACY_DECIMALS: 0,
     },
-    # Read-only: AUTO target selected on the CP Plus, 0 while AUTO is off (issue #28).
+    # Read-only: AUTO target selected on the CP Plus, NAN (unknown) while AUTO is off (issue #28).
     "AIRCON_AUTO_TARGET_TEMPERATURE": {
         CONF_CLASS: TRUMA_SENSOR_TYPE_dummy_ns.AIRCON_AUTO_TARGET_TEMPERATURE,
         CONF_UNIT_OF_MEASUREMENT: UNIT_CELSIUS,

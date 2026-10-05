@@ -21,6 +21,9 @@ static constexpr uint8_t DIAGNOSTIC_FRAME_SLAVE = 0x3d;
 static constexpr uint8_t LIN_PID_STATUS_2 = 0x22;
 // Read-only: vent mode in byte 5 (issue #25). Forwarded regardless of master/slave classification.
 static constexpr uint8_t LIN_PID_COMMAND_STATUS = 0x20;
+// Experimental, Combi D legacy protocol only: heater status, flag byte 1 bit 1 = 230 V present.
+// Sent by the heater (slave checksum), so forwarded regardless of master/slave classification.
+static constexpr uint8_t LIN_PID_HEATER_STATUS_LEGACY = 0x16;
 
 enum class LIN_CHECKSUM { LIN_CHECKSUM_VERSION_1, LIN_CHECKSUM_VERSION_2 };
 

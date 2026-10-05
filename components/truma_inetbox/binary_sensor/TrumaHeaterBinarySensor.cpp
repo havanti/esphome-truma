@@ -9,12 +9,19 @@ static const char *const TAG = "truma_inetbox.heater_binary_sensor";
 
 // Experimental: PID 0x22 byte 1 bit 7 (0xD0 heating requested, 0x50 target reached, 0x00 off) — issue #25.
 static constexpr uint8_t STATUS_2_HEATING_DEMAND_MASK = 0x80;
+// Experimental: PID 0x16 byte 1 bit 1, 230 V present (Combi D legacy protocol).
+static constexpr uint8_t HEATER_FLAGS_MAINS_POWER_MASK = 0x02;
 
 void TrumaHeaterBinarySensor::setup() {
   if (this->type_ == TRUMA_BINARY_SENSOR_TYPE::HEATING_DEMAND) {
     this->parent_->add_on_status_2_callback([this](uint8_t /*byte0*/, uint8_t byte1) {
       this->publish_state((byte1 & STATUS_2_HEATING_DEMAND_MASK) != 0);
     });
+    return;
+  }
+  if (this->type_ == TRUMA_BINARY_SENSOR_TYPE::HEATER_MAINS_POWER) {
+    this->parent_->add_on_heater_flags_callback(
+        [this](uint8_t flags) { this->publish_state((flags & HEATER_FLAGS_MAINS_POWER_MASK) != 0); });
     return;
   }
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
