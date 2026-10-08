@@ -35,9 +35,6 @@ Tested against:
 ### Documentation
 - README: `HEATER_MAINS_POWER` and capturing bus traffic described.
 
----
-
-
 ## [1.0.38] — 2026-10-03 — Aventa: light and AUTO from the CP Plus
 
 ### Added
@@ -52,9 +49,6 @@ Tested against:
 
 ### Documentation
 - README: Aventa section and Aventa example extended with light and AUTO.
-
----
-
 
 ## [1.0.37] — 2026-09-30 — Code cleanup
 
@@ -139,540 +133,235 @@ Tested against:
 ## [1.0.29] — 2026-09-21 — Unused function warnings
 
 ### Fixed
-- `truma_inetbox`: the `enum_to_c_str()` helpers for sensor, binary sensor, number and select were
-  defined `static` in headers. Every file including the header got its own copy, and where it went
-  unused (for example in `main.cpp`) the build reported `-Wunused-function`. The helpers are now
-  `inline`.
+- `truma_inetbox`: No more `-Wunused-function` warnings during the build.
 
 ## [1.0.28] — 2026-09-21 — Format warnings in the UART component
 
 ### Fixed
-- `uart`: The bundled UART component printed the baud rate with `%u`. On the ESP32-S3 `uint32_t`
-  is a `long unsigned int`, so the build reported `-Wformat` warnings in `uart.cpp` and
-  `uart_component_esp_idf.cpp`. The output now uses `PRIu32` like the ESPHome component. The
-  logged values were correct before as well.
+- `uart`: No more `-Wformat` warnings when building for the ESP32-S3. The logged values were correct
+  before as well.
 
 ## [1.0.27] — 2026-09-19 — Actions in triggers with arguments
 
 ### Fixed
-- `truma_inetbox`: the actions `truma_inetbox.heater.*`, `truma_inetbox.timer.*`,
-  `truma_inetbox.aircon.manual.set_target_temperature` and `truma_inetbox.clock.set` could only
-  be used in triggers without arguments, i.e. in buttons, scripts or `interval`. In a trigger
-  with an argument the build failed with `marked 'override', but does not override`, for example
-  in an `api:` action with variables, in the `set_action` of a template select or in `on_value`.
-  The actions overrode `play()` taking their arguments by value, while ESPHome 2026.9 passes them
-  as const references. Without arguments both signatures are the same, which is why the bug did
-  not show up in the example YAMLs.
-- `uart`: the same fix for `uart.write` in the bundled UART component.
+- `truma_inetbox`, `uart`: With ESPHome 2026.9 the actions also work in triggers with arguments,
+  e.g. in `api:` actions or `on_value`. Before, the build failed there.
 
 ## [1.0.26] — 2026-09-15 — Log PID fixed, `OPERATING_STATUS` corrected
 
 ### Fixed
-- `truma_inetbox`: in the VERBOSE and VERY_VERBOSE log, raw LIN frames (`PID xx …`) did not
-  show the PID of the logged frame but that of the frame currently being received. The log
-  queue is drained every 50 ms from the main loop, but the printed variable was overwritten
-  with every new frame, so PID and data did not match. The bug comes from the original project
-  and only affected the log output.
+- `truma_inetbox`: In the VERBOSE log, PID and data of the LIN frames did not match. Only the log
+  output was affected.
 
 ### Documentation
-- README: the statement from 1.0.25 that `OPERATING_STATUS` from 5 upwards indicates a running
-  burner was wrong. The values from 5 upwards depend on the model (Combi 4: 5 as soon as heating
-  or boiler are switched on; Combi D6E: 6 already without heating, 7 with heating set). The
-  "Burner active" example has been removed. Feedback from issue #25.
+- README: `OPERATING_STATUS` from 5 upwards does not show a running burner, the values depend on the
+  model (issue #25).
 
 ## [1.0.25] — 2026-09-07 — Example YAMLs: `id` for Operating Status
 
 ### Documentation
-- Example configurations: the "Operating Status" sensor now has `id: operating_status` and can
-  therefore be referenced from lambdas — for instance in a template binary sensor that reports
-  the burner running via `state >= 5`. Affects the four heater examples (ESP32 and ESP32-S3,
-  gas and diesel each).
-- README: the sensor section now explains the `OPERATING_STATUS` values (0 off, 1 warning,
-  4 start-up and cool-down, 5 and above running) and why `HEATER_ROOM` and `HEATER_WATER` are
-  not suitable for detecting a running burner
+- Heater examples: The sensor "Operating Status" has `id: operating_status` for lambdas.
+- README: Values of `OPERATING_STATUS` explained, corrected in 1.0.26.
 
-## [1.0.24] — 2026-07-17 — Correctness fixes from code audit
+## [1.0.24] — 2026-07-17 — Fixes from code audit
 
 ### Fixed
-- `truma_inetbox`: the log queue struct `QUEUE_LOG_MSG` used `int8_t` for LIN bytes
-  (`current_PID`, `data`, `len`) — corrected to `uint8_t`, removed the re-casts at the logging sites
-- `truma_inetbox`: the "CP Plus connected" binary sensor used a `micros()` comparison without
-  overflow protection — after each 32-bit rollover of the microsecond counter (~71 minutes) the
-  sensor could briefly report `false` incorrectly. Now uses the overflow-safe subtraction idiom.
-- `truma_inetbox`: `get_last_cp_plus_request()` returned `int64_t` although the underlying
-  timestamp is `uint32_t` — return type corrected (internal use only)
+- `truma_inetbox`: "CP Plus connected" briefly reported `false` by mistake about every 71 minutes.
 
-## [1.0.23] — 2026-07-09 — UART startup failure fixed (uninitialized configuration)
+## [1.0.23] — 2026-07-09 — UART startup failure fixed
 
 ### Fixed
-- `uart`: **`uart_config_t` is now zero-initialized** — the struct used to be declared
-  uninitialized and only filled field by field. Newer ESP-IDF versions added extra
-  fields (sleep-retention flags); when these contained stack garbage,
-  `uart_param_config()` failed with `ESP_ERR_NOT_SUPPORTED` ("not able to power down in
-  light sleep") and the UART component was marked `FAILED` at startup — no LIN traffic,
-  only "Cannot update Truma" warnings. Whether the failure occurred depended on the
-  individual build (identical code could work or fail depending on binary layout).
-  Diagnosed in issue #21. The failure reason is only visible in the **serial** boot
-  log, not in network logs.
-- `truma_inetbox`: fixed compile error at `logger: level: VERBOSE`/`VERY_VERBOSE` —
-  four `format_hex_pretty()` calls in `LinBusListener.cpp` required explicit casts
-  (issue #22).
+- `uart`: Depending on the build, the UART component could end up `FAILED` at startup, then there
+  was no LIN traffic ("Cannot update Truma"). The cause only showed in the serial boot log (issue
+  #21).
+- `truma_inetbox`: Build error with `logger: level: VERBOSE` fixed (issue #22).
 
 ### Changed
-- Component version (`TRUMA_INETBOX_VERSION`) bumped to 1.0.23 — it had been stuck at
-  1.0.20, so the `Component version:` log line reported 1.0.20 even on newer releases.
+- The log line `Component version:` shows the correct version again, it was stuck at 1.0.20.
 
 ## [1.0.22] — 2026-07-03 — Truma Cooler C69: master power switch + compressor confirmed
 
 ### Added
-- `truma_cooler` C69: **master `power` switch** — a single global on/off for the whole box. Removes the confusion where turning one zone on left the second zone showing "cool" only after the next status update (issue #18).
+- `truma_cooler` C69: Switch `power` turns the whole box on and off (issue #18).
 
 ### Changed
-- `truma_cooler` C69: the zone climates are now **cool-only** (no OFF mode) — on/off runs exclusively through the new `power` switch; the climate entities only set each zone's target temperature. The device power state is also mirrored onto the `power` switch.
-- `truma_cooler` C69: **compressor status confirmed on real C69 hardware** (issue #18) — no longer provisional; the idle bit (`data[5] & 0x08`) was verified via an observed compressor spin-up (byte5=0x07 running, 0x0B idle).
-
-### Compatibility
-- The C44 path is unchanged (climate still exposes OFF/COOL, no `power` switch).
-- Existing C69 configs: add the `power` switch to the YAML (see the updated example) — the zones can no longer be switched off via climate OFF.
+- `truma_cooler` C69: The zone climates only cool and set the target temperature, on/off goes
+  through `power`. Existing C69 configurations need the `power` switch, see the example.
+- `truma_cooler` C69: Compressor status confirmed on real hardware (issue #18).
 
 ## [1.0.21] — 2026-07-03 — Truma Cooler: C69 (dual zone) via `model:` selector
 
 ### Added
-- `truma_cooler`: **model selector `model:`** in the YAML (`c44` = default, `c69`). Model-specific code lives in its own files (`truma_cooler_c44.*`, `truma_cooler_c69.*`) on top of a shared base class — the C44 path is unchanged.
-- `truma_cooler` **C69 (dual zone)**: two climate entities (`climate_zone1`/`climate_zone2`), each with its own setpoint and interior temperature, optional per-zone temperature sensors (`temperature_zone1`/`temperature_zone2`), plus compressor and device status. Protocol reverse-engineered from an HCI snoop of the Truma app (C69, app 2.7.3) and verified against a timed action log.
-- Example configuration [`ESP32_truma_cooler_C69_example.yaml`](ESP32_truma_cooler_C69_example.yaml).
+- `truma_cooler`: Selector `model:` (`c44` default, `c69`). C44 configurations without `model:` keep
+  working unchanged.
+- `truma_cooler` C69: Two zones with their own target and actual temperature, compressor and device
+  status. On/off applies to the whole box, turbo is not implemented. Example
+  `ESP32_truma_cooler_C69_example.yaml`.
 
-### Changed
-- `truma_cooler` C69 status decoding uses bitfields (`data[4] & 0x01` device on, `data[5]` bitfield) instead of the C44 exact-match constants — the C44 keeps decoding by byte equality.
-
-### Limitations (C69)
-- **Power is global** — the protocol has no per-zone on/off; turning one zone off powers the whole box down.
-- **Turbo not implemented** — it does not work reliably even on the C44; to be revisited later. On the C44 turbo is checked on real hardware since 1.0.34.
-- **Compressor status initially provisional** — the "idle" bit (`data[5] & 0x08`) is derived from a single post-ON spin-up. Confirmed on real C69 hardware since 1.0.22 (issue #18).
-
-### Compatibility
-- Existing C44 configurations without `model:` keep working unchanged (`model:` defaults to `c44`).
-
-## [1.0.20] — 2026-05-12 — Truma Cooler: task safety + state restore
-
-### Changed
-- `truma_cooler`: entity mutations (`publish_state`, climate field writes, `cancel_timeout`) inside `gattc_event_handler` and `parse_notification_` are now dispatched to the main loop via `defer()` — gattc events run on the BT controller task, which is not the correct context for entity/scheduler operations
-- `truma_cooler`: `set_visual_temperature_step(1)` → `1.0f` (float literal matches trait signature)
+## [1.0.20] — 2026-05-12 — Truma Cooler: hardening and state after restart
 
 ### Added
-- `truma_cooler` climate: persists mode + target temperature across reboot via `apply_restored_state()` (`restore_state_()` from ESPHome climate base) — entity has meaningful values immediately, before the first BLE notification arrives after boot
-- `truma_cooler` connect-init: `turbo_running` and `device_on` binary sensors are initialised to `false` on `ESP_GATTC_OPEN_EVT` (previously shown as "unknown" in HA until first notification)
+- `truma_cooler`: Mode and target temperature survive a restart, turbo and device status start as
+  "off" instead of "unknown".
+
+### Changed
+- `truma_cooler`: BLE events only change entities from the main loop.
 
 ### Fixed
-- `truma_cooler`: `set_mode(false)` cancels any pending `turbo_reset` timeout — a fast ON→OFF (<500 ms) otherwise dispatched a redundant `CMD_TURBO_OFF` to an already-off device
-
+- `truma_cooler`: Quickly switching on and off no longer sends a needless turbo-off command.
 
 ## [1.0.19] — 2026-05-12 — RP2040 support removed
 
 ### Removed
-- Platform support for Raspberry Pi Pico (RP2040) — repo is ESP-IDF-only
-- `components/truma_inetbox/LinBusListener_rp2040.cpp` (file deleted)
-- `components/uart/uart_component_rp2040.h` / `.cpp` (files deleted)
-- `components/uart/truma_uart_component_rp2040.h` (file deleted)
-- `USE_RP2040` preprocessor guards in `LinBusListener.h` (includes, virtual `onSerialEvent()`, UART member fields)
-- `CONF_RP2040_HARDWARE_UART` pin-validation dict and `validate_hardware_uart()` helper in `truma_inetbox/__init__.py`
-- `RP2040UartComponent` class alias and `CORE.is_rp2040` branch in `uart/__init__.py`
+- Support for the Raspberry Pi Pico (RP2040), the repo is ESP-IDF only.
+
+## [1.0.18] — 2026-04-29 — Thread safety in heater/aircon/clock
 
 ### Changed
-- `CONFIG_SCHEMA` `only_on` reduced from `["esp32", "rp2040"]` to `["esp32"]`
-- Error message in `_uart_declare_type()` shortened from "ESP32 (ESP-IDF) and RP2040" to "ESP32 (ESP-IDF)"
-
-### Verified
-- ESP-IDF compile `truma.yaml` (ESP32-S3): ✅ successful (93s)
-
-
-## [1.0.18] — 2026-04-29 — Cross-task synchronisation in heater/aircon/clock
-
-### Changed
-- `TrumaStausFrameStorage` / `TrumaStausFrameResponseStorage` / `TrumaiNetBoxAppClock`: 5 shared boolean flags (`data_valid_`, `data_updated_`, `update_status_prepared_`, `update_status_unsubmitted_`, `update_status_stale_`) converted to `std::atomic<bool>` — prevents race conditions between LIN eventTask_ and main loop
-- `TrumaStausFrameStorage::update()`: uses `exchange(false)` for atomic test-and-clear of update flag
-
-### Documentation
-- Thread-safety comments in both storage headers: documents remaining (deliberately unfixed) risk on struct-level access
-
+- `truma_inetbox`: Status flags between LIN task and main loop are protected against concurrent
+  access.
 
 ## [1.0.17] — 2026-04-29 — Truma Cooler: robustness fixes
 
 ### Changed
-- `truma_cooler`: replaced `volatile` with `std::atomic` (safe cross-task sync between BT and app tasks)
-- `truma_cooler`: GATT handles as named `constexpr` constants (`WRITE_HANDLE`, `CCCD_HANDLE`)
-- `truma_cooler`: command arrays moved to `static constexpr`
+- `truma_cooler`: Code cleanup, access between BLE and app task protected.
 
 ### Fixed
-- `truma_cooler`: turbo-reset timeout is cancelled on disconnect (no dangling callback)
-- `truma_cooler`: `set_turbo` ignores command when device is off (protocol constraint)
-- `truma_cooler`: climate entity publishes initial OFF state on connect — no more "unknown" in Home Assistant
-
-### Documentation
-- `truma_cooler`: debug log uses `format_hex_pretty()` for full frame instead of first 3 bytes
-
+- `truma_cooler`: Turbo commands are ignored while the box is off.
+- `truma_cooler`: After connecting, the climate shows "off" instead of "unknown".
+- `truma_cooler`: A disconnect no longer leaves a pending turbo reset behind.
 
 ## [1.0.16] — 2026-04-26 — Version display in web interface
 
 ### Added
-- `text_sensor` platform: exposes component version in the ESPHome web interface and Home Assistant (`entity_category: diagnostic`, `icon: mdi:tag`)
-- `version.h`: central constant `TRUMA_INETBOX_VERSION` — single source of truth for all version references
-- Component version is logged at startup via `dump_config`
-- All heater example YAMLs now include a `text_sensor` block
-
-### Documentation
-- All example YAMLs: new block `text_sensor: - platform: truma_inetbox, name: "ESPHome Truma Version"`
-
+- Text sensor shows the component version in Home Assistant and the web interface, all heater
+  examples include it. The version is also logged at startup.
 
 ## [1.0.15] — 2026-04-23 — Safety and robustness fixes
 
 ### Fixed
-- LIN diagnostic frame: length guard before `message[2]` access prevents processing of truncated frames
-- `operating_status_to_str`: output buffer enlarged by 1 byte — "ON 255" was silently truncated to "ON 25"
-- `create_update_data` (Clock): `response_len` correctly set to 0 when no time source is configured; `update_status_unsubmitted_` is now cleared on both code paths — prevents permanently active `has_update()`
-- `heater_device_` / `aircon_device_`: access between UART task and main loop protected with `std::atomic`
-- `uart_event_queue_`: marked `volatile` — prevents compiler from caching the value across cores
-- `send_command` (Truma Cooler): removed `const_cast`; command buffer is copied before the IDF call
-- LIN TP first frame: removed dead `answer_len >> 8` shift (always zero on `uint8_t`)
-- `send_command` (Truma Cooler): length guard before buffer copy prevents out-of-bounds write
-- Truma Cooler: `connected_`, `poll_enabled_`, `write_handle_`, `device_is_on_` marked `volatile` — prevents compiler caching on cross-task access (BT task ↔ app task)
-- Truma Cooler Climate: setpoint is now applied when mode and temperature are changed simultaneously
-- LIN message queue: dropped frames on full queue are now reported via `ESP_LOGW` instead of silently discarded
-
----
-
+- `truma_inetbox`: Incomplete LIN frames are dropped, full queues are reported in the log.
+- `truma_inetbox`: The operating status "ON 255" was shown as "ON 25".
+- `truma_inetbox`: Without a time server, the clock stayed in update state forever.
+- `truma_cooler`: The target temperature is applied also when the mode changes at the same time.
+- `truma_inetbox`, `truma_cooler`: Access between tasks protected.
 
 ## [1.0.14] — 2026-04-21 — Truma Cooler C(XX) integration
 
 ### Added
-- Support for the Truma Cooler C(XX) series via BLE (active connection via `ble_client`)
-- New `truma_cooler` component under `components/truma_cooler/` (alongside `truma_inetbox` and `uart`)
-- Entities: Climate (setpoint −22 °C to +10 °C), interior temperature, ambient temperature, compressor status, turbo switch, device status, BLE connection status
-- Example configuration `ESP32_truma_cooler_example.yaml` (M5Stack Atom Lite)
-- Note on optional parallel use as ESPHome Bluetooth Proxy (M5Stack Atom)
-
----
-
+- New component `truma_cooler` for the Truma Cooler C(XX) via BLE: climate (−22 to +10 °C), inside
+  and outside temperature, compressor, turbo, device and connection status.
+- Example `ESP32_truma_cooler_example.yaml` (M5Stack Atom Lite), can be used as Bluetooth proxy at
+  the same time.
 
 ## [1.0.13] — 2026-04-20 — Truma Aventa Gen 2 air conditioning
 
 ### Added
-- Support for the Truma Aventa Gen 2 air conditioner via the same LIN bus as the heater (CP Plus / iNet Box)
-- New climate type `AIRCON` for a full HA climate entity (modes: Off / Cool / Heat / Heat+Cool / Fan only)
-- New select types `AIRCON_MODE` and `AIRCON_VENT_MODE` for direct access to operating mode and fan speed
-- New number type `AIRCON_MANUAL_TEMPERATURE` (already present, now documented)
-- Example configuration `ESP32-S3_truma_Aventa_example.yaml`
+- Truma Aventa Gen 2 over the same LIN bus as the heater: climate `AIRCON`, selects `AIRCON_MODE`
+  and `AIRCON_VENT_MODE`, number `AIRCON_MANUAL_TEMPERATURE`. Example
+  `ESP32-S3_truma_Aventa_example.yaml`.
 
----
-
-
-## [1.0.12] — 2026-04-19 — LIN protocol and thread-safety fixes
+## [1.0.12] — 2026-04-19 — LIN fixes
 
 ### Fixed
-- LIN multi-PDU length decoding corrected (operator precedence `&` vs. `<<`):
-  multi-frame messages > 255 bytes were previously dropped with length 0
-- Length guard added before `reinterpret_cast` on incoming Truma frames
-- `micros()` comparisons made wraparound-safe across the 71-minute rollover
-  using unsigned subtraction
-- Thread safety: timestamp fields (`device_registered_`, `init_requested_`,
-  `init_received_`, `update_time_`) converted to `std::atomic<uint32_t>`
-  (accessed from UART task and main loop)
-- LIN logging: post-increment bug (`len = len++`) fixed, CRC byte was not logged
-- Printf format specifier `%S` → `%s` corrected
+- `truma_inetbox`: LIN messages over 255 bytes were dropped.
+- `truma_inetbox`: Incoming frames are checked for their length before evaluation.
+- `truma_inetbox`: Time comparisons are correct also after the counter rolls over (about every 71
+  minutes), access between tasks protected.
+- `truma_inetbox`: The CRC byte was missing in the log.
 
 ## [1.0.11] — 2026-04-17 — ESPHome 2026.4.0 compatibility
 
-### Documentation
-- Hardware documentation extended by user request to make replication easier
-
 ### Fixed
-- Corrected `cg.templatable()` calls in `__init__.py` for ESPHome 2026.4.x:
-  enum types (`HeatingMode`, `TargetTemp`, `EnergyMix`, `ElectricPowerLevel`) now
-  use `_dummy_ns` references instead of `cg.uint16`/`cg.uint8`
-- Resolved entity key collisions between identically named Sensor and Number/Select
-  entities that caused `aioesphomeapi` crashes under ESPHome 2026.4.0
-  (`AttributeError: 'NumberInfo'/'SelectInfo' has no attribute 'accuracy_decimals'`)
+- `truma_inetbox`: Build error with ESPHome 2026.4 fixed.
+- Example YAMLs: Sensors with the same name as a number or select crashed the HA integration with
+  ESPHome 2026.4.0. `Target Room Temperature`, `Target Water Temperature`, `Electric Power Level`
+  and `Energy Mix` now carry the suffix "Status" as sensors. After flashing, delete the old sensors
+  in HA and switch dashboards and automations to the new ones.
 
-### Changed
-
-**Background:** In ESPHome, every entity receives a unique key (hash of its name).
-If two entities on the same device share the same name — even if they are different
-types (Sensor vs. Number or Select) — their keys collide. As of ESPHome 2026.4.0,
-the order in which `aioesphomeapi` builds the entity list changed, causing these
-collisions to trigger crashes for the first time.
-
-The following sensor names have been renamed in all example YAMLs:
-
-| Old name (sensor) | New name (sensor) | Conflict with |
-|---|---|---|
-| `Target Room Temperature` | `Target Room Temperature Status` | Number |
-| `Target Water Temperature` | `Target Water Temperature Status` | Number |
-| `Electric Power Level` | `Electric Power Level Status` | Number |
-| `Energy Mix` | `Energy Mix Status` | Select |
-
-> **Migration note for existing installations:** After flashing, the old sensor
-> entities will appear as "unavailable" in Home Assistant. These must be manually
-> deleted and the new entities (suffixed with "Status") re-added to dashboards
-> and automations.
-
----
+### Documentation
+- Hardware documentation extended to make rebuilding easier.
 
 ## [1.0.10] — 2026-04-11 — Further cleanup
 
 ### Changed
-- Removed duplicate macro definitions of `DIAGNOSTIC_FRAME_MASTER` / `DIAGNOSTIC_FRAME_SLAVE` from two `.cpp` files and consolidated them as a single `constexpr` in `LinBusListener.h`
-- Replaced magic number `1440` with named constant `MINUTES_PER_DAY`
-- Implemented `dump_data()` in the heater module: logs target temperatures, heating mode, energy mix, power level, and operating status at DEBUG level; logs error codes at WARN level
-- Corrected misleading comment on the consistency guard in `action_heater_energy_mix()`
-- Fixed wrong label `"Truma Climate"` in `TrumaWaterClimate::dump_config()` to `"Truma Water Climate"`
-- Removed commented-out preset code and dead options loop
-
----
+- `truma_inetbox`: Code cleanup. The heater module logs its state at DEBUG, error codes at WARN.
 
 ## [1.0.9] — 2026-04-02 — Cleanup
 
 ### Changed
-- Replaced magic number timeouts with named `constexpr` constants
-- Added `const` to local variable `lin_identifier`
-
----
+- Code cleanup, no change in behavior.
 
 ## [1.0.8] — 2026-03-30 — Code quality
 
 ### Fixed
-- Corrected wrong field assignments in response frames for energy mix and electric power level
+- `truma_inetbox`: Energy mix and electric power level were set wrongly in the answer to the CP
+  Plus.
 
 ### Changed
-- Cleaned up typos throughout the codebase
-- Removed outdated and resolved comments
-- Revised and unified code comments
+- Typos and comments cleaned up.
 
 ### Documentation
-- Added reference to @kamahat and their fork in all READMEs
-
----
+- README mentions the fork of @kamahat.
 
 ## [1.0.7] — 2026-03-28 — Minor improvements
 
 ### Fixed
-- Reduced log level for "LIN CRC error on SID" from WARN to VERBOSE — not a real error, just the Truma responding too slowly (suggested by @kamahat)
+- "LIN CRC error on SID" only appears in the VERBOSE log, it is not a real error (suggested by
+  @kamahat).
 
 ### Documentation
-- Added `min_version: 2026.3.1` to all example YAMLs
-- Added CONTRIBUTING files (DE/EN/FR)
-
----
+- `min_version: 2026.3.1` in all examples, CONTRIBUTING files added.
 
 ## [1.0.6] — 2026-03-27 — Robustness
 
 ### Fixed
-
-#### `components/truma_inetbox/LinBusListener_esp_idf.cpp`
-- `uartEventTask_`: fixed a startup crash on dual-core ESP32 where the task could
-  call `xQueueReceive()` with a NULL queue handle before `uart_driver_install()`
-  on core 1 had completed
-- Added a 5-second timeout to the queue-wait loop: if the UART driver never
-  becomes available (e.g. UART setup failed), the task now logs a clear error
-  and exits cleanly instead of looping silently forever
-
----
+- `truma_inetbox`: Crash at startup on dual-core ESP32 fixed. If the UART driver does not come up, a
+  clear message is logged after 5 s.
 
 ## [1.0.5] — 2026-03-27 — Improvements
 
 ### Changed
-
-#### Example YAMLs (all four)
-- `refresh` in `external_components` changed from `0s` to `24h` — ESPHome checks for updates once a day
-- Added two commented-out alternatives: `refresh: always` (for development) and `refresh: 0s` (no automatic updates)
-
----
+- Example YAMLs: `refresh: 24h` instead of `0s`, alternatives as comments.
 
 ## [1.0.4] — 2026-03-23 — Bugfixes
 
 ### Fixed
-
-#### `components/uart/__init__.py`
-- `validate_raw_data()`: second `isinstance(value, str)` check (dead code, never reachable) corrected to `isinstance(value, bytes)`
-
-#### `README.md` / `README.en.md`
-- Stale filename references `ESP32-S3_truma_6DE_example.yaml` → `ESP32-S3_truma_6DE_Diesel_example.yaml` (file was renamed earlier)
-
----
+- `uart`: Raw data check for `uart.write` corrected.
+- README: Outdated name of the diesel example file corrected.
 
 ## [1.0.3] — 2026-03-22 — OTA, cleanup
 
 ### Added
-
-#### All WiFi-based example YAMLs
-- Added `ota` block (`platform: esphome`, password placeholder) to all WiFi-based example configurations
-
-#### `README.md` / `README.en.md`
-- Added OTA section explaining over-the-air updates and the password placeholder
+- OTA in all Wi-Fi examples, plus a section in the README.
 
 ### Removed
-
-- `WomoLinControllerEthernet.yaml` — removed (Ethernet-specific, not maintained here)
-- `WomoLinControllerEthernetMqtt.yaml` — removed (Ethernet-specific, not maintained here)
-- `examples/` directory — removed (superseded by root-level example YAMLs)
-
----
+- WomoLin Ethernet examples and the `examples/` directory.
 
 ## [1.0.2] — 2026-03-19 — Example configurations and documentation
 
 ### Added
-
-#### `ESP32_truma_4-6_Gas_example.yaml` / `ESP32-S3_truma_4-6_Gas_example.yaml` (new)
-- Gas variant of the example configurations using `HEATER_GAS` and `HEATER_ENERGY_MIX_GAS`
-- Diesel-„Entkokung"/Rückstandsverbrennung script, sensor and buttons omitted (gas-only operation)
+- Gas examples for ESP32 and ESP32-S3.
 
 ### Changed
+- The diesel examples are now named `*_6DE_Diesel_example.yaml`.
+- Actions adapted to ESPHome 2026.3.0.
 
-#### `ESP32_truma_6DE_example.yaml` → `ESP32_truma_6DE_Diesel_example.yaml`
-#### `ESP32-S3_truma_6DE_example.yaml` → `ESP32-S3_truma_6DE_Diesel_example.yaml`
-- Renamed to make the diesel variant explicit
+### Documentation
+- README: Choosing the example by energy source and hardware, notes on the Combi 4 and on diesel
+  models without Eberspächer burner.
 
-#### `components/truma_inetbox/__init__.py` / `components/uart/__init__.py`
-- Added `synchronous=True` to all `register_action()` calls
-  (ESPHome 2026.3.0 requires this parameter; all `play()` methods are synchronous)
-
-#### `README.md` / `README.en.md`
-- Restructured example configuration section into 2-step selection (energy mix → hardware)
-- Added Gas/Diesel variant overview table
-- Added Truma Combi 4 compatibility note
-- Added compatibility disclaimer: tested with Truma Combi 6DE (2018, Eberspächer burner);
-  newer Truma diesel generations without Eberspächer not verified
-- Removed upstream intro paragraph (originated from Fabian-Schmidt repo)
-- Editorial cleanup
-
----
-
-## [1.0.1] — 2026-03-14 — ESPHome 2026.6 Compatibility (deprecation follow-up)
+## [1.0.1] — 2026-03-14 — ESPHome 2026.6 compatibility
 
 ### Changed
+- Deprecated ESPHome APIs replaced so the components also build with ESPHome 2026.6.
 
-#### `components/truma_inetbox/__init__.py`
-- `CORE.using_esp_idf` → `CORE.is_esp32 and not CORE.using_arduino`
-  Deprecated since ESPHome 2026.1 (behavior change in 2026.6). The condition targets
-  ESP-IDF-only builds where the `ARDUINO_SERIAL_EVENT_TASK_*` macros are not provided
-  by the framework.
-
-#### `components/uart/__init__.py`
-- `CORE.using_esp_idf` → `not CORE.using_arduino`
-  Same deprecation fix in the UART type selector (`_uart_declare_type`).
-
-#### `components/truma_inetbox/LinBusListener_esp_idf.cpp`
-- Added `#ifndef` fallback defines for `ARDUINO_SERIAL_EVENT_TASK_STACK_SIZE` (4096)
-  and `ARDUINO_SERIAL_EVENT_TASK_RUNNING_CORE` (0) so the file compiles even without
-  the build flags as a safety net.
-
-#### `components/truma_inetbox/climate/TrumaWaterClimate.cpp`
-#### `components/truma_inetbox/climate/TrumaRoomClimate.cpp`
-- `traits.set_supports_current_temperature(true)`
-  → `traits.add_feature_flags(climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE)`
-  `set_supports_current_temperature` is deprecated in ESPHome 2025+.
-
----
-
-## [1.0.0] — 2026-03-02 — ESPHome 2025.8+ / 2026.3.x Compatibility — Details
-
-### Changed — `components/uart/`
-
-#### `uart_component.h`
-- `virtual int available()` → `virtual size_t available()` to match ESPHome 2025.8+ signature
-- Added default (no-op) implementations for new virtual methods introduced in ESPHome 2025.8:
-  `set_rx_full_threshold()`, `set_rx_timeout()`, `load_settings(bool)`, `load_settings()`
-
-#### `uart_component.cpp`
-- Updated `check_read_timeout_()` to use `size_t` comparisons (no unnecessary `int` casts)
-
-#### `uart_component_esp_idf.h` _(critical)_
-- Preprocessor guard changed: `USE_ESP_IDF` → `USE_ESP32_FRAMEWORK_ESP_IDF`
-- Removed `SemaphoreHandle_t lock_` member (mutex removed from upstream in 2025.8)
-- `int available()` → `size_t available()`
-- Added `get_hw_serial_number()` directly to `IDFUARTComponent` base class
-- Added declarations for `load_settings()`, `set_rx_full_threshold()`, `set_rx_timeout()`
-- `uart_event_queue_` kept **unconditionally** (not guarded by `USE_UART_WAKE_LOOP_ON_RX`),
-  because the LIN-bus BREAK detection task requires it at all times
-
-#### `uart_component_esp_idf.cpp` _(critical)_
-- Preprocessor guard changed: `USE_ESP_IDF` → `USE_ESP32_FRAMEWORK_ESP_IDF`
-- `UART_SCLK_APB` → `UART_SCLK_DEFAULT` (ESP-IDF 5.x API change)
-- `portTICK_RATE_MS` → `pdMS_TO_TICKS(20)` (removed from ESP-IDF 5.x)
-- All `lock_` mutex take/give calls removed (~12 call-sites)
-- `static uint8_t next_uart_num` → `static uart_port_t next_uart_num = UART_NUM_0`
-  (ESP-IDF 5.x: `uart_port_t` is a scoped enum, no implicit `uint8_t` conversion)
-- Postfix `++` on `uart_port_t` replaced with explicit cast:
-  `next_uart_num = (uart_port_t)(next_uart_num + 1)`
-- `int available()` → `size_t available()`
-- Added implementations for `load_settings()`, `set_rx_full_threshold()`, `set_rx_timeout()`
-
-#### `truma_uart_component_esp_idf.h`
-- Preprocessor guard changed: `USE_ESP_IDF` → `USE_ESP32_FRAMEWORK_ESP_IDF`
-- Removed `get_hw_serial_number()` (now provided by `IDFUARTComponent` base class)
-- Retains `get_uart_event_queue()` exposing `&uart_event_queue_`
-
-#### `uart_component_esp32_arduino.h` / `.cpp`
-- `int available()` → `size_t available()`
-- `check_logger_conflict()`: `logger::global_logger->get_hw_serial()` guarded with
-  `#if defined(USE_LOGGER) && !defined(USE_ESP32)` — ESPHome 2026.1 removed
-  `get_hw_serial()` from `Logger` for ESP32 (Arduino on ESP32 now builds on IDF)
-
-#### `uart_component_rp2040.h` / `.cpp`
-- `int available()` → `size_t available()`
-
-#### `uart_component_esp8266.h` / `.cpp`
-- `ESP8266UartComponent::available()`: `int` → `size_t`
-
----
-
-### Changed — `components/truma_inetbox/`
-
-#### POSIX integer type replacements (all 30 affected files)
-- `u_int8_t` → `uint8_t`
-- `u_int16_t` → `uint16_t`
-- `u_int32_t` → `uint32_t`
-
-These POSIX-style types (`u_int*_t`) are defined implicitly by glibc / BSD libc headers
-that the Arduino toolchain includes automatically. The ESP-IDF 5.x GCC toolchain does
-**not** make them available, causing 294 compile errors across 30 files.
-
-Affected files include:
-`LinBusProtocol.h`, `LinBusProtocol.cpp`, `LinBusListener.h`, `LinBusListener.cpp`,
-`TrumaiNetBoxApp.h`, `TrumaiNetBoxApp.cpp`, `TrumaiNetBoxAppHeater.h/cpp`,
-`TrumaiNetBoxAppAirconManual.h/cpp`, `TrumaiNetBoxAppAirconAuto.h/cpp`,
-`TrumaiNetBoxAppClock.h/cpp`, `TrumaiNetBoxAppTimer.h/cpp`,
-`TrumaStructs.h`, `TrumaEnums.h`, `TrumaStatusFrameBuilder.h`,
-`TrumaStausFrameResponseStorage.h`, `helpers.h`, `helpers.cpp`,
-`automation.h`, `time/TrumaTime.h`, and sensor/number/select/climate sub-components.
-
-#### `LinBusListener_esp_idf.cpp`
-- `#define QUEUE_WAIT_BLOCKING (portTickType) portMAX_DELAY`
-  → `(TickType_t) portMAX_DELAY`
-  (`portTickType` was renamed to `TickType_t` in FreeRTOS 10 / ESP-IDF 5.x)
-- `uart_intr_config(uart_num, &uart_intr)` → `uart_intr_config((uart_port_t) uart_num, &uart_intr)`
-  (ESP-IDF 5.x: `uart_intr_config` requires `uart_port_t`, no implicit `uint8_t` conversion)
-
-#### `LinBusListener_esp32_arduino.cpp`
-- `#define QUEUE_WAIT_BLOCKING (portTickType) portMAX_DELAY`
-  → `(TickType_t) portMAX_DELAY`
-  (same FreeRTOS rename, also affects Arduino on ESP32 which builds on ESP-IDF 5.x)
-
----
+## [1.0.0] — 2026-03-02 — ESPHome 2025.8+ / 2026.3.x compatibility
 
 ### Added
+- Test configurations `test_compile.yaml` and `test_compile_idf.yaml`.
 
-- `test_compile.yaml` — minimal test configuration for ESP32 Arduino framework builds
-- `test_compile_idf.yaml` — minimal test configuration for ESP32 ESP-IDF framework builds
-
----
-
-### Notes
-
-- ESPHome **2026.1.x does not exist** on PyPI — version numbering jumps from 2025.10.x
-  directly to 2026.2.x.
-- ESPHome 2026.1 deprecated `CORE.using_esp_idf` (warning only; behavior changes in 2026.6).
-  ESP32 Arduino now officially builds on top of ESP-IDF, so IDF features are available
-  in both frameworks. The `uart_component_esp32_arduino` component continues to work
-  as a custom override for this project.
-- Installing ESPHome 2026.2.x in a Python venv additionally requires the
-  `fatfs-ng` package (`pip install fatfs-ng`) as a transitive PlatformIO dependency.
+### Changed
+- `uart`: Adapted to ESPHome 2025.8+ and ESP-IDF 5.x. The own UART component is still needed because
+  LIN detection requires the event queue.
+- `truma_inetbox`: Builds with ESP-IDF 5.x.
