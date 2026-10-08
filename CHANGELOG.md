@@ -45,27 +45,17 @@ Getestet mit:
 ## [1.0.38] — 2026-10-03 — Aventa: Licht und AUTO vom CP Plus
 
 ### Hinzugefügt
-- `truma_inetbox`: Number `AIRCON_LIGHT` für das Licht der Aventa, 0 ist aus, 1–5 die Stufe. Gelesen
-  wird Byte 6–7 des Aventa-Statusframes 0x35 (Stufe × 20), geschrieben an derselben Stelle im 0x34.
-  Laut Rückmeldung funktioniert das an einer Aventa der ersten Generation (Issue #28).
-- `truma_inetbox`: Binärsensor `AIRCON_AUTO_ACTIVE` und Sensor `AIRCON_AUTO_TARGET_TEMPERATURE` für
-  AUTO am CP Plus. Beide werten den Frame 0x37 aus, in dem der CP Plus nach dem Einschalten das
-  AUTO-Soll meldet und nach dem Ausschalten 0 (Logs aus Issue #28). Bestätigt an einer Aventa
-  Compact Plus 2nd Gen.
+- `truma_inetbox`: Number `AIRCON_LIGHT` für das Licht der Aventa (0 = aus, 1–5). Laut Rückmeldung
+  funktioniert das an einer Aventa der ersten Generation (Issue #28).
+- `truma_inetbox`: Binärsensor `AIRCON_AUTO_ACTIVE` und Sensor `AIRCON_AUTO_TARGET_TEMPERATURE` zeigen
+  AUTO am CP Plus an. Bestätigt an einer Aventa Compact Plus 2nd Gen (Issue #28).
 
 ### Geändert
-- `truma_inetbox`: Schreibbefehle an die Aventa (0x34) schicken die zuletzt gemeldete Lichtstufe mit.
-  Bisher stand dort 0, das hat das Licht bei jedem Befehl aus HA vermutlich ausgeschaltet. In den Logs
-  aus Issue #28 entspricht der Schreibframe 0x34 dem Anfang des Statusframes 0x35, beim Warmwasser
-  (Byte 10–11) hat das Zurückschicken des gemeldeten Werts in 1.0.35 den Fehler behoben. Laut
-  Rückmeldung an einer Aventa der ersten Generation bestätigt (Issue #28).
-- `truma_inetbox`: Feldnamen in den Aventa-Structs korrigiert. Byte 16–17 im 0x35 ist die
-  Ist-Temperatur des Warmwassers, nicht des Raums, im 0x37 stehen Warmwasser-Soll sowie Raum- und
-  Warmwasser-Ist. Keines dieser Felder wurde bisher ausgegeben, am Verhalten ändert sich dadurch nichts.
+- `truma_inetbox`: Befehle an die Aventa aus HA lassen das Licht unverändert, bisher wurde es dabei
+  vermutlich ausgeschaltet. Laut Rückmeldung an einer Aventa der ersten Generation bestätigt.
 
 ### Dokumentation
-- README: Abschnitt zur Aventa um Licht und AUTO ergänzt, die Einschränkung zu AUTO am CP Plus
-  angepasst. Das Aventa-Beispiel enthält die neuen Entitäten.
+- README: Aventa-Abschnitt und Aventa-Beispiel um Licht und AUTO ergänzt.
 
 ---
 
@@ -125,36 +115,20 @@ Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`. Am LIN-Bus l�
 ## [1.0.34] — 2026-09-29 — Kühlbox-Korrekturen, Absicherung der LIN-Kommunikation
 
 ### Geändert
-- `truma_cooler`: Die Anmeldung für Statusmeldungen läuft jetzt über ESPHome
-  (`register_for_notify`), das den CCCD selbst schreibt. Die Komponente schrieb ihn bisher zusätzlich
-  von Hand. ESPHome kann danach den GATT-Cache der Verbindung freigeben.
-- `truma_inetbox`: Antworten an den CP Plus liegen bis zur Abfrage per PID 0x3D in einer
-  Warteschlange. Der LIN-Task legt sie dort ab, der UART-Task holt sie heraus. Die Zugriffe waren
-  nicht abgesichert, und der höher priorisierte UART-Task konnte den LIN-Task mitten im Ablegen
-  unterbrechen. Selten, aber möglich waren dadurch eine fehlerhafte Antwort oder ein Absturz. Die
-  Warteschlange ist jetzt eine FreeRTOS-Queue mit 16 Plätzen.
-- `truma_inetbox`: Die Wartezeit auf das nächste Datenbyte eines LIN-Frames war beim Überlauf des
-  Mikrosekundenzählers (etwa alle 71 Minuten) für rund 5 ms falsch berechnet. Die Prüfung ist jetzt
-  überlaufsicher, wie beim Sensor „CP Plus verbunden“ seit 1.0.24.
-- `truma_inetbox`: Die UART-Interrupt-Einstellungen für den LIN-Empfang werden mit Nullen
-  vorbelegt, ein Fehler beim Setzen erscheint jetzt im Log.
-- `uart`: `uart_event_queue_` beginnt mit `nullptr` und `uart_num_` mit `UART_NUM_MAX`, wie in der
-  UART-Komponente von ESPHome. Schlägt die UART-Einrichtung fehl, meldet der UART-Task das
-  zuverlässig nach 5 s im Log.
+- `truma_cooler`: Die Anmeldung für Statusmeldungen läuft über ESPHome statt über eigenen Code.
+- `truma_inetbox`: Antworten an den CP Plus sind gegen gleichzeitigen Zugriff abgesichert. Selten
+  waren vorher eine fehlerhafte Antwort oder ein Absturz möglich.
+- `truma_inetbox`: Der LIN-Empfang rechnet seine Wartezeit auch beim Zählerüberlauf (etwa alle
+  71 Minuten) richtig.
+- `truma_inetbox`, `uart`: Fehler bei der UART-Einrichtung erscheinen zuverlässig im Log.
 
 ### Behoben
-- `truma_cooler`: Wurde „Kühlen“ an eine schon laufende Box erneut gesendet, etwa von einer
-  Automation, ging wieder der Einschaltbefehl raus. Beim C44 schaltete der anschließende
-  Turbo-Reset einen laufenden Turbo ab. Der Einschaltbefehl geht jetzt nur noch bei einem echten
-  Wechsel zwischen aus und an raus.
-- `truma_cooler`: Der Turbo-Schalter blieb auf „an“ stehen, wenn er bei ausgeschalteter Box betätigt
-  wurde, obwohl der Befehl verworfen wurde. Er bleibt jetzt aus.
-- `truma_cooler`: Ein C44, der mit Turbo kühlt, meldet den Status 0x05 und nicht 0x0D wie in den
-  HCI-Mitschnitten. Kompressor und Turbo wurden dann als aus angezeigt. 0x05 gilt jetzt als Turbo.
-- `truma_cooler`: Die Kühlbox sendet ihren Status nur als Antwort auf eine Abfrage. Die Komponente
-  fragte alle 60 s ab und schob die nächste Abfrage nach jedem Befehl wieder um 60 s hinaus, deshalb
-  kamen Änderungen erst nach bis zu einer Minute in Home Assistant an. Jetzt wird 1 s nach einem
-  Befehl und sonst alle 10 s abgefragt.
+- `truma_cooler`: Erneutes „Kühlen“ an eine laufende Box schaltet beim C44 den Turbo nicht mehr ab.
+- `truma_cooler`: Der Turbo-Schalter bleibt aus, wenn er bei ausgeschalteter Box betätigt wird.
+- `truma_cooler`: Ein C44 mit Turbo wird als Turbo angezeigt, vorher standen Kompressor und Turbo
+  auf aus.
+- `truma_cooler`: Änderungen nach einem Befehl kommen nach etwa einer Sekunde in Home Assistant an
+  statt nach bis zu einer Minute.
 
 ## [1.0.33] — 2026-09-28 — Aventa einschalten
 
