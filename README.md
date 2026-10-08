@@ -87,9 +87,9 @@ Lüftergeschwindigkeiten: Low / Mid / High / Night / Auto
 
 Temperaturbereich: 16–31 °C, Schrittweite 1 °C
 
-Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37). Der Aventa-Frame bleibt dabei auf Aus, deshalb zeigen die Klima-Entität und die Selects weiter „Off“. Ob AUTO am CP Plus läuft und mit welchem Soll, zeigen der Binärsensor `AIRCON_AUTO_ACTIVE` und der Sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. Ausgewertet ist das anhand von Logs einer Aventa Compact Plus 2. Generation (Issue #28), nach dem Einschalten steht im Frame das Soll, nach dem Ausschalten 0, der Sensor zeigt dann „Unbekannt“. Gesetzt werden kann AUTO am CP Plus über die Komponente nicht.
+Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37). Der Aventa-Frame bleibt dabei auf Aus, deshalb zeigen die Klima-Entität und die Selects weiter „Off“. Ob AUTO am CP Plus läuft und mit welchem Soll, zeigen der Binärsensor `AIRCON_AUTO_ACTIVE` und der Sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. Ausgewertet ist das anhand von Logs einer Aventa Compact Plus 2. Generation (Issue #28), nach dem Einschalten steht im Frame das Soll, nach dem Ausschalten 0, der Sensor zeigt dann „Unbekannt“. An dieser Aventa ist die Anzeige inzwischen bestätigt. Gesetzt werden kann AUTO am CP Plus über die Komponente nicht.
 
-Licht: Die Number `AIRCON_LIGHT` zeigt die Lichtstufe der Aventa (0 = aus, 1–5) und stellt sie ein, ausgewertet wird dafür Byte 6–7 des Aventa-Frames. Jeder Schreibbefehl an die Aventa schickt die zuletzt gemeldete Lichtstufe mit, bis 1.0.37 stand dort 0. An einer Aventa ist beides noch nicht bestätigt.
+Licht: Die Number `AIRCON_LIGHT` zeigt die Lichtstufe der Aventa (0 = aus, 1–5) und stellt sie ein, ausgewertet wird dafür Byte 6–7 des Aventa-Frames. Jeder Schreibbefehl an die Aventa schickt die zuletzt gemeldete Lichtstufe mit, bis 1.0.37 stand dort 0. Laut Rückmeldung aus Issue #28 funktioniert das Licht an einer Aventa der ersten Generation.
 
 Beispielkonfiguration: [`ESP32-S3_truma_Aventa_example.yaml`](ESP32-S3_truma_Aventa_example.yaml)
 
