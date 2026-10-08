@@ -15,8 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This release adds an experimental binary sensor for 230 V shore power at the Combi D, not yet
 confirmed on a heater. The Aventa AUTO target shows "unknown" instead of 0 °C while AUTO is off.
 AUTO and light for the Aventa from 1.0.38 are confirmed, AUTO on an Aventa Compact Plus 2nd Gen,
-the light according to feedback on a first generation Aventa (issue #28). The LIN communication
-hardening from 1.0.34 is not yet confirmed on a LIN bus.
+the light according to feedback on a first generation Aventa (issue #28).
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
