@@ -12,10 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release adds an experimental binary sensor for 230 V shore power at the Combi D, not yet
-confirmed on a heater. The Aventa AUTO target shows "unknown" instead of 0 °C while AUTO is off.
-The Aventa AUTO display from 1.0.38 is confirmed on an Aventa Compact Plus 2nd Gen, the light
-according to feedback on a first generation Aventa (issue #28).
+This release adds an experimental binary sensor for 230 V shore power at the Combi D, not confirmed
+yet. AUTO display and light of the Aventa are confirmed (issue #28).
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
@@ -26,18 +24,16 @@ Tested against:
 ## [1.0.39] — 2026-10-07 — Combi D: shore power at the heater (experimental)
 
 ### Added
-- `truma_inetbox`: binary sensor `HEATER_MAINS_POWER` (Combi D only), shows 230 V shore power at the
-  heater. Experimental: without shore power the evaluated bit is cleared, but the change when
-  plugging in is not confirmed yet. Not suitable for automations yet.
+- `truma_inetbox`: binary sensor `HEATER_MAINS_POWER` (Combi D only) for 230 V shore power at the
+  heater. Experimental and not suitable for automations yet, the change when plugging in is not
+  confirmed yet.
 
 ### Changed
 - `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` shows "unknown" instead of 0 °C while AUTO is
-  off. Whether AUTO is running is shown by `AIRCON_AUTO_ACTIVE`. Confirmed on an Aventa Compact
-  Plus 2nd Gen (issue #28).
+  off. Confirmed on an Aventa Compact Plus 2nd Gen (issue #28).
 
 ### Documentation
-- README: `HEATER_MAINS_POWER` described, capturing bus traffic with `logger: VERBOSE` and
-  `observer_mode`.
+- README: `HEATER_MAINS_POWER` and capturing bus traffic described.
 
 ---
 
@@ -47,10 +43,10 @@ Tested against:
 ### Added
 - `truma_inetbox`: Number `AIRCON_LIGHT` for the Aventa light (0 = off, 1–5). According to feedback
   this works on a first generation Aventa (issue #28).
-- `truma_inetbox`: Binary sensor `AIRCON_AUTO_ACTIVE` and sensor `AIRCON_AUTO_TARGET_TEMPERATURE` show
-  AUTO on the CP Plus. Confirmed on an Aventa Compact Plus 2nd Gen (issue #28).
+- `truma_inetbox`: Binary sensor `AIRCON_AUTO_ACTIVE` and sensor `AIRCON_AUTO_TARGET_TEMPERATURE`
+  show AUTO on the CP Plus. Confirmed on an Aventa Compact Plus 2nd Gen (issue #28).
 
-### Changed
+### Fixed
 - `truma_inetbox`: Aventa commands from HA leave the light unchanged, before it was presumably
   switched off. Confirmed according to feedback on a first generation Aventa.
 
@@ -63,53 +59,26 @@ Tested against:
 ## [1.0.37] — 2026-09-30 — Code cleanup
 
 ### Changed
-- `truma_inetbox`: constants are `constexpr` instead of `#define` (LIN SIDs, frame types, queue
-  lengths, stack and core of the LIN tasks). The global build flags `ARDUINO_SERIAL_EVENT_TASK_*` are
-  gone, the values are in the code now. The checksum start of the status frames is a named constant
-  instead of `10` in two places.
-- `truma_inetbox`: `xQueueSendFromISR()` gets `nullptr` as last argument. So far the timeout
-  constant 0 stood there, which the compiler let pass as null pointer, so `NULL` was always passed.
-- `truma_inetbox`: the atomic update flags in `update_prepare()` are read and set explicitly with
-  `.load()` and `.store()`, the header arrays in `helpers.h` are `inline constexpr`.
-- `uart`: the members in `uart_component.h` have default values.
-- `truma_inetbox`: comment on `check_for_lin_fault_()`, which the main loop and the UART task call
-  without a lock. The state is only reset there on a bus fault with a configured `fault_pin`.
-
-Built for ESP32 and ESP32-S3, also with log level `VERY_VERBOSE`. On a LIN bus this code runs since
-1.0.38 on a CP Plus with an Aventa (issue #28).
-
+- `truma_inetbox`, `uart`: Code cleanup, no change in behavior. Runs since 1.0.38 on a CP Plus with
+  an Aventa (issue #28).
 
 ## [1.0.36] — 2026-09-30 — Web server optional
 
 ### Changed
-- Example YAMLs: the `web_server` block is commented out and marked as optional. Without `auth`
-  anyone on the same Wi-Fi could switch all entities over port 80. The commented block contains
-  `auth` with `type: digest` and credentials from `secrets.yaml`.
-
-### Fixed
-- `truma_inetbox`: Aventa commands from Home Assistant no longer switch the water heater off
-  (change from 1.0.35), confirmed on an Aventa Compact Plus 2nd Gen (issue #16, #28).
+- Example YAMLs: The web server is commented out and optional. Without login anyone on the same
+  Wi-Fi could use it, the example now contains a login from `secrets.yaml`.
 
 ### Documentation
-- README: new section "Web server (optional)" on the risks without login and how to protect it,
-  references to the web portal updated.
-
+- README: new section "Web server (optional)".
 
 ## [1.0.35] — 2026-09-29 — Water heater on Aventa commands
 
-### Changed
-- `truma_inetbox`: Aventa commands from Home Assistant switched the water heater off, reported for
-  fan level, AUTO and switching off (issue #16, #28). In the Aventa status frame 0x35, bytes 10–11
-  hold the water target, and the CP Plus also takes this field from the write frame 0x34. The
-  component sent zeros there so far, now it echoes the last reported value. Confirmed on an
-  Aventa Compact Plus 2nd Gen (issue #28).
-
 ### Fixed
-- `truma_inetbox`: Switching on the Aventa from Home Assistant (change from 1.0.33) is confirmed on
-  an Aventa Compact Plus 2nd Gen with CP Plus C.04.05.02 (issue #28).
+- `truma_inetbox`: Aventa commands from HA no longer switch off the water heater (issue #16, #28).
+  Confirmed on an Aventa Compact Plus 2nd Gen.
 
 ### Documentation
-- README: note that the component does not evaluate AUTO selected on the CP Plus.
+- README: note that AUTO selected on the CP Plus is not evaluated.
 
 ## [1.0.34] — 2026-09-29 — Cooler fixes, LIN communication hardening
 
@@ -130,56 +99,42 @@ Built for ESP32 and ESP32-S3, also with log level `VERY_VERBOSE`. On a LIN bus t
 
 ## [1.0.33] — 2026-09-28 — Switching on the Aventa
 
-### Changed
-- `truma_inetbox`: CP Plus C.04.05.02 reports fan value 0xFF while the Aventa is off. When
-  switching on from Home Assistant this value was sent back unchanged, and the CP Plus rejected the
-  command with `StatusFrameResponseAck … FAILED 02` (issue #28). Unknown fan values are now
-  replaced by `Low` before sending, or by `Auto` in Auto mode. Switching on is confirmed on an
-  Aventa Compact Plus 2nd Gen with CP Plus C.04.05.02.
+### Fixed
+- `truma_inetbox`: The Aventa can now be switched on from HA also with CP Plus C.04.05.02, which
+  rejected the command before (issue #28). Confirmed on an Aventa Compact Plus 2nd Gen.
 
 ### Documentation
-- README: `VENT_MODE` now notes that PIDs 0x20 to 0x22 do not appear in captures from a
-  Combi D6 E.
+- README: note that `VENT_MODE` has no values on a Combi D6 E.
 
 ## [1.0.32] — 2026-09-24 — Fan level
 
 ### Added
-- `truma_inetbox`: sensor `VENT_MODE`, the upper digit of byte 5 in the LIN frame with PID 0x20
-  (0 off, 1–10 fan level, 11 heating fan Eco, 13 heating fan High). Display only, checked on a
-  Combi 4 (issue #25). The frame is now evaluated regardless of master/slave classification, like
-  PID 0x22 already.
+- `truma_inetbox`: Sensor `VENT_MODE` shows the fan level (0 off, 1–10, 11 heater fan Eco, 13 heater
+  fan High). Display only, checked on a Combi 4 (issue #25).
 
 ### Documentation
-- README: `HEATING_DEMAND` stays off in pure boiler operation. The earlier statement that 0xD0 also
-  applies there came from tests with heating and boiler on at the same time.
-- README: byte 0 of PID 0x22 as supply voltage confirmed by a second measurement. No further
-  analysis of PIDs 0x20 to 0x22 is planned.
+- README: `HEATING_DEMAND` stays off in water-heater-only mode.
+- README: `PID22_BYTE0` is the supply voltage, confirmed by a second measurement.
 
 ## [1.0.31] — 2026-09-23 — Example configurations for ESPHome 2026.9.0
 
 ### Changed
-- Example YAMLs: `api: encryption: key` now comes from `!secret api_encryption_key`. The empty key
-  `""` is rejected since ESPHome 2026.9.0, so the examples did not build as shipped.
-- Example YAMLs: `ota` uses `encryption: {}` with the `api` key instead of a placeholder password.
-  ESPHome warned that the password only costs flash and RAM next to the `api` key. Migrating from
-  firmware with an OTA password: see README, OTA section.
-- Example YAMLs: BLE scan window from 1100 ms to `interval: 320ms`/`window: 300ms`. ESPHome warns
-  that long windows can cause WiFi disconnects while WiFi is active.
-- Example YAMLs: `rgb_order` replaced with `channel_colors` (`rgb_order` goes away with ESPHome
-  2027.3.0).
+- Example YAMLs: The API key comes from `!secret api_encryption_key`, ESPHome 2026.9.0 rejects the
+  empty key.
+- Example YAMLs: OTA uses the API encryption instead of a password. Switching over: see README,
+  section OTA.
+- Example YAMLs: Shorter BLE scan window against Wi-Fi drops, `channel_colors` instead of
+  `rgb_order`.
 
 ### Documentation
-- README: Prerequisites and OTA sections updated to match the examples.
+- README: Prerequisites and OTA adapted to the new examples.
 
 ## [1.0.30] — 2026-09-23 — Heat demand (experimental)
 
 ### Added
-- `truma_inetbox`: binary sensor `HEATING_DEMAND` and sensors `PID22_BYTE0`/`PID22_BYTE1`,
-  experimental and for the Combi 4 only (issue #25). They read the first two bytes of the LIN frame
-  with PID 0x22, which the component so far only printed in the VERY_VERBOSE log. `HEATING_DEMAND`
-  is bit 7 of byte 1: 0xD0 while heating is requested, 0x50 once the temperature is reached. The
-  burner ignites a few seconds later, so the sensor shows the demand, not the flame. Values are
-  only reported on change.
+- `truma_inetbox`: Binary sensor `HEATING_DEMAND` and sensors `PID22_BYTE0`/`PID22_BYTE1`,
+  experimental and Combi 4 only (issue #25). `HEATING_DEMAND` shows whether the heater requests
+  heat, not whether the burner is running.
 
 ## [1.0.29] — 2026-09-21 — Unused function warnings
 

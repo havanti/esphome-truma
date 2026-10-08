@@ -12,10 +12,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Neu ist ein experimenteller Binärsensor für 230 V Landstrom an der Combi D, an einer Heizung noch
-nicht bestätigt. Das AUTO-Soll der Aventa zeigt bei AUTO aus „Unbekannt“ statt 0 °C. Die AUTO-Anzeige
-der Aventa aus 1.0.38 ist an einer Aventa Compact Plus 2nd Gen bestätigt, das Licht laut Rückmeldung
-an einer Aventa der ersten Generation (Issue #28).
+Neu ist ein experimenteller Binärsensor für 230 V Landstrom an der Combi D, noch nicht bestätigt.
+AUTO-Anzeige und Licht der Aventa sind bestätigt (Issue #28).
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
@@ -26,18 +24,16 @@ Getestet mit:
 ## [1.0.39] — 2026-10-07 — Combi D: Landstrom an der Heizung (experimentell)
 
 ### Hinzugefügt
-- `truma_inetbox`: Binärsensor `HEATER_MAINS_POWER` (nur Combi D), zeigt 230 V Landstrom an der
-  Heizung. Experimentell: Ohne Landstrom ist das ausgewertete Bit gelöscht, das Umschalten beim
-  Einstecken ist aber noch nicht bestätigt. Für Automationen noch nicht geeignet.
+- `truma_inetbox`: Binärsensor `HEATER_MAINS_POWER` (nur Combi D) für 230 V Landstrom an der
+  Heizung. Experimentell und für Automationen noch nicht geeignet, das Umschalten beim Einstecken
+  ist noch nicht bestätigt.
 
 ### Geändert
-- `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` zeigt bei AUTO aus „Unbekannt“ statt 0 °C. Ob
-  AUTO läuft, zeigt `AIRCON_AUTO_ACTIVE`. Bestätigt an einer Aventa Compact Plus 2nd Gen
-  (Issue #28).
+- `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` zeigt bei AUTO aus „Unbekannt“ statt 0 °C.
+  Bestätigt an einer Aventa Compact Plus 2nd Gen (Issue #28).
 
 ### Dokumentation
-- README: `HEATER_MAINS_POWER` beschrieben, Busverkehr mitschneiden mit `logger: VERBOSE` und
-  `observer_mode`.
+- README: `HEATER_MAINS_POWER` und das Mitschneiden des Busverkehrs beschrieben.
 
 ---
 
@@ -47,10 +43,10 @@ Getestet mit:
 ### Hinzugefügt
 - `truma_inetbox`: Number `AIRCON_LIGHT` für das Licht der Aventa (0 = aus, 1–5). Laut Rückmeldung
   funktioniert das an einer Aventa der ersten Generation (Issue #28).
-- `truma_inetbox`: Binärsensor `AIRCON_AUTO_ACTIVE` und Sensor `AIRCON_AUTO_TARGET_TEMPERATURE` zeigen
-  AUTO am CP Plus an. Bestätigt an einer Aventa Compact Plus 2nd Gen (Issue #28).
+- `truma_inetbox`: Binärsensor `AIRCON_AUTO_ACTIVE` und Sensor `AIRCON_AUTO_TARGET_TEMPERATURE`
+  zeigen AUTO am CP Plus an. Bestätigt an einer Aventa Compact Plus 2nd Gen (Issue #28).
 
-### Geändert
+### Behoben
 - `truma_inetbox`: Befehle an die Aventa aus HA lassen das Licht unverändert, bisher wurde es dabei
   vermutlich ausgeschaltet. Laut Rückmeldung an einer Aventa der ersten Generation bestätigt.
 
@@ -63,54 +59,26 @@ Getestet mit:
 ## [1.0.37] — 2026-09-30 — Code aufgeräumt
 
 ### Geändert
-- `truma_inetbox`: Konstanten sind `constexpr` statt `#define` (LIN-SIDs, Frame-Typen, Queue-Längen,
-  Stack und Kern der LIN-Tasks). Die globalen Build-Flags `ARDUINO_SERIAL_EVENT_TASK_*` entfallen,
-  die Werte stehen jetzt im Code. Der Checksum-Beginn der Statusframes ist eine benannte Konstante
-  statt zweimal `10`.
-- `truma_inetbox`: `xQueueSendFromISR()` bekommt als letztes Argument `nullptr`. Dort stand bisher
-  die Timeout-Konstante 0, die der Compiler als Nullzeiger durchgehen ließ, übergeben wurde also schon
-  immer `NULL`.
-- `truma_inetbox`: Die atomaren Update-Flags in `update_prepare()` werden explizit mit `.load()` und
-  `.store()` gelesen und gesetzt, die Header-Arrays in `helpers.h` sind `inline constexpr`.
-- `uart`: Die Member in `uart_component.h` haben Default-Werte.
-- `truma_inetbox`: Kommentar zu `check_for_lin_fault_()`, das Main-Loop und UART-Task ohne Sperre
-  aufrufen. Der Zustand wird dort nur bei einem Busfehler mit gesetztem `fault_pin` zurückgesetzt.
-
-Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`. Am LIN-Bus läuft der Stand seit
-1.0.38 an einem CP Plus mit Aventa (Issue #28).
-
+- `truma_inetbox`, `uart`: Code aufgeräumt, am Verhalten ändert sich nichts. Läuft seit 1.0.38 an
+  einem CP Plus mit Aventa (Issue #28).
 
 ## [1.0.36] — 2026-09-30 — Webserver optional
 
 ### Geändert
-- Beispiel-YAMLs: Der `web_server`-Block ist auskommentiert und als optional gekennzeichnet. Ohne
-  `auth` konnte jeder im selben WLAN über Port 80 alle Entitäten schalten. Der auskommentierte Block
-  enthält `auth` mit `type: digest` und Zugangsdaten aus `secrets.yaml`.
-
-### Behoben
-- `truma_inetbox`: Aventa-Befehle aus Home Assistant schalten das Warmwasser nicht mehr ab
-  (Änderung aus 1.0.35), bestätigt an einer Aventa Compact Plus 2nd Gen (Issue #16, #28).
+- Beispiel-YAMLs: Der Webserver ist auskommentiert und optional. Ohne Anmeldung konnte ihn jeder im
+  selben WLAN nutzen, das Beispiel enthält jetzt eine Anmeldung über `secrets.yaml`.
 
 ### Dokumentation
-- README: neuer Abschnitt „Webserver (optional)“ zu den Risiken ohne Anmeldung und zur Absicherung,
-  Hinweise auf das Web-Portal angepasst.
-
+- README: neuer Abschnitt „Webserver (optional)“.
 
 ## [1.0.35] — 2026-09-29 — Warmwasser bei Aventa-Befehlen
 
-### Geändert
-- `truma_inetbox`: Befehle an die Aventa aus Home Assistant schalteten das Warmwasser ab, gemeldet
-  für Lüfterstufe, AUTO und Ausschalten (Issue #16, #28). Im Aventa-Statusframe 0x35 steht in
-  Byte 10–11 das Warmwasser-Soll, und der CP Plus übernimmt diese Stelle auch aus dem Schreibframe
-  0x34. Die Komponente schickte dort bisher Nullen, jetzt spiegelt sie den zuletzt gemeldeten Wert
-  zurück. Bestätigt an einer Aventa Compact Plus 2nd Gen (Issue #28).
-
 ### Behoben
-- `truma_inetbox`: Das Einschalten der Aventa aus Home Assistant (Änderung aus 1.0.33) ist an einer
-  Aventa Compact Plus 2nd Gen mit CP Plus C.04.05.02 bestätigt (Issue #28).
+- `truma_inetbox`: Befehle an die Aventa aus HA schalten das Warmwasser nicht mehr ab (Issue #16,
+  #28). Bestätigt an einer Aventa Compact Plus 2nd Gen.
 
 ### Dokumentation
-- README: Hinweis, dass die Komponente den am CP Plus gewählten AUTO-Betrieb nicht auswertet.
+- README: Hinweis, dass AUTO am CP Plus nicht ausgewertet wird.
 
 ## [1.0.34] — 2026-09-29 — Kühlbox-Korrekturen, Absicherung der LIN-Kommunikation
 
@@ -132,56 +100,41 @@ Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`. Am LIN-Bus l�
 
 ## [1.0.33] — 2026-09-28 — Aventa einschalten
 
-### Geändert
-- `truma_inetbox`: Der CP Plus C.04.05.02 meldet bei ausgeschalteter Aventa den Lüfterwert 0xFF.
-  Dieser Wert wurde beim Einschalten aus Home Assistant unverändert zurückgeschickt, und der CP Plus
-  lehnte den Befehl mit `StatusFrameResponseAck … FAILED 02` ab (Issue #28). Unbekannte Lüfterwerte
-  werden vor dem Senden jetzt durch `Low` ersetzt, im Modus Auto durch `Auto`. Das Einschalten
-  ist an einer Aventa Compact Plus 2nd Gen mit CP Plus C.04.05.02 bestätigt.
+### Behoben
+- `truma_inetbox`: Die Aventa lässt sich aus HA jetzt auch mit dem CP Plus C.04.05.02 einschalten,
+  der den Befehl bisher abgelehnt hat (Issue #28). Bestätigt an einer Aventa Compact Plus 2nd Gen.
 
 ### Dokumentation
-- README: `VENT_MODE` um den Hinweis ergänzt, dass die PIDs 0x20 bis 0x22 in den Mitschnitten
-  einer Combi D6 E nicht vorkommen.
+- README: Hinweis, dass `VENT_MODE` an der Combi D6 E keine Werte liefert.
 
 ## [1.0.32] — 2026-09-24 — Lüfterstufe
 
 ### Hinzugefügt
-- `truma_inetbox`: Sensor `VENT_MODE`, die obere Ziffer von Byte 5 im LIN-Frame mit der PID 0x20
-  (0 aus, 1–10 Lüfterstufe, 11 Heizlüfter Eco, 13 Heizlüfter High). Nur Anzeige, an einer Combi 4
-  nachgeprüft (Issue #25). Der Frame wird jetzt unabhängig von der Master/Slave-Zuordnung
-  ausgewertet, wie schon PID 0x22.
+- `truma_inetbox`: Sensor `VENT_MODE` zeigt die Lüfterstufe (0 aus, 1–10, 11 Heizlüfter Eco, 13
+  Heizlüfter High). Nur Anzeige, an einer Combi 4 nachgeprüft (Issue #25).
 
 ### Dokumentation
-- README: `HEATING_DEMAND` bleibt im reinen Boilerbetrieb aus. Die frühere Angabe, 0xD0 gelte auch
-  dort, stammte aus Tests mit Heizung und Boiler gleichzeitig.
-- README: Byte 0 von PID 0x22 als Versorgungsspannung durch eine zweite Messung bestätigt. Eine
-  weitere Auswertung der PIDs 0x20 bis 0x22 ist nicht geplant.
+- README: `HEATING_DEMAND` bleibt im reinen Boilerbetrieb aus.
+- README: `PID22_BYTE0` ist die Versorgungsspannung, durch eine zweite Messung bestätigt.
 
 ## [1.0.31] — 2026-09-23 — Beispielkonfigurationen für ESPHome 2026.9.0
 
 ### Geändert
-- Beispiel-YAMLs: `api: encryption: key` kommt jetzt aus `!secret api_encryption_key`. Der leere
-  Schlüssel `""` wird seit ESPHome 2026.9.0 abgelehnt, die Beispiele ließen sich so nicht bauen.
-- Beispiel-YAMLs: `ota` nutzt `encryption: {}` mit dem `api`-Schlüssel statt eines
-  Platzhalter-Passworts. ESPHome warnte, dass das Passwort neben dem `api`-Schlüssel nur Flash und
-  RAM kostet. Umstieg von einer Firmware mit OTA-Passwort: siehe README, Abschnitt OTA.
-- Beispiel-YAMLs: BLE-Scanfenster von 1100 ms auf `interval: 320ms`/`window: 300ms`. ESPHome
-  warnt, dass lange Fenster bei gleichzeitigem WLAN zu Verbindungsabbrüchen führen können.
-- Beispiel-YAMLs: `rgb_order` durch `channel_colors` ersetzt (`rgb_order` entfällt mit ESPHome
-  2027.3.0).
+- Beispiel-YAMLs: Der API-Schlüssel kommt aus `!secret api_encryption_key`, ESPHome 2026.9.0 lehnt
+  den leeren Schlüssel ab.
+- Beispiel-YAMLs: OTA nutzt die API-Verschlüsselung statt eines Passworts. Umstieg siehe README,
+  Abschnitt OTA.
+- Beispiel-YAMLs: Kürzeres BLE-Scanfenster gegen WLAN-Abbrüche, `channel_colors` statt `rgb_order`.
 
 ### Dokumentation
-- README: Abschnitte Voraussetzungen und OTA an die neuen Beispiele angepasst.
+- README: Voraussetzungen und OTA an die neuen Beispiele angepasst.
 
 ## [1.0.30] — 2026-09-23 — Heizanforderung (experimentell)
 
 ### Hinzugefügt
 - `truma_inetbox`: Binärsensor `HEATING_DEMAND` und Sensoren `PID22_BYTE0`/`PID22_BYTE1`,
-  experimentell und nur für die Combi 4 (Issue #25). Sie werten die ersten beiden Bytes des
-  LIN-Frames mit der PID 0x22 aus, den die Komponente bisher nur im VERY_VERBOSE-Log ausgab.
-  `HEATING_DEMAND` ist Bit 7 von Byte 1: 0xD0, solange geheizt werden soll, 0x50 bei erreichter
-  Temperatur. Der Brenner zündet einige Sekunden später, der Sensor zeigt also die Anforderung,
-  nicht die Flamme. Die Werte werden nur bei Änderung gemeldet.
+  experimentell und nur für die Combi 4 (Issue #25). `HEATING_DEMAND` zeigt, ob die Heizung Wärme
+  anfordert, nicht ob der Brenner läuft.
 
 ## [1.0.29] — 2026-09-21 — Warnungen zu unbenutzten Funktionen
 
