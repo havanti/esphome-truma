@@ -32,7 +32,8 @@ Getestet mit:
 
 ### Geändert
 - `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` zeigt bei AUTO aus „Unbekannt“ statt 0 °C. Ob
-  AUTO läuft, zeigt `AIRCON_AUTO_ACTIVE`. An einer Aventa noch nicht getestet.
+  AUTO läuft, zeigt `AIRCON_AUTO_ACTIVE`. Bestätigt an einer Aventa Compact Plus 2nd Gen
+  (Issue #28).
 
 ### Dokumentation
 - README: `HEATER_MAINS_POWER` beschrieben, Busverkehr mitschneiden mit `logger: VERBOSE` und
@@ -46,17 +47,18 @@ Getestet mit:
 ### Hinzugefügt
 - `truma_inetbox`: Number `AIRCON_LIGHT` für das Licht der Aventa, 0 ist aus, 1–5 die Stufe. Gelesen
   wird Byte 6–7 des Aventa-Statusframes 0x35 (Stufe × 20), geschrieben an derselben Stelle im 0x34.
-  An einer Aventa ist das noch nicht getestet.
+  Laut Rückmeldung funktioniert das an einer Aventa der ersten Generation (Issue #28).
 - `truma_inetbox`: Binärsensor `AIRCON_AUTO_ACTIVE` und Sensor `AIRCON_AUTO_TARGET_TEMPERATURE` für
   AUTO am CP Plus. Beide werten den Frame 0x37 aus, in dem der CP Plus nach dem Einschalten das
-  AUTO-Soll meldet und nach dem Ausschalten 0 (Logs aus Issue #28).
+  AUTO-Soll meldet und nach dem Ausschalten 0 (Logs aus Issue #28). Bestätigt an einer Aventa
+  Compact Plus 2nd Gen.
 
 ### Geändert
 - `truma_inetbox`: Schreibbefehle an die Aventa (0x34) schicken die zuletzt gemeldete Lichtstufe mit.
   Bisher stand dort 0, das hat das Licht bei jedem Befehl aus HA vermutlich ausgeschaltet. In den Logs
   aus Issue #28 entspricht der Schreibframe 0x34 dem Anfang des Statusframes 0x35, beim Warmwasser
-  (Byte 10–11) hat das Zurückschicken des gemeldeten Werts in 1.0.35 den Fehler behoben. Noch nicht
-  bestätigt.
+  (Byte 10–11) hat das Zurückschicken des gemeldeten Werts in 1.0.35 den Fehler behoben. Laut
+  Rückmeldung an einer Aventa der ersten Generation bestätigt (Issue #28).
 - `truma_inetbox`: Feldnamen in den Aventa-Structs korrigiert. Byte 16–17 im 0x35 ist die
   Ist-Temperatur des Warmwassers, nicht des Raums, im 0x37 stehen Warmwasser-Soll sowie Raum- und
   Warmwasser-Ist. Keines dieser Felder wurde bisher ausgegeben, am Verhalten ändert sich dadurch nichts.
@@ -84,7 +86,8 @@ Getestet mit:
 - `truma_inetbox`: Kommentar zu `check_for_lin_fault_()`, das Main-Loop und UART-Task ohne Sperre
   aufrufen. Der Zustand wird dort nur bei einem Busfehler mit gesetztem `fault_pin` zurückgesetzt.
 
-Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`, am LIN-Bus nicht getestet.
+Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`. Am LIN-Bus läuft der Stand seit
+1.0.38 an einem CP Plus mit Aventa (Issue #28).
 
 
 ## [1.0.36] — 2026-09-30 — Webserver optional
@@ -110,7 +113,7 @@ Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`, am LIN-Bus ni
   für Lüfterstufe, AUTO und Ausschalten (Issue #16, #28). Im Aventa-Statusframe 0x35 steht in
   Byte 10–11 das Warmwasser-Soll, und der CP Plus übernimmt diese Stelle auch aus dem Schreibframe
   0x34. Die Komponente schickte dort bisher Nullen, jetzt spiegelt sie den zuletzt gemeldeten Wert
-  zurück. An der Hardware noch nicht bestätigt.
+  zurück. Bestätigt an einer Aventa Compact Plus 2nd Gen (Issue #28).
 
 ### Behoben
 - `truma_inetbox`: Das Einschalten der Aventa aus Home Assistant (Änderung aus 1.0.33) ist an einer
@@ -159,8 +162,8 @@ Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`, am LIN-Bus ni
 - `truma_inetbox`: Der CP Plus C.04.05.02 meldet bei ausgeschalteter Aventa den Lüfterwert 0xFF.
   Dieser Wert wurde beim Einschalten aus Home Assistant unverändert zurückgeschickt, und der CP Plus
   lehnte den Befehl mit `StatusFrameResponseAck … FAILED 02` ab (Issue #28). Unbekannte Lüfterwerte
-  werden vor dem Senden jetzt durch `Low` ersetzt, im Modus Auto durch `Auto`. Ob sich die Aventa
-  damit einschalten lässt, ist an der Hardware noch nicht bestätigt.
+  werden vor dem Senden jetzt durch `Low` ersetzt, im Modus Auto durch `Auto`. Das Einschalten
+  ist an einer Aventa Compact Plus 2nd Gen mit CP Plus C.04.05.02 bestätigt.
 
 ### Dokumentation
 - README: `VENT_MODE` um den Hinweis ergänzt, dass die PIDs 0x20 bis 0x22 in den Mitschnitten
@@ -318,8 +321,8 @@ Gebaut für ESP32 und ESP32-S3, auch mit Log-Level `VERY_VERBOSE`, am LIN-Bus ni
 
 ### Einschränkungen (C69)
 - **Power ist global** — das Protokoll kennt kein Ein/Aus je Zone; schaltet man eine Zone aus, geht die ganze Box aus.
-- **Turbo nicht implementiert** — funktioniert schon am C44 nicht zuverlässig; wird bei Gelegenheit erneut angegangen.
-- **Kompressor-Status vorläufig** — das „Idle"-Bit (`data[5] & 0x08`) stammt aus einem einzelnen Post-ON-Spin-up und ist noch nicht an echter Hardware bestätigt.
+- **Turbo nicht implementiert** — funktioniert schon am C44 nicht zuverlässig; wird bei Gelegenheit erneut angegangen. Am C44 ist Turbo seit 1.0.34 an echter Hardware geprüft.
+- **Kompressor-Status anfangs vorläufig** — das „Idle"-Bit (`data[5] & 0x08`) stammt aus einem einzelnen Post-ON-Spin-up. Seit 1.0.22 an echter C69-Hardware bestätigt (Issue #18).
 
 ### Kompatibilität
 - Bestehende C44-Konfigurationen ohne `model:` funktionieren unverändert (`model:` fällt auf `c44` zurück).

@@ -32,7 +32,8 @@ Tested against:
 
 ### Changed
 - `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` shows "unknown" instead of 0 °C while AUTO is
-  off. Whether AUTO is running is shown by `AIRCON_AUTO_ACTIVE`. Not yet tested on an Aventa.
+  off. Whether AUTO is running is shown by `AIRCON_AUTO_ACTIVE`. Confirmed on an Aventa Compact
+  Plus 2nd Gen (issue #28).
 
 ### Documentation
 - README: `HEATER_MAINS_POWER` described, capturing bus traffic with `logger: VERBOSE` and
@@ -45,18 +46,19 @@ Tested against:
 
 ### Added
 - `truma_inetbox`: Number `AIRCON_LIGHT` for the Aventa light, 0 is off, 1–5 the level. It reads
-  bytes 6–7 of the Aventa status frame 0x35 (level × 20) and writes the same position in 0x34. Not
-  yet tested on an Aventa.
+  bytes 6–7 of the Aventa status frame 0x35 (level × 20) and writes the same position in 0x34.
+  According to feedback this works on a first generation Aventa (issue #28).
 - `truma_inetbox`: Binary sensor `AIRCON_AUTO_ACTIVE` and sensor `AIRCON_AUTO_TARGET_TEMPERATURE` for
   AUTO on the CP Plus. Both evaluate frame 0x37, in which the CP Plus reports the AUTO target after
-  switching on and 0 after switching off (logs from issue #28).
+  switching on and 0 after switching off (logs from issue #28). Confirmed on an Aventa Compact Plus
+  2nd Gen.
 
 ### Changed
 - `truma_inetbox`: Write commands to the Aventa (0x34) send the last reported light level along. So
   far there was 0, which presumably switched the light off with every command from HA. In the logs
   from issue #28 the write frame 0x34 matches the start of the status frame 0x35, for the water
-  heater (bytes 10–11) sending back the reported value fixed the problem in 1.0.35. Not yet
-  confirmed.
+  heater (bytes 10–11) sending back the reported value fixed the problem in 1.0.35.
+  Confirmed according to feedback on a first generation Aventa (issue #28).
 - `truma_inetbox`: Field names in the Aventa structs corrected. Bytes 16–17 in 0x35 are the actual
   water temperature, not the room, 0x37 holds the water target as well as room and water actual
   values. None of these fields was exposed so far, the behavior does not change.
@@ -83,7 +85,8 @@ Tested against:
 - `truma_inetbox`: comment on `check_for_lin_fault_()`, which the main loop and the UART task call
   without a lock. The state is only reset there on a bus fault with a configured `fault_pin`.
 
-Built for ESP32 and ESP32-S3, also with log level `VERY_VERBOSE`, not tested on a LIN bus.
+Built for ESP32 and ESP32-S3, also with log level `VERY_VERBOSE`. On a LIN bus this code runs since
+1.0.38 on a CP Plus with an Aventa (issue #28).
 
 
 ## [1.0.36] — 2026-09-30 — Web server optional
@@ -108,8 +111,8 @@ Built for ESP32 and ESP32-S3, also with log level `VERY_VERBOSE`, not tested on 
 - `truma_inetbox`: Aventa commands from Home Assistant switched the water heater off, reported for
   fan level, AUTO and switching off (issue #16, #28). In the Aventa status frame 0x35, bytes 10–11
   hold the water target, and the CP Plus also takes this field from the write frame 0x34. The
-  component sent zeros there so far, now it echoes the last reported value. Not yet confirmed on
-  hardware.
+  component sent zeros there so far, now it echoes the last reported value. Confirmed on an
+  Aventa Compact Plus 2nd Gen (issue #28).
 
 ### Fixed
 - `truma_inetbox`: Switching on the Aventa from Home Assistant (change from 1.0.33) is confirmed on
@@ -155,8 +158,8 @@ Built for ESP32 and ESP32-S3, also with log level `VERY_VERBOSE`, not tested on 
 - `truma_inetbox`: CP Plus C.04.05.02 reports fan value 0xFF while the Aventa is off. When
   switching on from Home Assistant this value was sent back unchanged, and the CP Plus rejected the
   command with `StatusFrameResponseAck … FAILED 02` (issue #28). Unknown fan values are now
-  replaced by `Low` before sending, or by `Auto` in Auto mode. Whether the Aventa can be switched
-  on this way is not yet confirmed on hardware.
+  replaced by `Low` before sending, or by `Auto` in Auto mode. Switching on is confirmed on an
+  Aventa Compact Plus 2nd Gen with CP Plus C.04.05.02.
 
 ### Documentation
 - README: `VENT_MODE` now notes that PIDs 0x20 to 0x22 do not appear in captures from a
@@ -313,8 +316,8 @@ Built for ESP32 and ESP32-S3, also with log level `VERY_VERBOSE`, not tested on 
 
 ### Limitations (C69)
 - **Power is global** — the protocol has no per-zone on/off; turning one zone off powers the whole box down.
-- **Turbo not implemented** — it does not work reliably even on the C44; to be revisited later.
-- **Compressor status provisional** — the "idle" bit (`data[5] & 0x08`) is derived from a single post-ON spin-up and not yet confirmed on real hardware.
+- **Turbo not implemented** — it does not work reliably even on the C44; to be revisited later. On the C44 turbo is checked on real hardware since 1.0.34.
+- **Compressor status initially provisional** — the "idle" bit (`data[5] & 0x08`) is derived from a single post-ON spin-up. Confirmed on real C69 hardware since 1.0.22 (issue #18).
 
 ### Compatibility
 - Existing C44 configurations without `model:` keep working unchanged (`model:` defaults to `c44`).

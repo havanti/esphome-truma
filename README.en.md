@@ -73,7 +73,7 @@ A template sensor (Diesel De-coking Remaining Time, unit: min) counts down the r
 
 <img src="img/Aventa.png" width="300" alt="Truma Aventa Gen 2 air conditioner">
 
-The ESP32 controls the Truma Aventa Gen 2 air conditioner over the same LIN bus as the heater — no second device required. A full climate entity with all operating modes appears in Home Assistant.
+The ESP32 controls the Truma Aventa Gen 2 air conditioner over the same LIN bus as the heater — no second device required. A full climate entity with all operating modes appears in Home Assistant. According to user feedback this also works with the first generation Aventa (issue #26, #28).
 
 Supported modes:
 

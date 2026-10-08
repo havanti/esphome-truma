@@ -71,7 +71,7 @@ Ein Template-Sensor (Diesel De-coking Remaining Time, Einheit: min) zeigt die ve
 
 <img src="img/Aventa.png" width="500" alt="Truma Aventa Gen 2 Klimaanlage">
 
-Der ESP32 steuert die Truma Aventa Gen 2 Klimaanlage über denselben LIN-Bus wie die Heizung — kein zweites Gerät nötig. In Home Assistant erscheint eine vollständige Climate-Entität mit allen Betriebsmodi.
+Der ESP32 steuert die Truma Aventa Gen 2 Klimaanlage über denselben LIN-Bus wie die Heizung — kein zweites Gerät nötig. In Home Assistant erscheint eine vollständige Climate-Entität mit allen Betriebsmodi. Laut Rückmeldungen funktioniert das auch mit der Aventa der ersten Generation (Issue #26, #28).
 
 Unterstützte Modi:
 
