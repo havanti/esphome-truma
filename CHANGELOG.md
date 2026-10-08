@@ -13,9 +13,10 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Zusammenfassung
 
 Neu ist ein experimenteller Binärsensor für 230 V Landstrom an der Combi D, an einer Heizung noch
-nicht bestätigt. Das AUTO-Soll der Aventa zeigt bei AUTO aus „Unbekannt“ statt 0 °C. Licht und AUTO
-der Aventa aus 1.0.38 sind weiterhin nicht an einer Aventa bestätigt, die Absicherung der
-LIN-Kommunikation aus 1.0.34 nicht an einem LIN-Bus.
+nicht bestätigt. Das AUTO-Soll der Aventa zeigt bei AUTO aus „Unbekannt“ statt 0 °C. AUTO und Licht
+der Aventa aus 1.0.38 sind bestätigt, AUTO an einer Aventa Compact Plus 2nd Gen, das Licht laut
+Rückmeldung an einer Aventa der ersten Generation (Issue #28). Die Absicherung der
+LIN-Kommunikation aus 1.0.34 ist an einem LIN-Bus noch nicht bestätigt.
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
