@@ -26,6 +26,8 @@ CONF_SUPPORTED_TYPE = {
     "ROOM": truma_inetbox_ns.class_("TrumaRoomClimate", climate.Climate, cg.Component),
     "WATER": truma_inetbox_ns.class_("TrumaWaterClimate", climate.Climate, cg.Component),
     "AIRCON": truma_inetbox_ns.class_("TrumaAirconClimate", climate.Climate, cg.Component),
+    # AUTO on the CP Plus. Experimental, not confirmed on hardware yet.
+    "AIRCON_AUTO": truma_inetbox_ns.class_("TrumaAirconAutoClimate", climate.Climate, cg.Component),
 }
 
 AIRCON_DEFAULT_MODES = ["OFF", "COOL", "HEAT", "HEAT_COOL", "FAN_ONLY"]

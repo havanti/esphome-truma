@@ -15,6 +15,7 @@
 #   select   – Truma Aircon Mode    (Off / Ventilation / Cooling / Heating / Auto)
 #   select   – Truma Aircon Vent    (Low / Mid / High / Night / Auto)
 #   number   – Truma Aircon Temp    (15–31 °C)
+#   climate/number – Truma Aircon Auto (AUTO on the CP Plus, experimental, commented out below)
 
 esphome:
   name: "truma"
@@ -101,6 +102,12 @@ climate:
     #   - "HEAT_COOL"
     #   - "FAN_ONLY"
 
+  # Experimental: AUTO on the CP Plus (heater and aircon together), not confirmed on hardware yet
+  # - platform: truma_inetbox
+  #   truma_inetbox_id: truma_inetbox_id
+  #   name: "Aircon Auto"
+  #   type: AIRCON_AUTO
+
 select:
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
@@ -118,11 +125,17 @@ number:
     name: "Aircon Temperature"
     type: AIRCON_MANUAL_TEMPERATURE
 
-  # Aventa light: 0 = off, 1-5 = level (not yet confirmed)
+  # Aventa light: 0 = off, 1-5 = level
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
     name: "Aircon Light"
     type: AIRCON_LIGHT
+
+  # Experimental: AUTO target on the CP Plus, 0 = AUTO off, not confirmed on hardware yet
+  # - platform: truma_inetbox
+  #   truma_inetbox_id: truma_inetbox_id
+  #   name: "Aircon Auto Temperature"
+  #   type: AIRCON_AUTO_TEMPERATURE
 
 sensor:
   # AUTO target selected on the CP Plus, unknown while AUTO is off

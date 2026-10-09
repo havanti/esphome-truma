@@ -12,14 +12,24 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Neu ist ein experimenteller Binärsensor für 230 V Landstrom an der Combi D, noch nicht bestätigt.
-AUTO-Anzeige und Licht der Aventa sind bestätigt (Issue #28).
+Neu ist das Setzen von AUTO am CP Plus aus HA, experimentell und noch nicht bestätigt. Der
+Landstrom-Sensor der Combi D aus 1.0.39 ist ebenfalls noch nicht bestätigt. AUTO-Anzeige und Licht
+der Aventa sind bestätigt (Issue #28).
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.40] — 2026-10-09 — Aventa: AUTO aus HA setzen (experimentell)
+
+### Hinzugefügt
+- `truma_inetbox`: Klima-Entität `AIRCON_AUTO` und Number `AIRCON_AUTO_TEMPERATURE` schalten AUTO am
+  CP Plus ein und aus und setzen das Soll. Experimentell, an der Hardware noch nicht bestätigt.
+
+### Dokumentation
+- README und Aventa-Beispiel um AUTO aus HA ergänzt, die Entitäten sind im Beispiel auskommentiert.
 
 ## [1.0.39] — 2026-10-07 — Combi D: Landstrom an der Heizung (experimentell)
 

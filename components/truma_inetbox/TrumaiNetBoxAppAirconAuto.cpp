@@ -60,5 +60,19 @@ bool TrumaiNetBoxAppAirconAuto::can_update() {
          this->parent_->get_aircon_device() != TRUMA_DEVICE::UNKNOWN;
 }
 
+bool TrumaiNetBoxAppAirconAuto::action_set_temp(uint8_t temperature) {
+  if (!this->can_update()) {
+    ESP_LOGW(TAG, "Cannot update Truma aircon AUTO.");
+    return false;
+  }
+
+  auto update_data = this->update_prepare();
+  // The CP Plus reports 0 while AUTO is off (issue #28 logs), values below 16 °C map to 0.
+  update_data->target_temp_aircon_auto = decimal_to_aircon_auto_temp(temperature);
+
+  this->update_submit();
+  return true;
+}
+
 }  // namespace truma_inetbox
 }  // namespace esphome

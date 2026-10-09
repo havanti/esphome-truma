@@ -12,14 +12,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release adds an experimental binary sensor for 230 V shore power at the Combi D, not confirmed
-yet. AUTO display and light of the Aventa are confirmed (issue #28).
+This release adds setting AUTO on the CP Plus from HA, experimental and not confirmed yet. The shore
+power sensor of the Combi D from 1.0.39 is not confirmed yet either. AUTO display and light of the
+Aventa are confirmed (issue #28).
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.40] — 2026-10-09 — Aventa: set AUTO from HA (experimental)
+
+### Added
+- `truma_inetbox`: climate entity `AIRCON_AUTO` and number `AIRCON_AUTO_TEMPERATURE` switch AUTO on
+  the CP Plus on and off and set the target. Experimental, not confirmed on hardware yet.
+
+### Documentation
+- README and Aventa example extended with AUTO from HA, the entities are commented out in the example.
 
 ## [1.0.39] — 2026-10-07 — Combi D: shore power at the heater (experimental)
 
