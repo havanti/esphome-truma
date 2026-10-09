@@ -89,18 +89,6 @@ CONF_SUPPORTED_TYPE = {
         CONF_MIN_VALUE: 0,
         CONF_STEP: 1,
     },
-    # AUTO target on the CP Plus. Experimental, not confirmed on hardware yet.
-    "AIRCON_AUTO_TEMPERATURE": {
-        CONF_CLASS: truma_inetbox_ns.class_("TrumaAirconAutoNumber", number.Number, cg.Component),
-        CONF_TYPE: TRUMA_NUMBER_TYPE_dummy_ns.AIRCON_AUTO_TEMPERATURE,
-        CONF_UNIT_OF_MEASUREMENT: UNIT_CELSIUS,
-        CONF_ICON: ICON_THERMOMETER,
-        CONF_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
-        CONF_MAX_VALUE: 31,
-        # Values between 0 and 15 switch AUTO off.
-        CONF_MIN_VALUE: 0,
-        CONF_STEP: 1,
-    },
 }
 
 

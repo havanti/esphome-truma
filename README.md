@@ -87,7 +87,7 @@ Lüftergeschwindigkeiten: Low / Mid / High / Night / Auto
 
 Temperaturbereich: 16–31 °C, Schrittweite 1 °C
 
-Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37). Der Aventa-Frame bleibt dabei auf Aus, deshalb zeigen die Klima-Entität und die Selects weiter „Off“. Ob AUTO am CP Plus läuft und mit welchem Soll, zeigen der Binärsensor `AIRCON_AUTO_ACTIVE` und der Sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. Ausgewertet ist das anhand von Logs einer Aventa Compact Plus 2. Generation (Issue #28), nach dem Einschalten steht im Frame das Soll, nach dem Ausschalten 0, der Sensor zeigt dann „Unbekannt“. An dieser Aventa ist die Anzeige inzwischen bestätigt. Seit 1.0.40 lässt sich AUTO experimentell auch aus HA setzen, über die Klima-Entität `AIRCON_AUTO` (Aus/Auto und Soll) oder die Number `AIRCON_AUTO_TEMPERATURE` (0 = AUTO aus). Das ist an keiner Anlage getestet, ob der CP Plus die Befehle annimmt, ist offen. Im Aventa-Beispiel sind beide Entitäten deshalb auskommentiert.
+Wird am CP Plus AUTO gewählt, meldet der CP Plus das in einem eigenen Frame (0x37). Der Aventa-Frame bleibt dabei auf Aus, deshalb zeigen die Klima-Entität und die Selects weiter „Off“. Ob AUTO am CP Plus läuft und mit welchem Soll, zeigen der Binärsensor `AIRCON_AUTO_ACTIVE` und der Sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. Ausgewertet ist das anhand von Logs einer Aventa Compact Plus 2. Generation (Issue #28), nach dem Einschalten steht im Frame das Soll, nach dem Ausschalten 0, der Sensor zeigt dann „Unbekannt“. An dieser Aventa ist die Anzeige inzwischen bestätigt. Das Setzen von AUTO aus HA (1.0.40) lehnt der CP Plus ab, es ist seit 1.0.41 wieder entfernt.
 
 Licht: Die Number `AIRCON_LIGHT` zeigt die Lichtstufe der Aventa (0 = aus, 1–5) und stellt sie ein, ausgewertet wird dafür Byte 6–7 des Aventa-Frames. Jeder Schreibbefehl an die Aventa schickt die zuletzt gemeldete Lichtstufe mit, bis 1.0.37 stand dort 0. Laut Rückmeldung aus Issue #28 funktioniert das Licht an einer Aventa der ersten Generation.
 
@@ -451,7 +451,6 @@ Folgende `type`-Werte sind verfügbar:
 - `ROOM`
 - `WATER`
 - `AIRCON` — Truma Aventa Gen 2
-- `AIRCON_AUTO` — AUTO am CP Plus, Aus/Auto und Soll (experimentell, Aventa)
 
 ### Number
 
@@ -471,7 +470,6 @@ Folgende `type`-Werte sind verfügbar:
 - `ELECTRIC_POWER_LEVEL`
 - `AIRCON_MANUAL_TEMPERATURE`
 - `AIRCON_LIGHT` — Lichtstufe Aventa, 0 = aus, 1–5
-- `AIRCON_AUTO_TEMPERATURE` — AUTO-Soll am CP Plus, 0 = AUTO aus (experimentell, Aventa)
 
 ### Select
 

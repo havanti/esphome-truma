@@ -12,9 +12,9 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Neu ist das Setzen von AUTO am CP Plus aus HA, experimentell und noch nicht bestätigt. Der
-Landstrom-Sensor der Combi D aus 1.0.39 ist ebenfalls noch nicht bestätigt. AUTO-Anzeige und Licht
-der Aventa sind bestätigt (Issue #28).
+Das Setzen von AUTO aus HA (1.0.40) lehnt der CP Plus ab, es ist wieder entfernt. Der
+Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und Licht der Aventa
+sind bestätigt (Issue #28).
 
 Getestet mit:
 - ESPHome **2026.9.1** — ESP-IDF ✅
@@ -22,11 +22,21 @@ Getestet mit:
 ---
 
 
+## [1.0.41] — 2026-10-09 — Aventa: AUTO aus HA wieder entfernt
+
+### Entfernt
+- `truma_inetbox`: Klima-Entität `AIRCON_AUTO` und Number `AIRCON_AUTO_TEMPERATURE` aus 1.0.40. Der
+  CP Plus lehnt den Befehl ab (Issue #28). Wer sie in der YAML hat, muss sie dort löschen, die
+  AUTO-Anzeige bleibt.
+
+### Dokumentation
+- README und Aventa-Beispiel angepasst.
+
 ## [1.0.40] — 2026-10-09 — Aventa: AUTO aus HA setzen (experimentell)
 
 ### Hinzugefügt
 - `truma_inetbox`: Klima-Entität `AIRCON_AUTO` und Number `AIRCON_AUTO_TEMPERATURE` schalten AUTO am
-  CP Plus ein und aus und setzen das Soll. Experimentell, an der Hardware noch nicht bestätigt.
+  CP Plus ein und aus und setzen das Soll. Vom CP Plus abgelehnt (Issue #28), in 1.0.41 entfernt.
 
 ### Dokumentation
 - README und Aventa-Beispiel um AUTO aus HA ergänzt, die Entitäten sind im Beispiel auskommentiert.

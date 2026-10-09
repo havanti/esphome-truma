@@ -12,9 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-This release adds setting AUTO on the CP Plus from HA, experimental and not confirmed yet. The shore
-power sensor of the Combi D from 1.0.39 is not confirmed yet either. AUTO display and light of the
-Aventa are confirmed (issue #28).
+Setting AUTO from HA (1.0.40) is rejected by the CP Plus and was removed again. The shore power
+sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO display and light of the Aventa are
+confirmed (issue #28).
 
 Tested against:
 - ESPHome **2026.9.1** — ESP-IDF ✅
@@ -22,11 +22,21 @@ Tested against:
 ---
 
 
+## [1.0.41] — 2026-10-09 — Aventa: AUTO from HA removed again
+
+### Removed
+- `truma_inetbox`: climate entity `AIRCON_AUTO` and number `AIRCON_AUTO_TEMPERATURE` from 1.0.40. The
+  CP Plus rejects the command (issue #28). Please delete these entries from your YAML, the AUTO
+  display stays.
+
+### Documentation
+- README and Aventa example updated.
+
 ## [1.0.40] — 2026-10-09 — Aventa: set AUTO from HA (experimental)
 
 ### Added
 - `truma_inetbox`: climate entity `AIRCON_AUTO` and number `AIRCON_AUTO_TEMPERATURE` switch AUTO on
-  the CP Plus on and off and set the target. Experimental, not confirmed on hardware yet.
+  the CP Plus on and off and set the target. Rejected by the CP Plus (issue #28), removed in 1.0.41.
 
 ### Documentation
 - README and Aventa example extended with AUTO from HA, the entities are commented out in the example.
