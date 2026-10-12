@@ -9,6 +9,10 @@ namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.TrumaiNetBoxAppClock";
 
+// Verified on CP-Plus C3.00.00: the clock write (0A 14) is ignored and the panel stops serving the
+// iNet Box until the next cycle. The write is only sent once the CP-Plus is known and is not a C3.
+static constexpr uint8_t CPPLUS_C3_SOFTWARE_MAJOR = 0x03;
+
 void TrumaiNetBoxAppClock::dump_data() const {
   ESP_LOGD(TAG, "StatusFrameClock %02d:%02d:%02d", this->data_.clock_hour, this->data_.clock_minute,
            this->data_.clock_second);
@@ -18,6 +22,16 @@ void TrumaiNetBoxAppClock::dump_data() const {
 bool TrumaiNetBoxAppClock::action_write_time() {
   if (!this->can_update()) {
     ESP_LOGW(TAG, "Cannot update Truma.");
+    return false;
+  }
+
+  const uint8_t cpplus_major = this->parent_->get_cpplus_software_major();
+  if (cpplus_major == 0) {
+    ESP_LOGW(TAG, "CP Plus software unknown, not syncing the clock.");
+    return false;
+  }
+  if (cpplus_major == CPPLUS_C3_SOFTWARE_MAJOR) {
+    ESP_LOGW(TAG, "CP Plus C3 does not accept a clock write, not syncing the clock.");
     return false;
   }
 

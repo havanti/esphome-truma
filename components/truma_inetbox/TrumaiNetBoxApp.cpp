@@ -10,8 +10,9 @@ namespace truma_inetbox {
 static const char *const TAG = "truma_inetbox.TrumaiNetBoxApp";
 
 static constexpr uint32_t CLOCK_SYNC_DELAY_US = 30 * 1000 * 1000;   // 30 seconds after init before syncing time
-static constexpr uint32_t INIT_RETRY_DELAY_US = 5 * 1000 * 1000;    // 5 seconds before retrying init request
-static constexpr uint32_t UPDATE_RETRY_DELAY_US = 5 * 1000 * 1000;  // 5 seconds before retrying update notification
+// 20 seconds before retrying the init request: on a CP Plus C3 the device lists and status buffers it triggers take
+// ~13 s.
+static constexpr uint32_t INIT_RETRY_DELAY_US = 20 * 1000 * 1000;
 static constexpr uint8_t STATUS_2_MIN_LENGTH = 2;                   // PID 0x22: only bytes 0 and 1 are exposed
 static constexpr uint8_t COMMAND_STATUS_VENT_BYTE = 5;              // PID 0x20: vent mode in the high nibble
 static constexpr uint8_t VENT_MODE_SHIFT = 4;
@@ -24,6 +25,9 @@ static constexpr uint8_t HEATER_STATUS_LEGACY_ROOM_HIGH = 3;
 static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_0AAA = 0x0AAA;
 static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_AAAA = 0xAAAA;
 static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_ZERO = 0x0000;
+// The original box always transfers the full 40-byte buffer (first frame 03 10 29 FA); CP-Plus C3.00.00
+// accepted every upload in that form. Shorter Truma frames are padded with zeros (checksum unchanged).
+static constexpr uint8_t TRUMA_TRANSFER_LEN = 41;  // SID + 40-byte buffer
 
 TrumaiNetBoxApp::TrumaiNetBoxApp() {
   this->airconAuto_.set_parent(this);
@@ -97,6 +101,7 @@ void TrumaiNetBoxApp::lin_reset_device() {
   LinBusProtocol::lin_reset_device();
   this->device_registered_.store(micros(), std::memory_order_relaxed);
   this->init_received_.store(0, std::memory_order_relaxed);
+  this->init_request_sent_.store(0, std::memory_order_relaxed);
 
   this->airconAuto_.reset();
   this->airconManual_.reset();
@@ -104,8 +109,6 @@ void TrumaiNetBoxApp::lin_reset_device() {
   this->config_.reset();
   this->heater_.reset();
   this->timer_.reset();
-
-  this->update_time_.store(0, std::memory_order_relaxed);
 }
 
 bool TrumaiNetBoxApp::answer_lin_order_(const uint8_t pid) {
@@ -191,35 +194,31 @@ void TrumaiNetBoxApp::publish_heater_flags_() {
   this->heater_flags_callback_.call(flags);
 }
 
-bool TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) {
+uint8_t TrumaiNetBoxApp::lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) {
+  // Answers of the original iNet Box (WomoLIN C4.01.01 init logs). Verified on CP-Plus C3.00.00:
+  // the panel registers the box without B0 and lists it as T2.02.00.
   if (identifier == 0x00 /* LIN Product Identification */) {
     const auto lin_identifier = this->lin_identifier();
-    (*response)[0] = lin_identifier[0];
-    (*response)[1] = lin_identifier[1];
-    (*response)[2] = lin_identifier[2];
-    (*response)[3] = lin_identifier[3];
-    (*response)[4] = 0x01;  // Variant
-    return true;
-  } else if (identifier == 0x20 /* Product details to display in CP plus */) {
-    const auto lin_identifier = this->lin_identifier();
-    // Only the first three parts are displayed.
-    (*response)[0] = lin_identifier[0];
-    (*response)[1] = lin_identifier[1];
-    (*response)[2] = lin_identifier[2];
-    // (*response)[3] = // unknown
-    // (*response)[4] = // unknown
-    return true;
-  } else if (identifier == 0x22 /* unknown usage */) {
-    // Init is failing if missing
-    // Data can be anything?
-    return true;
+    std::copy(lin_identifier.begin(), lin_identifier.end(), response->begin());
+    (*response)[4] = 0x00;  // Variant
+    return 5;
+  } else if (identifier == 0x20 /* Software version shown in the CP Plus device list */) {
+    (*response)[0] = 0x02;
+    (*response)[1] = 0x02;
+    (*response)[2] = 0x00;
+    return 3;
+  } else if (identifier == 0x22 /* unknown usage, asked by C4 panels; init fails if missing */) {
+    (*response)[0] = 0x03;
+    (*response)[1] = 0x07;
+    (*response)[2] = 0x00;
+    return 3;
   }
-  return false;
+  return 0;
 }
 
 const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, const uint8_t message_len,
                                                          uint8_t *return_len) {
-  static uint8_t response[sizeof(StatusFrame)] = {};
+  static uint8_t response[sizeof(StatusFrame) > TRUMA_TRANSFER_LEN ? sizeof(StatusFrame) : TRUMA_TRANSFER_LEN] = {};
   // Validate message prefix.
   if (message_len < truma_message_header.size()) {
     return nullptr;
@@ -238,41 +237,39 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
     // Example: BA.00.1F.00.1E.00.00.22.FF.FF.FF (11)
     memset(response, 0, sizeof(response));
     auto response_frame = reinterpret_cast<StatusFrame *>(response);
+    bool answered = true;
 
     // The order must match with the method 'has_update_to_submit_'.
     if (this->init_received_.load(std::memory_order_relaxed) == 0) {
       ESP_LOGD(TAG, "Requested read: Sending init");
       status_frame_create_init(response_frame, return_len, this->message_counter++);
-      return response;
+      this->init_request_sent_.store(micros(), std::memory_order_relaxed);
     } else if (this->heater_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending heater update");
       this->heater_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_.store(0, std::memory_order_relaxed);
-      return response;
     } else if (this->timer_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending timer update");
       this->timer_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_.store(0, std::memory_order_relaxed);
-      return response;
     } else if (this->airconManual_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending aircon manual update");
       this->airconManual_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_.store(0, std::memory_order_relaxed);
-      return response;
     } else if (this->airconAuto_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending aircon auto update");
       this->airconAuto_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_.store(0, std::memory_order_relaxed);
-      return response;
 #ifdef USE_TIME
     } else if (this->clock_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending clock update");
       this->clock_.create_update_data(response_frame, return_len, this->message_counter++);
-      this->update_time_.store(0, std::memory_order_relaxed);
-      return response;
 #endif  // USE_TIME
     } else {
       ESP_LOGW(TAG, "Requested read: CP Plus asks for an update, but I have none.");
+      answered = false;
+    }
+    if (answered) {
+      if (*return_len > 0 && *return_len < TRUMA_TRANSFER_LEN) {
+        *return_len = TRUMA_TRANSFER_LEN;
+      }
+      return response;
     }
   }
 
@@ -440,7 +437,9 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
     // first submitted device is CP Plus device
     const auto is_CPPLUSDevice = device.device_id == 0;
 
-    if (!is_CPPLUSDevice) {
+    if (is_CPPLUSDevice) {
+      this->cpplus_software_major_.store(device.software_revision[0], std::memory_order_relaxed);
+    } else {
       // Assumption first device is Heater
       if (device.device_id == 1) {
         this->heater_device_.store(truma_device, std::memory_order_relaxed);
@@ -473,32 +472,16 @@ bool TrumaiNetBoxApp::has_update_to_submit_() {
   // No logging in this message!
   // It is called by interrupt. Logging is a blocking operation (especially when Wifi Logging).
   // If logging is necessary use logging queue of LinBusListener class.
-  if (this->init_requested_.load(std::memory_order_relaxed) == 0) {
-    this->init_requested_.store(micros(), std::memory_order_relaxed);
-    return true;
-  } else if (this->init_received_.load(std::memory_order_relaxed) == 0) {
+  // The flag stays on every 0x18 poll until the CP Plus reads BA: a CP Plus C3 with the panel asleep ignores a
+  // single FF per idle burst.
+  if (this->init_received_.load(std::memory_order_relaxed) == 0) {
+    auto init_request_sent = this->init_request_sent_.load(std::memory_order_relaxed);
+    // No device list INIT_RETRY_DELAY_US after the init request went out: ask again.
     // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
-    auto init_wait_time = micros() - this->init_requested_.load(std::memory_order_relaxed);
-    // it has been 5 seconds and i am still awaiting the init data.
-    if (init_wait_time > INIT_RETRY_DELAY_US) {
-      this->init_requested_.store(micros(), std::memory_order_relaxed);
-      return true;
-    }
-  } else if (this->airconAuto_.has_update() || this->airconManual_.has_update() || this->clock_.has_update() ||
-             this->heater_.has_update() || this->timer_.has_update()) {
-    auto update_time_snapshot = this->update_time_.load(std::memory_order_relaxed);
-    if (update_time_snapshot == 0) {
-      this->update_time_.store(micros(), std::memory_order_relaxed);
-      return true;
-    }
-    // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
-    auto update_wait_time = micros() - update_time_snapshot;
-    if (update_wait_time > UPDATE_RETRY_DELAY_US) {
-      this->update_time_.store(micros(), std::memory_order_relaxed);
-      return true;
-    }
+    return init_request_sent == 0 || micros() - init_request_sent > INIT_RETRY_DELAY_US;
   }
-  return false;
+  return this->airconAuto_.has_update() || this->airconManual_.has_update() || this->clock_.has_update() ||
+         this->heater_.has_update() || this->timer_.has_update();
 }
 
 }  // namespace truma_inetbox

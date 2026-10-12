@@ -21,7 +21,8 @@ class LinBusProtocol : public LinBusListener {
   bool answer_lin_order_(const uint8_t pid) override;
   void lin_message_received_(const uint8_t pid, const uint8_t *message, uint8_t length) override;
 
-  virtual bool lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) = 0;
+  // Data bytes of a Read-by-Identifier answer (up to 5) and their number; 0 = identifier not supported.
+  virtual uint8_t lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) = 0;
   virtual const uint8_t *lin_multiframe_received(const uint8_t *message, const uint8_t message_len,
                                                   uint8_t *return_len) = 0;
 

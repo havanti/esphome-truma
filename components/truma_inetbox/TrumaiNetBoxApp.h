@@ -31,6 +31,8 @@ class TrumaiNetBoxApp : public LinBusProtocol {
 
   TRUMA_DEVICE get_heater_device() const { return this->heater_device_.load(std::memory_order_relaxed); }
   TRUMA_DEVICE get_aircon_device() const { return this->aircon_device_.load(std::memory_order_relaxed); }
+  // Software major of the CP-Plus (device 0 of the device list), 0 until known. C3.00.00 reports 0x03.
+  uint8_t get_cpplus_software_major() const { return this->cpplus_software_major_.load(std::memory_order_relaxed); }
 
   TrumaiNetBoxAppAirconAuto *get_aircon_auto() { return &this->airconAuto_; }
   TrumaiNetBoxAppAirconManual *get_aircon_manual() { return &this->airconManual_; }
@@ -68,7 +70,8 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   // Truma CP Plus needs init (reset). This device is not registered.
   // Accessed from both the UART ISR/task and the main loop — must be atomic.
   std::atomic<uint32_t> device_registered_{0};
-  std::atomic<uint32_t> init_requested_{0};
+  // micros() when BA last carried the init request; 0 = not sent since the last reset.
+  std::atomic<uint32_t> init_request_sent_{0};
   std::atomic<uint32_t> init_received_{0};
   uint8_t message_counter = 1;
 
@@ -77,6 +80,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   // Written from lin_event_task, read from main loop — must be atomic.
   std::atomic<TRUMA_DEVICE> heater_device_{TRUMA_DEVICE::UNKNOWN};
   std::atomic<TRUMA_DEVICE> aircon_device_{TRUMA_DEVICE::UNKNOWN};
+  std::atomic<uint8_t> cpplus_software_major_{0};
 
   TrumaiNetBoxAppAirconAuto airconAuto_;
   TrumaiNetBoxAppAirconManual airconManual_;
@@ -84,9 +88,6 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   TrumaiNetBoxAppConfig config_;
   TrumaiNetBoxAppHeater heater_;
   TrumaiNetBoxAppTimer timer_;
-
-  // last time CP plus was informed I got an update msg.
-  std::atomic<uint32_t> update_time_{0};
 
   // PID 0x22 bytes 0 (low) and 1 (high). Written from lin_event_task, read from main loop.
   std::atomic<uint16_t> status_2_raw_{0};
@@ -125,7 +126,7 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   void publish_vent_mode_();
   void publish_heater_flags_();
 
-  bool lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) override;
+  uint8_t lin_read_field_by_identifier_(uint8_t identifier, std::array<uint8_t, 5> *response) override;
   const uint8_t *lin_multiframe_received(const uint8_t *message, const uint8_t message_len,
                                           uint8_t *return_len) override;
 
