@@ -81,7 +81,6 @@ void TrumaHeaterSelect::control(const std::string &value) {
   if (!index.has_value()) {
     return;
   }
-  auto heater_device = this->parent_->get_heater_device();
   auto status_heater = this->parent_->get_heater()->get_status();
   float temp = temp_code_to_decimal(status_heater->target_temp_room, 0);
   if (index.value() > 0 && temp < 5) {
@@ -93,21 +92,13 @@ void TrumaHeaterSelect::control(const std::string &value) {
       switch ((TRUMA_SELECT_TYPE_HEATER_FAN_MODE) index.value()) {
         case TRUMA_SELECT_TYPE_HEATER_FAN_MODE::ECO:
           // case TRUMA_SELECT_TYPE_HEATER_FAN_MODE::VARIO_HEAT_NIGHT:
-          if (heater_device == TRUMA_DEVICE::CPPLUS_VARIO) {
-            this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp),
-                                                         HeatingMode::HEATING_MODE_VARIO_HEAT_NIGHT);
-          } else {
-            this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp), HeatingMode::HEATING_MODE_ECO);
-          }
+          this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp),
+                                                       this->parent_->get_heater()->fan_mode_heating_mode(false));
           break;
         case TRUMA_SELECT_TYPE_HEATER_FAN_MODE::COMBI_HIGH:
           // case TRUMA_SELECT_TYPE_HEATER_FAN_MODE::VARIO_HEAT_AUTO:
-          if (heater_device == TRUMA_DEVICE::CPPLUS_VARIO) {
-            this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp),
-                                                         HeatingMode::HEATING_MODE_VARIO_HEAT_AUTO);
-          } else {
-            this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp), HeatingMode::HEATING_MODE_HIGH);
-          }
+          this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp),
+                                                       this->parent_->get_heater()->fan_mode_heating_mode(true));
           break;
         case TRUMA_SELECT_TYPE_HEATER_FAN_MODE::BOOST:
           this->parent_->get_heater()->action_heater_room(static_cast<uint8_t>(temp), HeatingMode::HEATING_MODE_BOOST);

@@ -52,7 +52,7 @@ void TrumaiNetBoxAppHeater::dump_data() const {
            temp_code_to_decimal(this->data_.target_temp_room), (uint16_t) this->data_.heating_mode,
            temp_code_to_decimal(this->data_.target_temp_water), (uint8_t) this->data_.energy_mix_a,
            (uint16_t) this->data_.el_power_level_a, operating_status_to_str(this->data_.operating_status).c_str());
-  if (this->data_.error_code_low != 0 || this->data_.error_code_high != 0) {
+  if (this->has_error()) {
     ESP_LOGW(TAG, "StatusFrameHeater error_code: 0x%02X 0x%02X", this->data_.error_code_low,
              this->data_.error_code_high);
   }
@@ -61,6 +61,18 @@ void TrumaiNetBoxAppHeater::dump_data() const {
 bool TrumaiNetBoxAppHeater::can_update() {
   return TrumaStausFrameResponseStorage<StatusFrameHeater, StatusFrameHeaterResponse>::can_update() &&
          this->parent_->get_heater_device() != TRUMA_DEVICE::UNKNOWN;
+}
+
+// E212 arrives as low 0xD4, high 0x00: either byte marks an error.
+bool TrumaiNetBoxAppHeater::has_error() const {
+  return this->data_.error_code_low != 0x00 || this->data_.error_code_high != 0x00;
+}
+
+HeatingMode TrumaiNetBoxAppHeater::fan_mode_heating_mode(bool high) const {
+  if (this->parent_->get_heater_device() == TRUMA_DEVICE::HEATER_VARIO) {
+    return high ? HeatingMode::HEATING_MODE_VARIO_HEAT_AUTO : HeatingMode::HEATING_MODE_VARIO_HEAT_NIGHT;
+  }
+  return high ? HeatingMode::HEATING_MODE_HIGH : HeatingMode::HEATING_MODE_ECO;
 }
 
 bool TrumaiNetBoxAppHeater::action_heater_room(uint8_t temperature, HeatingMode mode) {

@@ -52,6 +52,12 @@ void LinBusProtocol::lin_message_received_(const uint8_t pid, const uint8_t *mes
       bool my_node_address = message[0] == this->lin_node_address_;
       bool broadcast_address = message[0] == LIN_NAD_BROADCAST;
       if (!my_node_address && !broadcast_address) {
+        // A master request to another node ends any answer still pending for us: the master will not
+        // poll 0x3D for us any more, and a late answer would collide with the other node's response.
+        if (this->has_update_to_send_()) {
+          xQueueReset(this->updates_to_send_);
+          ESP_LOGW(TAG, "Pending LIN answer dropped: master addressed NAD %02X.", message[0]);
+        }
         return;
       }
     }
