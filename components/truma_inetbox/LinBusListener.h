@@ -61,6 +61,9 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
   bool check_for_lin_fault_();
   virtual bool answer_lin_order_(const uint8_t pid) = 0;
   virtual void lin_message_received_(const uint8_t pid, const uint8_t *message, uint8_t length) = 0;
+  // Reads every available UART byte through the LIN state machine. Called by uartEventTask_ and by
+  // host-side test harnesses that feed bytes without an ESP32 UART.
+  void onReceive_();
 
  private:
   // Microseconds per UART Baud
@@ -106,7 +109,6 @@ class LinBusListener : public PollingComponent, public uart::UARTDevice {
     this->current_data_count_ = 0;
     memset(this->current_data_, 0, sizeof(this->current_data_));
   };
-  void onReceive_();
   void read_lin_frame_();
   void clear_uart_buffer_();
   void setup_framework();
