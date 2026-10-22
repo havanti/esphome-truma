@@ -12,16 +12,28 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). Die Lüfterauswahl an der
-Combi 6 Gas hat Marco ebenfalls bestätigt. `HEATER_HAS_ERROR` meldet jetzt auch Warnungen. Der
-Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und Licht der Aventa
-sind bestätigt (Issue #28).
+Neu in 1.0.46: Die Klimaautomatik am CP Plus lässt sich wieder aus HA setzen, experimentell und noch
+nicht bestätigt. Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). Die
+Lüfterauswahl an der Combi 6 Gas hat Marco ebenfalls bestätigt. `HEATER_HAS_ERROR` meldet jetzt auch
+Warnungen. Der Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und
+Licht der Aventa sind bestätigt (Issue #28).
 
 Getestet mit:
 - ESPHome **2026.10.0** — ESP-IDF ✅
 
 ---
 
+
+## [1.0.46] — 2026-10-24 — Aventa: AUTO aus HA setzen (experimentell)
+
+### Hinzugefügt
+- `truma_inetbox`: Klima-Entität `AIRCON_AUTO` und Number `AIRCON_AUTO_TEMPERATURE` schalten die
+  Klimaautomatik am CP Plus wieder ein und aus und setzen das Soll (18–25 °C). Das Format stammt aus
+  Mitschnitten einer originalen iNet Box (Issue #32). Noch nicht bestätigt.
+
+### Dokumentation
+- README und Aventa-Beispiel um AUTO aus HA ergänzt, die Entitäten sind im Beispiel auskommentiert.
+  `VENT_MODE` zeigt die Stufen 1–10 auch an einer weiteren Combi (Issue #32).
 
 ## [1.0.45] — 2026-10-15 — Aufräumen
 
