@@ -266,15 +266,18 @@ struct StatusFrameAirconAuto {  // NOLINT(altera-struct-pack-align)
   TargetTemp current_temp_water;
 } __attribute__((packed));
 
+// Length 12 (0x0C) - as written by an original iNet Box (issue #32 logs): the status frame without bytes 4-5.
+// The 14 byte variant of 1.0.40 with the target at offset 6 was rejected by the CP Plus with FAILED 02.
 struct StatusFrameAirconAutoResponse {  // NOLINT(altera-struct-pack-align)
   EnergyMix energy_mix_a;
   uint8_t unknown_02;  // 0x00
   EnergyMix energy_mix_b;
   uint8_t unknown_04;  // 0x00
-  uint8_t unknown_05;  // 0x00
-  uint8_t unknown_06;  // 0x00
+  // 0 switches AUTO off
   TargetTemp target_temp_aircon_auto;
+  // Only 0 seen in the logs, same as in the status frame
   ElectricPowerLevel el_power_level_a;
+  // The iNet Box sends the current water target along
   TargetTemp target_temp_water;
   ElectricPowerLevel el_power_level_b;
 } __attribute__((packed));

@@ -41,6 +41,7 @@ static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_ZERO = 0x0000;
 static constexpr uint8_t TRUMA_TRANSFER_LEN = 41;  // SID + 40-byte buffer
 
 TrumaiNetBoxApp::TrumaiNetBoxApp() {
+  this->airconAuto_.set_parent(this);
   this->airconManual_.set_parent(this);
   this->clock_.set_parent(this);
   // this->config_.set_parent(this);
@@ -265,6 +266,9 @@ const uint8_t *TrumaiNetBoxApp::lin_multiframe_received(const uint8_t *message, 
     } else if (this->airconManual_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending aircon manual update");
       this->airconManual_.create_update_data(response_frame, return_len, this->message_counter++);
+    } else if (this->airconAuto_.has_update()) {
+      ESP_LOGD(TAG, "Requested read: Sending aircon auto update");
+      this->airconAuto_.create_update_data(response_frame, return_len, this->message_counter++);
 #ifdef USE_TIME
     } else if (this->clock_.has_update()) {
       ESP_LOGD(TAG, "Requested read: Sending clock update");
@@ -487,7 +491,7 @@ bool TrumaiNetBoxApp::has_update_to_submit_() {
     // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
     return init_request_sent == 0 || micros() - init_request_sent > INIT_RETRY_DELAY_US;
   }
-  return this->airconManual_.has_update() || this->clock_.has_update() ||
+  return this->airconAuto_.has_update() || this->airconManual_.has_update() || this->clock_.has_update() ||
          this->heater_.has_update() || this->timer_.has_update();
 }
 

@@ -91,7 +91,7 @@ Fan speeds: Low / Mid / High / Night / Auto
 
 Temperature range: 16–31 °C, step 1 °C
 
-The climate automatic of the CP Plus (AUTO with ACC = ON in the service menu) is a separate thing. The CP Plus reports it in a separate frame (0x37). The Aventa frame stays on off, so the climate entity and the selects still show "Off". Whether AUTO is running on the CP Plus and with which target is shown by the binary sensor `AIRCON_AUTO_ACTIVE` and the sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. This is based on logs of an Aventa Compact Plus 2nd Gen (issue #28), after switching on the frame holds the target, after switching off 0, and the sensor then shows "unknown". On this Aventa the display is confirmed by now. Setting AUTO from HA (1.0.40) is rejected by the CP Plus and was removed again in 1.0.41.
+The climate automatic of the CP Plus (AUTO with ACC = ON in the service menu) is a separate thing. The CP Plus reports it in a separate frame (0x37). The Aventa frame stays on off, so the climate entity and the selects still show "Off". Whether AUTO is running on the CP Plus and with which target is shown by the binary sensor `AIRCON_AUTO_ACTIVE` and the sensor `AIRCON_AUTO_TARGET_TEMPERATURE`. This is based on logs of an Aventa Compact Plus 2nd Gen (issue #28), after switching on the frame holds the target, after switching off 0, and the sensor then shows "unknown". On this Aventa the display is confirmed by now. Since 1.0.46 AUTO can be set from HA again as an experimental feature, with the climate entity `AIRCON_AUTO` (off/auto, target 18–25 °C) or the number `AIRCON_AUTO_TEMPERATURE` (below 18 = AUTO off). The format is taken from captures of an original iNet Box (issue #32). The version from 1.0.40 used a wrong format and was rejected by the CP Plus. Setting AUTO is not tested on a system without an iNet Box yet, so both entities are commented out in the Aventa example.
 
 Light: The number `AIRCON_LIGHT` shows the light level of the Aventa (0 = off, 1–5) and sets it, using bytes 6–7 of the Aventa frame. Every write command to the Aventa sends the last reported light level along, up to 1.0.37 there was 0. According to feedback in issue #28 the light works on a first generation Aventa.
 
@@ -455,6 +455,7 @@ The following `type` values are available:
 - `ROOM`
 - `WATER`
 - `AIRCON` — Truma Aventa Gen 2
+- `AIRCON_AUTO` — AUTO on the CP Plus, off/auto and target (experimental, Aventa)
 
 ### Number
 
@@ -474,6 +475,7 @@ The following `type` values are available:
 - `ELECTRIC_POWER_LEVEL`
 - `AIRCON_MANUAL_TEMPERATURE`
 - `AIRCON_LIGHT` — Aventa light level, 0 = off, 1–5
+- `AIRCON_AUTO_TEMPERATURE` — AUTO target on the CP Plus 18–25 °C, below AUTO off (experimental, Aventa)
 
 ### Select
 
@@ -549,7 +551,8 @@ reported when one of the two bytes changes.
 
 `VENT_MODE` shows the fan level, the upper digit of byte 5 in the LIN frame with PID 0x20: 0 off,
 1 to 10 fan level in pure ventilation mode (Vent), 11 heating fan Eco, 13 heating fan High. This
-matches inetbox.py and was checked on a Combi 4 (issue #25). The sensor is display only; the
+matches inetbox.py and was checked on a Combi 4 (issue #25), levels 1 to 10 also on another Combi
+(issue #32). The sensor is display only; the
 ventilation cannot be set through it. If the frame does not appear on the bus, the sensor stays
 without a value. Captures from a Combi D6 E contain no PIDs 0x20 to 0x22 at all. No further
 analysis of these PIDs is planned.

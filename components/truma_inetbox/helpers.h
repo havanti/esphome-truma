@@ -17,6 +17,11 @@ inline constexpr std::array<uint8_t, 11> alde_message_header = {0x00, 0x00, 0x1F
 inline constexpr uint8_t ROOM_SWITCH_ON_TEMPERATURE = 5;
 inline constexpr uint8_t WATER_SWITCH_ON_TEMPERATURE = 40;
 
+// AUTO range of the CP Plus with climate automatic (iNet app: 17.8-25 °C, default 22, 0 = off).
+inline constexpr uint8_t AIRCON_AUTO_TEMPERATURE_MIN = 18;
+inline constexpr uint8_t AIRCON_AUTO_TEMPERATURE_MAX = 25;
+inline constexpr uint8_t AIRCON_AUTO_TEMPERATURE_DEFAULT = 22;
+
 uint8_t addr_parity(const uint8_t pid);
 uint8_t data_checksum(const uint8_t *message, uint8_t length, uint16_t sum);
 float temp_code_to_decimal(uint16_t val, float zero = NAN);
@@ -28,6 +33,7 @@ TargetTemp decimal_to_room_temp(uint8_t val);
 TargetTemp decimal_to_room_temp(float val);
 TargetTemp decimal_to_aircon_manual_temp(uint8_t val);
 TargetTemp decimal_to_aircon_manual_temp(float val);
+TargetTemp decimal_to_aircon_auto_temp(uint8_t val);
 TargetTemp decimal_to_water_temp(uint8_t val);
 TargetTemp decimal_to_water_temp(float val);
 const std::string operating_status_to_str(OperatingStatus val);

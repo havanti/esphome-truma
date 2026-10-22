@@ -17,6 +17,7 @@
 #   number   – Truma Aircon Temp    (16–31 °C)
 #   number   – Truma Aircon Light   (0–5)
 #   sensor / binary_sensor – AUTO on the CP Plus (target, active), read-only
+#   climate/number – Truma Aircon Auto (setting AUTO on the CP Plus, experimental, commented out below)
 
 esphome:
   name: "truma"
@@ -104,6 +105,12 @@ climate:
     #   - "HEAT_COOL"
     #   - "FAN_ONLY"
 
+  # Experimental: AUTO on the CP Plus (climate automatic, ACC = ON), 18-25 °C, not confirmed on hardware yet
+  # - platform: truma_inetbox
+  #   truma_inetbox_id: truma_inetbox_id
+  #   name: "Aircon Auto"
+  #   type: AIRCON_AUTO
+
 select:
   - platform: truma_inetbox
     truma_inetbox_id: truma_inetbox_id
@@ -126,6 +133,12 @@ number:
     truma_inetbox_id: truma_inetbox_id
     name: "Aircon Light"
     type: AIRCON_LIGHT
+
+  # Experimental: AUTO target on the CP Plus, below 18 = AUTO off, not confirmed on hardware yet
+  # - platform: truma_inetbox
+  #   truma_inetbox_id: truma_inetbox_id
+  #   name: "Aircon Auto Temperature"
+  #   type: AIRCON_AUTO_TEMPERATURE
 
 sensor:
   # AUTO target selected on the CP Plus, unknown while AUTO is off

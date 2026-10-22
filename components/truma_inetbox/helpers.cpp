@@ -92,6 +92,16 @@ TargetTemp decimal_to_aircon_manual_temp(float val) {
   return decimal_to_temp(val);
 }
 
+TargetTemp decimal_to_aircon_auto_temp(uint8_t val) {
+  if (val < AIRCON_AUTO_TEMPERATURE_MIN) {
+    return TargetTemp::TARGET_TEMP_OFF;
+  }
+  if (val >= AIRCON_AUTO_TEMPERATURE_MAX) {
+    return TargetTemp::TARGET_TEMP_AIRCON_AUTO_MAX;
+  }
+  return decimal_to_temp(val);
+}
+
 TargetTemp decimal_to_water_temp(uint8_t val) {
   if (val < 40) {
     return TargetTemp::TARGET_TEMP_OFF;
