@@ -1,5 +1,5 @@
 ###############################
-# ESPHome Version >= 2026.9.1 #
+# ESPHome Version >= 2026.10.0 #
 # ESP32-S3 !                  #
 # Truma 6DE                   #
 ###############################
@@ -7,7 +7,7 @@
 esphome:
   name: "truma"
   friendly_name: "Truma Heater"
-  min_version: "2026.9.1"
+  min_version: "2026.10.0"
 
 external_components:
   - source:
@@ -163,7 +163,7 @@ esp32_ble_tracker:
     window: 300ms
     active: false
   on_ble_advertise:
-    - mac_address: "00:00:00:00:00:00"  # Front Left – replace with your sensor MAC
+    - mac_address: "XX:XX:XX:XX:XX:XX"  # Front Left – replace with your sensor MAC
       then:
         - lambda: |-
             for (auto data : x.get_manufacturer_datas()) {
@@ -180,7 +180,7 @@ esp32_ble_tracker:
                 }
               }
             }
-    - mac_address: "00:00:00:00:00:00"  # Front Right – replace with your sensor MAC
+    - mac_address: "XX:XX:XX:XX:XX:XX"  # Front Right – replace with your sensor MAC
       then:
         - lambda: |-
             for (auto data : x.get_manufacturer_datas()) {
@@ -197,7 +197,7 @@ esp32_ble_tracker:
                 }
               }
             }
-    - mac_address: "00:00:00:00:00:00"  # Rear Right – replace with your sensor MAC
+    - mac_address: "XX:XX:XX:XX:XX:XX"  # Rear Right – replace with your sensor MAC
       then:
         - lambda: |-
             for (auto data : x.get_manufacturer_datas()) {
@@ -214,7 +214,7 @@ esp32_ble_tracker:
                 }
               }
             }
-    - mac_address: "00:00:00:00:00:00"  # Rear Left – replace with your sensor MAC
+    - mac_address: "XX:XX:XX:XX:XX:XX"  # Rear Left – replace with your sensor MAC
       then:
         - lambda: |-
             for (auto data : x.get_manufacturer_datas()) {

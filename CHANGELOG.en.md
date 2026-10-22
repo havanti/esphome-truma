@@ -18,7 +18,7 @@ of the Combi D from 1.0.39 is not confirmed yet. AUTO display and light of the A
 (issue #28).
 
 Tested against:
-- ESPHome **2026.9.1** — ESP-IDF ✅
+- ESPHome **2026.10.0** — ESP-IDF ✅
 
 ---
 

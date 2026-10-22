@@ -18,7 +18,7 @@ Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige 
 sind bestätigt (Issue #28).
 
 Getestet mit:
-- ESPHome **2026.9.1** — ESP-IDF ✅
+- ESPHome **2026.10.0** — ESP-IDF ✅
 
 ---
 

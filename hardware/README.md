@@ -154,7 +154,7 @@ Für den ESP32-S3 die passende Variante wählen:
 
 **Onboard-LED (Waveshare ESP32-S3):** Der Waveshare ESP32-S3-DEV-KIT-N8R8 besitzt eine WS2812-RGB-LED auf GPIO38. Die Beispiel-YAMLs nutzen diese als Statusanzeige — wenn Verkabelung und Konfiguration korrekt sind, blinkt die LED **grün** (CP Plus verbunden) bzw. **blau** (LIN-Daten werden gesendet).
 
-**Mindestversion:** ESPHome 2026.9.1
+**Mindestversion:** ESPHome 2026.10.0
 
 **CP Plus vs. iNet Box:** Die Beispiel-YAMLs verwenden `lin_checksum: VERSION_2` (für CP Plus).
 Mit `VERSION_1` kommt keine Verbindung zustande, siehe [TROUBLESHOOTING.md](../TROUBLESHOOTING.md).
