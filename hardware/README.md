@@ -71,7 +71,7 @@ Der Konverter wandelt die 12V Bordspannung auf die 5V um, die der ESP32-S3 benö
 
 | Kabel | ESP32-S3 | LIN-Transceiver |
 |---|---|---|
-| Grün | GPIO18 | TX |
+| Blau | GPIO18 | TX |
 | Grün | GPIO8 | RX |
 | Schwarz | GND | GND |
 
