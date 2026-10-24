@@ -71,7 +71,7 @@ The converter steps the 12V supply down to the 5V required by the ESP32-S3.
 
 | Wire | ESP32-S3 | LIN Transceiver |
 |---|---|---|
-| Green | GPIO18 | TX |
+| Blue | GPIO18 | TX |
 | Green | GPIO8 | RX |
 | Black | GND | GND |
 
