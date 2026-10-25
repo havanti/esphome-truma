@@ -1,4 +1,5 @@
 #include "LinBusListener.h"
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/helpers.h"
 #include "esphome/core/log.h"
 #include "helpers.h"
