@@ -12,10 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-New in 1.0.46: the climate automatic of the CP Plus can be set from HA again, experimental and not
-confirmed yet. Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). Marco also
-confirmed the fan mode select on the Combi 6 Gas. `HEATER_HAS_ERROR` now also reports warnings. The
-shore power sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO display and light of the
+New in 1.0.46: the climate automatic of the CP Plus can be set from HA again. According to feedback
+in issue #32 it works. Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). Marco
+also confirmed the fan mode select on the Combi 6 Gas. `HEATER_HAS_ERROR` now also reports warnings.
+The shore power sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO display and light of the
 Aventa are confirmed (issue #28).
 
 Tested against:
@@ -27,9 +27,9 @@ Tested against:
 ## [1.0.46] — 2026-10-24 — Aventa: set AUTO from HA (experimental)
 
 ### Added
-- `truma_inetbox`: Climate entity `AIRCON_AUTO` and number `AIRCON_AUTO_TEMPERATURE` switch the
-  climate automatic of the CP Plus on and off again and set the target (18–25 °C). The format is taken
-  from captures of an original iNet Box (issue #32). Not confirmed yet.
+- `truma_inetbox`: Climate entity `AIRCON_AUTO` and number `AIRCON_AUTO_TEMPERATURE` switch the climate
+  automatic of the CP Plus on and off again and set the target (18–25 °C). The format is taken from
+  captures of an original iNet Box (issue #32). According to feedback in the issue it works.
 
 ### Documentation
 - README and Aventa example cover AUTO from HA, the entities are commented out in the example.
