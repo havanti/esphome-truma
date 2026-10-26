@@ -233,7 +233,8 @@ climate::ClimateTraits TrumaCoolerClimate::traits() {
   }
   traits.set_visual_min_temperature(SETPOINT_MIN_C);
   traits.set_visual_max_temperature(SETPOINT_MAX_C);
-  traits.set_visual_temperature_step(1.0f);
+  traits.set_visual_target_temperature_step(SETPOINT_STEP_C);
+  traits.set_visual_current_temperature_step(CURRENT_TEMPERATURE_STEP_C);
   return traits;
 }
 

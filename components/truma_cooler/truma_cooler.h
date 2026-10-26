@@ -39,6 +39,9 @@ static constexpr uint16_t NOTIFY_HANDLE = 0x0015;
 // Setpoint range supported by the device (also exposed via climate traits).
 static constexpr float SETPOINT_MIN_C = -22.0f;
 static constexpr float SETPOINT_MAX_C = 10.0f;
+static constexpr float SETPOINT_STEP_C = 1.0f;
+// C44 and C69 report the interior temperature in whole degrees.
+static constexpr float CURRENT_TEMPERATURE_STEP_C = 1.0f;
 
 // Protocol frame layout.
 static constexpr uint8_t FRAME_LEN = 16;
