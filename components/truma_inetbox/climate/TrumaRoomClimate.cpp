@@ -9,6 +9,8 @@ static const char *const TAG = "truma_inetbox.room_climate";
 static constexpr float ROOM_TEMPERATURE_MIN = 5;
 static constexpr float ROOM_TEMPERATURE_MAX = 30;
 static constexpr float ROOM_TEMPERATURE_STEP = 1;
+// Home Assistant takes the current step as precision: the room temperature comes in tenths.
+static constexpr float ROOM_CURRENT_TEMPERATURE_STEP = 0.1;
 
 void TrumaRoomClimate::setup() {
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
@@ -112,7 +114,8 @@ climate::ClimateTraits TrumaRoomClimate::traits() {
   }});
   traits.set_visual_min_temperature(ROOM_TEMPERATURE_MIN);
   traits.set_visual_max_temperature(ROOM_TEMPERATURE_MAX);
-  traits.set_visual_temperature_step(ROOM_TEMPERATURE_STEP);
+  traits.set_visual_target_temperature_step(ROOM_TEMPERATURE_STEP);
+  traits.set_visual_current_temperature_step(ROOM_CURRENT_TEMPERATURE_STEP);
   return traits;
 }
 }  // namespace truma_inetbox
