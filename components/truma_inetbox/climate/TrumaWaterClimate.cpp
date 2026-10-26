@@ -9,6 +9,9 @@ static const char *const TAG = "truma_inetbox.water_climate";
 static constexpr float WATER_TEMPERATURE_MIN = 40;
 static constexpr float WATER_TEMPERATURE_MAX = 80;
 static constexpr float WATER_TEMPERATURE_STEP = 20;
+// The CP Plus reports the water temperature in whole degrees; Home Assistant MQTT discovery accepts precision values
+// of 0.1, 0.5 or 1.
+static constexpr float WATER_CURRENT_TEMPERATURE_STEP = 1;
 
 void TrumaWaterClimate::setup() {
   this->parent_->get_heater()->add_on_message_callback([this](const StatusFrameHeater *status_heater) {
@@ -53,7 +56,8 @@ climate::ClimateTraits TrumaWaterClimate::traits() {
   traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_HEAT});
   traits.set_visual_min_temperature(WATER_TEMPERATURE_MIN);
   traits.set_visual_max_temperature(WATER_TEMPERATURE_MAX);
-  traits.set_visual_temperature_step(WATER_TEMPERATURE_STEP);
+  traits.set_visual_target_temperature_step(WATER_TEMPERATURE_STEP);
+  traits.set_visual_current_temperature_step(WATER_CURRENT_TEMPERATURE_STEP);
   return traits;
 }
 }  // namespace truma_inetbox
