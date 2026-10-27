@@ -9,6 +9,8 @@ static const char *const TAG = "truma_inetbox.aircon_climate";
 static constexpr float AIRCON_TEMPERATURE_MIN = 16;
 static constexpr float AIRCON_TEMPERATURE_MAX = 31;
 static constexpr float AIRCON_TEMPERATURE_STEP = 1;
+// Home Assistant takes the current step as precision: the aircon temperature comes in tenths.
+static constexpr float AIRCON_CURRENT_TEMPERATURE_STEP = 0.1;
 
 void TrumaAirconClimate::setup() {
   this->parent_->get_aircon_manual()->add_on_message_callback([this](const StatusFrameAirconManual *status) {
@@ -58,7 +60,8 @@ climate::ClimateTraits TrumaAirconClimate::traits() {
 
   traits.set_visual_min_temperature(AIRCON_TEMPERATURE_MIN);
   traits.set_visual_max_temperature(AIRCON_TEMPERATURE_MAX);
-  traits.set_visual_temperature_step(AIRCON_TEMPERATURE_STEP);
+  traits.set_visual_target_temperature_step(AIRCON_TEMPERATURE_STEP);
+  traits.set_visual_current_temperature_step(AIRCON_CURRENT_TEMPERATURE_STEP);
   return traits;
 }
 

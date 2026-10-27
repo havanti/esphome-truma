@@ -7,6 +7,8 @@ namespace truma_inetbox {
 static const char *const TAG = "truma_inetbox.aircon_auto_climate";
 static constexpr uint8_t AIRCON_AUTO_OFF = 0;
 static constexpr float AIRCON_AUTO_TEMPERATURE_STEP = 1;
+// Home Assistant takes the current step as precision: the room temperature comes in tenths.
+static constexpr float AIRCON_AUTO_CURRENT_TEMPERATURE_STEP = 0.1;
 
 void TrumaAirconAutoClimate::setup() {
   this->parent_->get_aircon_auto()->add_on_message_callback([this](const StatusFrameAirconAuto *status) {
@@ -42,7 +44,8 @@ climate::ClimateTraits TrumaAirconAutoClimate::traits() {
   traits.set_supported_modes({climate::CLIMATE_MODE_OFF, climate::CLIMATE_MODE_AUTO});
   traits.set_visual_min_temperature(AIRCON_AUTO_TEMPERATURE_MIN);
   traits.set_visual_max_temperature(AIRCON_AUTO_TEMPERATURE_MAX);
-  traits.set_visual_temperature_step(AIRCON_AUTO_TEMPERATURE_STEP);
+  traits.set_visual_target_temperature_step(AIRCON_AUTO_TEMPERATURE_STEP);
+  traits.set_visual_current_temperature_step(AIRCON_AUTO_CURRENT_TEMPERATURE_STEP);
   return traits;
 }
 
