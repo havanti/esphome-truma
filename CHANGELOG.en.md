@@ -12,8 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-New in 1.0.46: the climate automatic of the CP Plus can be set from HA again. According to feedback
-in issue #32 it works. Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). Marco
+New in 1.0.47: the current temperature shows up in HA with tenths, the water also over MQTT (PR #40
+by Marco). Since 1.0.46 the climate automatic of the CP Plus can be set from HA again, according to feedback in
+issue #32 it works. Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). Marco
 also confirmed the fan mode select on the Combi 6 Gas. `HEATER_HAS_ERROR` now also reports warnings.
 The shore power sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO display and light of the
 Aventa are confirmed (issue #28).
@@ -23,6 +24,15 @@ Tested against:
 
 ---
 
+
+## [1.0.47] — 2026-10-27 — Current temperature in HA
+
+### Fixed
+- `truma_inetbox`: `ROOM` shows the current temperature with tenths, `WATER` also shows up over MQTT
+  (issue #38, PR #40 by Marco). Tested by Marco.
+
+### Changed
+- `truma_inetbox`: `AIRCON` and `AIRCON_AUTO` as well. Not confirmed on an Aventa yet.
 
 ## [1.0.46] — 2026-10-24 — Aventa: set AUTO from HA (experimental)
 

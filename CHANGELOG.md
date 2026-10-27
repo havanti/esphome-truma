@@ -12,7 +12,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Neu in 1.0.46: Die Klimaautomatik am CP Plus lässt sich wieder aus HA setzen. Laut Rückmeldung aus
+Neu in 1.0.47: Die Ist-Temperatur erscheint in HA mit Zehnteln, das Wasser auch über MQTT (PR #40
+von Marco). Seit 1.0.46 lässt sich die Klimaautomatik am CP Plus wieder aus HA setzen, laut Rückmeldung aus
 Issue #32 funktioniert das. Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). Die
 Lüfterauswahl an der Combi 6 Gas hat Marco ebenfalls bestätigt. `HEATER_HAS_ERROR` meldet jetzt auch
 Warnungen. Der Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und
@@ -23,6 +24,15 @@ Getestet mit:
 
 ---
 
+
+## [1.0.47] — 2026-10-27 — Ist-Temperatur in HA
+
+### Behoben
+- `truma_inetbox`: `ROOM` zeigt die Ist-Temperatur mit Zehnteln, `WATER` erscheint auch über MQTT
+  (Issue #38, PR #40 von Marco). Von Marco getestet.
+
+### Geändert
+- `truma_inetbox`: `AIRCON` und `AIRCON_AUTO` ebenso. An einer Aventa noch nicht bestätigt.
 
 ## [1.0.46] — 2026-10-24 — Aventa: AUTO aus HA setzen (experimentell)
 
