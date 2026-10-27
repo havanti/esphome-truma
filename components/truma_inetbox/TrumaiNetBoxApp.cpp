@@ -32,6 +32,11 @@ static constexpr uint8_t HEATER_STATUS_LEGACY_LENGTH = 8;
 static constexpr uint8_t HEATER_STATUS_LEGACY_FLAGS_BYTE = 1;
 static constexpr uint8_t HEATER_STATUS_LEGACY_ROOM_LOW = 2;
 static constexpr uint8_t HEATER_STATUS_LEGACY_ROOM_HIGH = 3;
+static constexpr uint8_t HEATER_STATUS_LEGACY_WATER_LOW = 4;
+static constexpr uint8_t HEATER_STATUS_LEGACY_WATER_HIGH = 5;
+// Room and water a Combi 6 H5.00.00 sends in its first frames after a bus wake-up (31.1/46.2 °C), whatever it measures.
+static constexpr uint16_t HEATER_STATUS_LEGACY_WAKE_UP_ROOM = 0x0BE1;
+static constexpr uint16_t HEATER_STATUS_LEGACY_WAKE_UP_WATER = 0x0C78;
 // Idle frames carry these instead of a room temperature; their flags say nothing about the supply.
 static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_0AAA = 0x0AAA;
 static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_AAAA = 0xAAAA;
@@ -143,6 +148,18 @@ bool TrumaiNetBoxApp::answer_lin_order_(const uint8_t pid) {
   return LinBusProtocol::answer_lin_order_(pid);
 }
 
+bool TrumaiNetBoxApp::heater_wake_up_values_within(uint32_t window_ms) {
+  if (!this->heater_wake_up_values_seen_) {
+    return false;
+  }
+  // Unsigned subtraction is wraparound-safe; forgetting old values keeps a 49-day-old one from looking recent after
+  // the millis() rollover.
+  if (millis() - this->heater_wake_up_values_ms_ > window_ms) {
+    this->heater_wake_up_values_seen_ = false;
+  }
+  return this->heater_wake_up_values_seen_;
+}
+
 void TrumaiNetBoxApp::lin_message_received_(const uint8_t pid, const uint8_t *message, uint8_t length) {
   if (pid == LIN_PID_STATUS_2) {
     if (length >= STATUS_2_MIN_LENGTH) {
@@ -162,6 +179,12 @@ void TrumaiNetBoxApp::lin_message_received_(const uint8_t pid, const uint8_t *me
     if (length >= HEATER_STATUS_LEGACY_LENGTH) {
       const uint16_t room = static_cast<uint16_t>(message[HEATER_STATUS_LEGACY_ROOM_LOW] |
                                                   (message[HEATER_STATUS_LEGACY_ROOM_HIGH] << 8));
+      const uint16_t water = static_cast<uint16_t>(message[HEATER_STATUS_LEGACY_WATER_LOW] |
+                                                   (message[HEATER_STATUS_LEGACY_WATER_HIGH] << 8));
+      if (room == HEATER_STATUS_LEGACY_WAKE_UP_ROOM && water == HEATER_STATUS_LEGACY_WAKE_UP_WATER) {
+        this->heater_wake_up_values_ms_ = millis();
+        this->heater_wake_up_values_seen_ = true;
+      }
       if (room != HEATER_STATUS_LEGACY_IDLE_0AAA && room != HEATER_STATUS_LEGACY_IDLE_AAAA &&
           room != HEATER_STATUS_LEGACY_IDLE_ZERO) {
         this->heater_flags_raw_.store(message[HEATER_STATUS_LEGACY_FLAGS_BYTE], std::memory_order_relaxed);
