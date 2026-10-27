@@ -8,6 +8,9 @@ namespace esphome {
 namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.TrumaiNetBoxAppHeater";
+// Room and water current temperature both 0.0 °C: the CP Plus has no data from the heater (after a wake-up, from an
+// idle Combi D).
+static constexpr uint16_t CURRENT_TEMP_NO_DATA = 0x0AAA;
 
 StatusFrameHeaterResponse *TrumaiNetBoxAppHeater::update_prepare() {
   // An update is currently going on.
@@ -27,6 +30,16 @@ StatusFrameHeaterResponse *TrumaiNetBoxAppHeater::update_prepare() {
 
   this->update_status_prepared_.store(true);
   return &this->update_status_;
+}
+
+void TrumaiNetBoxAppHeater::set_status(StatusFrameHeater val) {
+  // 0x0AAA on both (0.0 °C room, 0 °C water): the heater has no data yet. Stored as 0, which reads as unknown. A real
+  // reading like this needs a stored vehicle at exactly 0 °C and lasts one push; unknown costs less than a false 0 °C.
+  if (val.current_temp_room == CURRENT_TEMP_NO_DATA && val.current_temp_water == CURRENT_TEMP_NO_DATA) {
+    val.current_temp_room = 0;
+    val.current_temp_water = 0;
+  }
+  TrumaStausFrameResponseStorage<StatusFrameHeater, StatusFrameHeaterResponse>::set_status(val);
 }
 
 void TrumaiNetBoxAppHeater::create_update_data(StatusFrame *response, uint8_t *response_len,

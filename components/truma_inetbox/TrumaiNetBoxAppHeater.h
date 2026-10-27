@@ -12,6 +12,8 @@ class TrumaiNetBoxAppHeater : public TrumaStausFrameResponseStorage<StatusFrameH
   void create_update_data(StatusFrame *response, uint8_t *response_len, uint8_t command_counter) override;
   void dump_data() const override;
   bool can_update() override;
+  // LIN event task.
+  void set_status(StatusFrameHeater val) override;
 
   // Heating mode for the fan-mode select: Vario Heat modes only on a Vario Heat heater (H3, TRUMA_DEVICE
   // HEATER_VARIO); every Combi uses ECO/HIGH. The Combi 6 Gas heater H5.00.00 reports 0x05, which
