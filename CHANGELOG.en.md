@@ -22,7 +22,7 @@ The shore power sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO dis
 Aventa are confirmed (issue #28).
 
 Tested against:
-- ESPHome **2026.10.0** — ESP-IDF ✅
+- ESPHome **2026.10.1** — ESP-IDF ✅
 
 ---
 

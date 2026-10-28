@@ -22,7 +22,7 @@ Warnungen. Der Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt
 Licht der Aventa sind bestätigt (Issue #28).
 
 Getestet mit:
-- ESPHome **2026.10.0** — ESP-IDF ✅
+- ESPHome **2026.10.1** — ESP-IDF ✅
 
 ---
 
