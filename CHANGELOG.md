@@ -12,8 +12,10 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Neu in 1.0.47: Die Ist-Temperatur erscheint in HA mit Zehnteln, das Wasser auch über MQTT (PR #40
-von Marco). Seit 1.0.46 lässt sich die Klimaautomatik am CP Plus wieder aus HA setzen, laut Rückmeldung aus
+Neu in 1.0.48: Ohne Daten von der Heizung zeigt HA die Ist-Temperatur als „Unbekannt“ statt 0 °C, den
+Ausreißer der Combi 6 nach dem Aufwachen filtert die Komponente aus (PR #41 von Marco, am Fahrzeug noch
+nicht bestätigt). Seit 1.0.47 erscheint die Ist-Temperatur in HA mit Zehnteln, das Wasser auch über MQTT
+(PR #40 von Marco). Seit 1.0.46 lässt sich die Klimaautomatik am CP Plus wieder aus HA setzen, laut Rückmeldung aus
 Issue #32 funktioniert das. Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). Die
 Lüfterauswahl an der Combi 6 Gas hat Marco ebenfalls bestätigt. `HEATER_HAS_ERROR` meldet jetzt auch
 Warnungen. Der Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und
@@ -24,6 +26,15 @@ Getestet mit:
 
 ---
 
+
+## [1.0.48] — 2026-10-28 — Ist-Temperatur ohne Ausreißer
+
+### Geändert
+- `truma_inetbox`: Hat der CP Plus keine Daten von der Heizung (0,0 °C bei Raum und Wasser), zeigt HA die
+  Ist-Temperaturen als „Unbekannt“ statt 0 °C (PR #41 von Marco).
+- `truma_inetbox`: Combi 6 H5.00.00: Den einmaligen Ausreißer auf 31,1/50 °C nach dem Aufwachen des Busses
+  filtert die Komponente aus, die letzten Ist-Werte bleiben stehen (Issue #37, PR #41 von Marco). Am Fahrzeug
+  noch nicht bestätigt.
 
 ## [1.0.47] — 2026-10-27 — Ist-Temperatur in HA
 
