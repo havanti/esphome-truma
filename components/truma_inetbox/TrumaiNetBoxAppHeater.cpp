@@ -8,6 +8,16 @@ namespace esphome {
 namespace truma_inetbox {
 
 static const char *const TAG = "truma_inetbox.TrumaiNetBoxAppHeater";
+// Room and water current temperature both 0.0 °C: the CP Plus has no data from the heater (after a wake-up, from an
+// idle Combi D).
+static constexpr uint16_t CURRENT_TEMP_NO_DATA = 0x0AAA;
+// Room 31.1 °C and water 50 °C: seconds after a Combi 6 H5.00.00 sent its wake-up values in PID 0x16, the CP Plus
+// sends this pair in one heater status, usually while PID 0x16 already carries live values; the next status carries
+// live values again.
+static constexpr uint16_t WAKE_UP_ROOM = 0x0BE1;
+static constexpr uint16_t WAKE_UP_WATER = 0x0C9E;
+// Seen 0.6-7.2 s after the PID 0x16 wake-up values.
+static constexpr uint32_t WAKE_UP_WINDOW_MS = 10 * 1000;
 
 StatusFrameHeaterResponse *TrumaiNetBoxAppHeater::update_prepare() {
   // An update is currently going on.
@@ -27,6 +37,33 @@ StatusFrameHeaterResponse *TrumaiNetBoxAppHeater::update_prepare() {
 
   this->update_status_prepared_.store(true);
   return &this->update_status_;
+}
+
+void TrumaiNetBoxAppHeater::set_status(StatusFrameHeater val) {
+  // 0x0AAA on both (0.0 °C room, 0 °C water): the heater has no data yet. Stored as 0, which reads as unknown. A real
+  // reading like this needs a stored vehicle at exactly 0 °C and lasts one push; unknown costs less than a false 0 °C.
+  if (val.current_temp_room == CURRENT_TEMP_NO_DATA && val.current_temp_water == CURRENT_TEMP_NO_DATA) {
+    val.current_temp_room = 0;
+    val.current_temp_water = 0;
+  }
+  // Asked on every status, so old wake-up values are forgotten in time.
+  const bool after_wake_up_values = this->parent_->heater_wake_up_values_within(WAKE_UP_WINDOW_MS);
+  // At most once in a row, so live values equal to these always get through.
+  const bool wake_up = after_wake_up_values && val.current_temp_room == WAKE_UP_ROOM &&
+                       val.current_temp_water == WAKE_UP_WATER && !this->wake_up_values_skipped_;
+  if (wake_up) {
+    ESP_LOGD(TAG, "Current temperatures 31.1/50°C after the heater wake-up values, keeping the last ones");
+    const bool previous = this->data_valid_.load();
+    val.current_temp_room = previous ? this->data_.current_temp_room : 0;
+    val.current_temp_water = previous ? this->data_.current_temp_water : 0;
+  }
+  this->wake_up_values_skipped_ = wake_up;
+  TrumaStausFrameResponseStorage<StatusFrameHeater, StatusFrameHeaterResponse>::set_status(val);
+}
+
+void TrumaiNetBoxAppHeater::reset() {
+  TrumaStausFrameResponseStorage<StatusFrameHeater, StatusFrameHeaterResponse>::reset();
+  this->wake_up_values_skipped_ = false;
 }
 
 void TrumaiNetBoxAppHeater::create_update_data(StatusFrame *response, uint8_t *response_len,

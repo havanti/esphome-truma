@@ -61,6 +61,10 @@ class TrumaiNetBoxApp : public LinBusProtocol {
     this->heater_flags_callback_.add(std::move(callback));
   }
 
+  // LIN event task: the heater sent its wake-up values in PID 0x16 (Combi 6 H5.00.00, 31.1/46.2 °C) within the last
+  // `window_ms`.
+  bool heater_wake_up_values_within(uint32_t window_ms);
+
 #ifdef USE_TIME
   void set_time(time::RealTimeClock *time) { time_ = time; }
   time::RealTimeClock *get_time() const { return time_; }
@@ -112,6 +116,9 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   bool heater_flags_published_{false};
   uint8_t heater_flags_last_published_{0};
   CallbackManager<void(uint8_t)> heater_flags_callback_{};
+  // millis() of the last PID 0x16 with the heater wake-up values. LIN event task only.
+  uint32_t heater_wake_up_values_ms_{0};
+  bool heater_wake_up_values_seen_{false};
 
 #ifdef USE_TIME
   time::RealTimeClock *time_ = nullptr;
