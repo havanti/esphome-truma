@@ -12,8 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-New in 1.0.49: the timer can be set from the dashboard in the heater examples (issue #39, not tested on a
-CP Plus yet). Since 1.0.48 HA shows the current temperature as unknown instead of 0 °C without data from the
+New in 1.0.50: prepared for ESPHome 2026.11 (PR #42 by Marco). Since 1.0.49 the timer can be set from the
+dashboard in the heater examples, according to feedback in issue #39 it works. Since 1.0.48 HA shows the current temperature as unknown instead of 0 °C without data from the
 heater, the Combi 6 spike after a wake-up is filtered out (PR #41 by Marco, not confirmed in a vehicle yet).
 Since 1.0.47 the current temperature shows up in HA with tenths, the water also over MQTT (PR #40 by Marco).
 Since 1.0.46 the climate automatic of the CP Plus can be set from HA again, according to feedback in
@@ -28,12 +28,18 @@ Tested against:
 ---
 
 
+## [1.0.50] — 2026-10-29 — Preparing for ESPHome 2026.11
+
+### Changed
+- `truma_inetbox`, `truma_cooler`: Prepared for ESPHome 2026.11, a header is now included directly
+  (PR #42 by Marco).
+
 ## [1.0.49] — 2026-10-29 — Timer in the dashboard
 
 ### Added
 - Heater examples: start, stop, room temperature, heating mode and hot water of the timer can be set from the
   dashboard, while the timer is active changes are sent to the CP Plus right away (idea by Gerald, issue #39).
-  Not tested on a CP Plus yet.
+  According to feedback in issue #39 it works.
 
 ## [1.0.48] — 2026-10-28 — Current temperature without spikes
 

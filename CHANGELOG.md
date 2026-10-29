@@ -12,8 +12,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Neu in 1.0.49: Der Timer lässt sich in den Heizungs-Beispielen im Dashboard einstellen (Issue #39, am CP Plus
-noch nicht getestet). Seit 1.0.48 zeigt HA ohne Daten von der Heizung die Ist-Temperatur als „Unbekannt“
+Neu in 1.0.50: Vorbereitet auf ESPHome 2026.11 (PR #42 von Marco). Seit 1.0.49 lässt sich der Timer in den
+Heizungs-Beispielen im Dashboard einstellen, laut Rückmeldung aus Issue #39 funktioniert das. Seit 1.0.48 zeigt HA ohne Daten von der Heizung die Ist-Temperatur als „Unbekannt“
 statt 0 °C, den Ausreißer der Combi 6 nach dem Aufwachen filtert die Komponente aus (PR #41 von Marco, am
 Fahrzeug noch nicht bestätigt). Seit 1.0.47 erscheint die Ist-Temperatur in HA mit Zehnteln, das Wasser auch
 über MQTT (PR #40 von Marco). Seit 1.0.46 lässt sich die Klimaautomatik am CP Plus wieder aus HA setzen, laut Rückmeldung aus
@@ -28,12 +28,18 @@ Getestet mit:
 ---
 
 
+## [1.0.50] — 2026-10-29 — Vorbereitung auf ESPHome 2026.11
+
+### Geändert
+- `truma_inetbox`, `truma_cooler`: Für ESPHome 2026.11 vorbereitet, ein Header ist jetzt direkt eingebunden
+  (PR #42 von Marco).
+
 ## [1.0.49] — 2026-10-29 — Timer im Dashboard
 
 ### Hinzugefügt
 - Heizungs-Beispiele: Start, Stopp, Raumtemperatur, Heizmodus und Warmwasser des Timers lassen sich im
   Dashboard einstellen, bei aktivem Timer gehen Änderungen sofort an das CP Plus (Idee von Gerald, Issue #39).
-  Am CP Plus noch nicht getestet.
+  Laut Rückmeldung aus Issue #39 funktioniert das.
 
 ## [1.0.48] — 2026-10-28 — Ist-Temperatur ohne Ausreißer
 
