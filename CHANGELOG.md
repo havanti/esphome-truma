@@ -12,10 +12,11 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Neu in 1.0.48: Ohne Daten von der Heizung zeigt HA die Ist-Temperatur als „Unbekannt“ statt 0 °C, den
-Ausreißer der Combi 6 nach dem Aufwachen filtert die Komponente aus (PR #41 von Marco, am Fahrzeug noch
-nicht bestätigt). Seit 1.0.47 erscheint die Ist-Temperatur in HA mit Zehnteln, das Wasser auch über MQTT
-(PR #40 von Marco). Seit 1.0.46 lässt sich die Klimaautomatik am CP Plus wieder aus HA setzen, laut Rückmeldung aus
+Neu in 1.0.49: Der Timer lässt sich in den Heizungs-Beispielen im Dashboard einstellen (Issue #39, am CP Plus
+noch nicht getestet). Seit 1.0.48 zeigt HA ohne Daten von der Heizung die Ist-Temperatur als „Unbekannt“
+statt 0 °C, den Ausreißer der Combi 6 nach dem Aufwachen filtert die Komponente aus (PR #41 von Marco, am
+Fahrzeug noch nicht bestätigt). Seit 1.0.47 erscheint die Ist-Temperatur in HA mit Zehnteln, das Wasser auch
+über MQTT (PR #40 von Marco). Seit 1.0.46 lässt sich die Klimaautomatik am CP Plus wieder aus HA setzen, laut Rückmeldung aus
 Issue #32 funktioniert das. Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). Die
 Lüfterauswahl an der Combi 6 Gas hat Marco ebenfalls bestätigt. `HEATER_HAS_ERROR` meldet jetzt auch
 Warnungen. Der Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und
@@ -26,6 +27,13 @@ Getestet mit:
 
 ---
 
+
+## [1.0.49] — 2026-10-29 — Timer im Dashboard
+
+### Hinzugefügt
+- Heizungs-Beispiele: Start, Stopp, Raumtemperatur, Heizmodus und Warmwasser des Timers lassen sich im
+  Dashboard einstellen, bei aktivem Timer gehen Änderungen sofort an das CP Plus (Idee von Gerald, Issue #39).
+  Am CP Plus noch nicht getestet.
 
 ## [1.0.48] — 2026-10-28 — Ist-Temperatur ohne Ausreißer
 

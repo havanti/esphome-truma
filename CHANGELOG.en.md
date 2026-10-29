@@ -12,9 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-New in 1.0.48: without data from the heater HA shows the current temperature as unknown instead of 0 °C,
-the Combi 6 spike after a wake-up is filtered out (PR #41 by Marco, not confirmed in a vehicle yet). Since
-1.0.47 the current temperature shows up in HA with tenths, the water also over MQTT (PR #40 by Marco).
+New in 1.0.49: the timer can be set from the dashboard in the heater examples (issue #39, not tested on a
+CP Plus yet). Since 1.0.48 HA shows the current temperature as unknown instead of 0 °C without data from the
+heater, the Combi 6 spike after a wake-up is filtered out (PR #41 by Marco, not confirmed in a vehicle yet).
+Since 1.0.47 the current temperature shows up in HA with tenths, the water also over MQTT (PR #40 by Marco).
 Since 1.0.46 the climate automatic of the CP Plus can be set from HA again, according to feedback in
 issue #32 it works. Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). Marco
 also confirmed the fan mode select on the Combi 6 Gas. `HEATER_HAS_ERROR` now also reports warnings.
@@ -26,6 +27,13 @@ Tested against:
 
 ---
 
+
+## [1.0.49] — 2026-10-29 — Timer in the dashboard
+
+### Added
+- Heater examples: start, stop, room temperature, heating mode and hot water of the timer can be set from the
+  dashboard, while the timer is active changes are sent to the CP Plus right away (idea by Gerald, issue #39).
+  Not tested on a CP Plus yet.
 
 ## [1.0.48] — 2026-10-28 — Current temperature without spikes
 

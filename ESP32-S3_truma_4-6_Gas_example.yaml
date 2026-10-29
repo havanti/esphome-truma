@@ -288,6 +288,19 @@ number:
   - platform: truma_inetbox
     name: "Electric Power Level"
     type: ELECTRIC_POWER_LEVEL
+  # Timer settings (0 = room heating off)
+  - platform: template
+    name: "Timer Room Temperature"
+    id: timer_room_temperature
+    unit_of_measurement: "°C"
+    min_value: 0
+    max_value: 30
+    step: 1
+    initial_value: 18
+    optimistic: true
+    restore_value: true
+    on_value:
+      - script.execute: truma_timer_update
 
 sensor:
   # Truma
@@ -455,6 +468,56 @@ text_sensor:
   - platform: truma_inetbox
     name: "ESPHome Truma Version"
 
+datetime:
+  - platform: template
+    name: "Timer Start"
+    id: timer_start
+    type: time
+    initial_value: "07:00:00"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - script.execute: truma_timer_update
+  - platform: template
+    name: "Timer Stop"
+    id: timer_stop
+    type: time
+    initial_value: "07:45:00"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - script.execute: truma_timer_update
+
+script:
+  # Sends the timer settings to the CP Plus and activates the timer
+  - id: truma_timer_activate
+    then:
+      - truma_inetbox.timer.activate:
+          start: !lambda 'return id(timer_start).hour * 60 + id(timer_start).minute;'
+          stop: !lambda 'return id(timer_stop).hour * 60 + id(timer_stop).minute;'
+          room_temperature: !lambda 'return id(timer_room_temperature).state;'
+          heating_mode: !lambda |-
+            auto mode = id(timer_heating_mode).current_option();
+            if (mode == "HIGH") return truma_inetbox::HeatingMode::HEATING_MODE_HIGH;
+            if (mode == "BOOST") return truma_inetbox::HeatingMode::HEATING_MODE_BOOST;
+            return truma_inetbox::HeatingMode::HEATING_MODE_ECO;
+          water_temperature: !lambda |-
+            auto mode = id(timer_water_temperature).current_option();
+            if (mode == "ECO") return 40;
+            if (mode == "HIGH") return 60;
+            if (mode == "BOOST") return 80;
+            return 0;
+          energy_mix: GAS
+          watt: 0
+  # Changed timer settings are only sent while the timer is active
+  - id: truma_timer_update
+    then:
+      - if:
+          condition:
+            binary_sensor.is_on: TIMER_ACTIVE
+          then:
+            - script.execute: truma_timer_activate
+
 switch:
   - platform: template
     name: "Activate Room Heater"
@@ -498,14 +561,7 @@ switch:
       return id(TIMER_ACTIVE).state;
     turn_on_action:
       - lambda: 'id(led_color) = 2; id(led_ticks) = 3;'
-      - truma_inetbox.timer.activate:
-          start: 7:00
-          stop: 7:45
-          room_temperature: 18
-          heating_mode: ECO
-          water_temperature: 40
-          energy_mix: GAS
-          watt: 0
+      - script.execute: truma_timer_activate
     turn_off_action:
       - lambda: 'id(led_color) = 2; id(led_ticks) = 3;'
       - truma_inetbox.timer.disable
@@ -517,6 +573,25 @@ select:
   - platform: truma_inetbox
     name: "Fan Mode"
     type: HEATER_FAN_MODE_COMBI
+  # Timer settings
+  - platform: template
+    name: "Timer Heating Mode"
+    id: timer_heating_mode
+    options: ["ECO", "HIGH", "BOOST"]
+    initial_option: "ECO"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - script.execute: truma_timer_update
+  - platform: template
+    name: "Timer Water Temperature"
+    id: timer_water_temperature
+    options: ["OFF", "ECO", "HIGH", "BOOST"]
+    initial_option: "ECO"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - script.execute: truma_timer_update
 
 button:
   - platform: restart

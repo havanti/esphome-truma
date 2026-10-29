@@ -208,6 +208,8 @@ Optionale Web-UI — Ein lokaler Webserver auf Port 80 (ESPHome Web Server v3) m
 
 Template-Schalter — Fertige Ein/Aus-Schalter für die Raumheizung, den Wasserboiler und den integrierten Timer sind enthalten, was die Automatisierung und Dashboard-Integration vereinfacht.
 
+Timer im Dashboard — In den Heizungs-Beispielen lassen sich Start, Stopp, Raumtemperatur, Heizmodus und Warmwasser des Timers einstellen. Ist der Timer aktiv, gehen Änderungen sofort an das CP Plus. Die Werte kommen aus Home Assistant, am CP Plus geänderte Timer-Werte werden nicht zurückgelesen.
+
 Neustart-Schaltfläche — Eine Ein-Klick-ESP-Neustart-Schaltfläche ist in Home Assistant für die Fernwartung verfügbar.
 
 Busverkehr mitschneiden — esphome-truma liest den gesamten LIN-Bus mit, nicht nur die eigenen Frames. Wer sehen will, was das CP Plus sendet, etwa beim Umschalten der Umluft, hebt das Log-Level an:

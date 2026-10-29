@@ -210,6 +210,8 @@ Optional web UI — A local web server on port 80 (ESPHome Web Server v3) with `
 
 Template switches — Ready-to-use on/off switches for the room heater, water heater, and the built-in timer are included, making automation and dashboard integration straightforward.
 
+Timer in the dashboard — In the heater examples, start, stop, room temperature, heating mode and hot water of the timer can be set. While the timer is active, changes are sent to the CP Plus right away. The values come from Home Assistant, timer values changed on the CP Plus are not read back.
+
 Restart button — A one-click ESP restart button is exposed in Home Assistant for remote maintenance.
 
 Capturing bus traffic — esphome-truma listens to the whole LIN bus, not just its own frames. To see what the CP Plus sends, for example when the recirculation fan is switched, raise the log level:
