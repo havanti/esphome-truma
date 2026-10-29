@@ -2,6 +2,7 @@
 
 #ifdef USE_ESP32_FRAMEWORK_ESP_IDF
 
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/log.h"
 #include <cmath>
 #include <cstring>

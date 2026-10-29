@@ -1,4 +1,5 @@
 #include "helpers.h"
+#include "esphome/core/alloc_helpers.h"
 
 namespace esphome {
 namespace truma_inetbox {
