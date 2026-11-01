@@ -14,8 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 New in 1.0.50: prepared for ESPHome 2026.11 (PR #42 by Marco). Since 1.0.49 the timer can be set from the
 dashboard in the heater examples, according to feedback in issue #39 it works. Since 1.0.48 HA shows the current temperature as unknown instead of 0 °C without data from the
-heater, the Combi 6 spike after a wake-up is filtered out (PR #41 by Marco, not confirmed in a vehicle yet).
-Since 1.0.47 the current temperature shows up in HA with tenths, the water also over MQTT (PR #40 by Marco).
+heater, the Combi 6 spike after a wake-up is filtered out (PR #41 by Marco), according to feedback in issue #37
+both work. Since 1.0.47 the current temperature shows up in HA with tenths, the water also over MQTT (PR #40 by Marco).
 Since 1.0.46 the climate automatic of the CP Plus can be set from HA again, according to feedback in
 issue #32 it works. Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). Marco
 also confirmed the fan mode select on the Combi 6 Gas. `HEATER_HAS_ERROR` now also reports warnings.
@@ -43,11 +43,11 @@ Tested against:
 
 ## [1.0.48] — 2026-10-28 — Current temperature without spikes
 
-### Changed
+### Fixed
 - `truma_inetbox`: when the CP Plus has no data from the heater (0.0 °C room and water), HA shows the
   current temperatures as unknown instead of 0 °C (PR #41 by Marco).
 - `truma_inetbox`: Combi 6 H5.00.00: the single 31.1/50 °C spike after the bus wakes up is filtered out, the
-  last current values stay (issue #37, PR #41 by Marco). Not confirmed in a vehicle yet.
+  last current values stay (issue #37, PR #41 by Marco). According to feedback in issue #37 both work.
 
 ## [1.0.47] — 2026-10-27 — Current temperature in HA
 

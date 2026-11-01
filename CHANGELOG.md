@@ -14,8 +14,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Neu in 1.0.50: Vorbereitet auf ESPHome 2026.11 (PR #42 von Marco). Seit 1.0.49 lässt sich der Timer in den
 Heizungs-Beispielen im Dashboard einstellen, laut Rückmeldung aus Issue #39 funktioniert das. Seit 1.0.48 zeigt HA ohne Daten von der Heizung die Ist-Temperatur als „Unbekannt“
-statt 0 °C, den Ausreißer der Combi 6 nach dem Aufwachen filtert die Komponente aus (PR #41 von Marco, am
-Fahrzeug noch nicht bestätigt). Seit 1.0.47 erscheint die Ist-Temperatur in HA mit Zehnteln, das Wasser auch
+statt 0 °C, den Ausreißer der Combi 6 nach dem Aufwachen filtert die Komponente aus (PR #41 von Marco), laut
+Rückmeldung aus Issue #37 funktioniert beides. Seit 1.0.47 erscheint die Ist-Temperatur in HA mit Zehnteln, das Wasser auch
 über MQTT (PR #40 von Marco). Seit 1.0.46 lässt sich die Klimaautomatik am CP Plus wieder aus HA setzen, laut Rückmeldung aus
 Issue #32 funktioniert das. Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). Die
 Lüfterauswahl an der Combi 6 Gas hat Marco ebenfalls bestätigt. `HEATER_HAS_ERROR` meldet jetzt auch
@@ -43,12 +43,12 @@ Getestet mit:
 
 ## [1.0.48] — 2026-10-28 — Ist-Temperatur ohne Ausreißer
 
-### Geändert
+### Behoben
 - `truma_inetbox`: Hat der CP Plus keine Daten von der Heizung (0,0 °C bei Raum und Wasser), zeigt HA die
   Ist-Temperaturen als „Unbekannt“ statt 0 °C (PR #41 von Marco).
 - `truma_inetbox`: Combi 6 H5.00.00: Den einmaligen Ausreißer auf 31,1/50 °C nach dem Aufwachen des Busses
-  filtert die Komponente aus, die letzten Ist-Werte bleiben stehen (Issue #37, PR #41 von Marco). Am Fahrzeug
-  noch nicht bestätigt.
+  filtert die Komponente aus, die letzten Ist-Werte bleiben stehen (Issue #37, PR #41 von Marco). Laut
+  Rückmeldung aus Issue #37 funktioniert beides.
 
 ## [1.0.47] — 2026-10-27 — Ist-Temperatur in HA
 
