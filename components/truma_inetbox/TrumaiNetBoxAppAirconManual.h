@@ -14,7 +14,8 @@ class TrumaiNetBoxAppAirconManual
   void dump_data() const override;
   bool can_update() override;
 
-  bool action_set_temp(uint8_t temperature);
+  // Rounded to whole degrees; below 16 sets the target off.
+  bool action_set_temp(float temperature);
   bool action_set_mode(AirconMode mode);
   bool action_set_vent_mode(AirconVentMode vent_mode);
   bool action_set_light(uint8_t level);

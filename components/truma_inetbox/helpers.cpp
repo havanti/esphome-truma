@@ -81,16 +81,11 @@ TargetTemp decimal_to_aircon_manual_temp(uint8_t val) {
 }
 
 TargetTemp decimal_to_aircon_manual_temp(float val) {
-  if (std::isnan(val)) {
+  if (std::isnan(val) || val < 0) {
     return TargetTemp::TARGET_TEMP_OFF;
   }
-  if (val < 16) {
-    return TargetTemp::TARGET_TEMP_OFF;
-  }
-  if (val >= 31) {
-    return TargetTemp::TARGET_TEMP_AIRCON_MAX;
-  }
-  return decimal_to_temp(val);
+  // Round to whole degrees, like AUTO: truncated, 23.7 °C would become 23.
+  return decimal_to_aircon_manual_temp(static_cast<uint8_t>(std::min(std::round(val), static_cast<float>(UINT8_MAX))));
 }
 
 TargetTemp decimal_to_aircon_auto_temp(uint8_t val) {

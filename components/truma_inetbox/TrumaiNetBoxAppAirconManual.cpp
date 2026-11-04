@@ -82,7 +82,7 @@ bool TrumaiNetBoxAppAirconManual::can_update() {
          this->parent_->get_aircon_device() != TRUMA_DEVICE::UNKNOWN;
 }
 
-bool TrumaiNetBoxAppAirconManual::action_set_temp(uint8_t temperature) {
+bool TrumaiNetBoxAppAirconManual::action_set_temp(float temperature) {
   if (!this->can_update()) {
     ESP_LOGW(TAG, "Cannot update Truma aircon.");
     return false;

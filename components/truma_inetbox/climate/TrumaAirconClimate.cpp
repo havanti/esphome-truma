@@ -39,7 +39,7 @@ void TrumaAirconClimate::control(const climate::ClimateCall &call) {
     aircon->action_set_vent_mode(this->fan_mode_to_vent_mode_(*call.get_fan_mode()));
   }
   if (call.get_target_temperature().has_value()) {
-    aircon->action_set_temp(static_cast<uint8_t>(*call.get_target_temperature()));
+    aircon->action_set_temp(*call.get_target_temperature());
   }
 }
 
