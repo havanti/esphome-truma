@@ -24,8 +24,9 @@ void TrumaAirconAutoClimate::setup() {
 void TrumaAirconAutoClimate::dump_config() { LOG_CLIMATE(TAG, "Truma Aircon Auto Climate", this); }
 
 void TrumaAirconAutoClimate::control(const climate::ClimateCall &call) {
-  auto status = this->parent_->get_aircon_auto()->get_status();
-  float temp = temp_code_to_decimal(status->target_temp_aircon_auto, AIRCON_AUTO_TEMPERATURE_DEFAULT);
+  auto aircon_auto = this->parent_->get_aircon_auto();
+  // Start from the pending target, so a temperature sent just before is not overwritten.
+  float temp = temp_code_to_decimal(aircon_auto->pending_target_temp(), AIRCON_AUTO_TEMPERATURE_DEFAULT);
 
   if (call.get_target_temperature().has_value()) {
     temp = *call.get_target_temperature();
@@ -35,7 +36,7 @@ void TrumaAirconAutoClimate::control(const climate::ClimateCall &call) {
     temp = AIRCON_AUTO_OFF;
   }
 
-  this->parent_->get_aircon_auto()->action_set_temp(static_cast<uint8_t>(temp));
+  aircon_auto->action_set_temp(temp);
 }
 
 climate::ClimateTraits TrumaAirconAutoClimate::traits() {

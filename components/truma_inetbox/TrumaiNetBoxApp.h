@@ -62,8 +62,8 @@ class TrumaiNetBoxApp : public LinBusProtocol {
   }
 
   // LIN event task: the heater sent its wake-up values in PID 0x16 (Combi 6 H5.00.00, 31.1/46.2 °C) within the last
-  // `window_ms`.
-  bool heater_wake_up_values_within(uint32_t window_ms);
+  // seconds.
+  bool heater_wake_up_values_recent() const;
 
 #ifdef USE_TIME
   void set_time(time::RealTimeClock *time) { time_ = time; }

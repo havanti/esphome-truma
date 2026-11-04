@@ -17,6 +17,12 @@ inline constexpr std::array<uint8_t, 11> alde_message_header = {0x00, 0x00, 0x1F
 inline constexpr uint8_t ROOM_SWITCH_ON_TEMPERATURE = 5;
 inline constexpr uint8_t WATER_SWITCH_ON_TEMPERATURE = 40;
 
+// Temperature codes (Kelvin x10) that mark a state instead of a reading.
+// 0.0 °C: no data from the heater in a status frame, an idle frame in PID 0x16.
+inline constexpr uint16_t TEMP_CODE_NO_DATA = 0x0AAA;
+// 31.1 °C: room value of a Combi 6 H5.00.00 after a bus wake-up, in PID 0x16 and in the next heater status.
+inline constexpr uint16_t TEMP_CODE_WAKE_UP_ROOM = 0x0BE1;
+
 // AUTO range of the CP Plus with climate automatic (iNet app: 17.8-25 °C, default 22, 0 = off).
 inline constexpr uint8_t AIRCON_AUTO_TEMPERATURE_MIN = 18;
 inline constexpr uint8_t AIRCON_AUTO_TEMPERATURE_MAX = 25;
@@ -34,6 +40,7 @@ TargetTemp decimal_to_room_temp(float val);
 TargetTemp decimal_to_aircon_manual_temp(uint8_t val);
 TargetTemp decimal_to_aircon_manual_temp(float val);
 TargetTemp decimal_to_aircon_auto_temp(uint8_t val);
+TargetTemp decimal_to_aircon_auto_temp(float val);
 TargetTemp decimal_to_water_temp(uint8_t val);
 TargetTemp decimal_to_water_temp(float val);
 const std::string operating_status_to_str(OperatingStatus val);

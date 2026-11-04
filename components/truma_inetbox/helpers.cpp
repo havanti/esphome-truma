@@ -103,6 +103,15 @@ TargetTemp decimal_to_aircon_auto_temp(uint8_t val) {
   return decimal_to_temp(val);
 }
 
+TargetTemp decimal_to_aircon_auto_temp(float val) {
+  if (std::isnan(val) || val < 0) {
+    return TargetTemp::TARGET_TEMP_OFF;
+  }
+  // Round to whole degrees: the iNet range starts at 17.8 °C, truncated to 17 it would switch AUTO off.
+  return decimal_to_aircon_auto_temp(
+      static_cast<uint8_t>(std::min(std::round(val), static_cast<float>(AIRCON_AUTO_TEMPERATURE_MAX))));
+}
+
 TargetTemp decimal_to_water_temp(uint8_t val) {
   if (val < 40) {
     return TargetTemp::TARGET_TEMP_OFF;

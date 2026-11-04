@@ -29,6 +29,8 @@ class TrumaiNetBoxAppHeater : public TrumaStausFrameResponseStorage<StatusFrameH
   // not yet confirmed by a status frame, otherwise the last status.
   TargetTemp pending_target_temp_room() const;
   TargetTemp pending_target_temp_water() const;
+  // Same for all fields of the heater write. Also read from the LIN event task by the AUTO write, which carries them.
+  StatusFrameHeaterResponse pending_response() const;
 
   bool action_heater_room(uint8_t temperature, HeatingMode mode = HeatingMode::HEATING_MODE_OFF);
   bool action_heater_water(uint8_t temperature);
@@ -38,6 +40,9 @@ class TrumaiNetBoxAppHeater : public TrumaStausFrameResponseStorage<StatusFrameH
                                 ElectricPowerLevel el_power_level = ElectricPowerLevel::ELECTRIC_POWER_LEVEL_0);
 
  protected:
+  // The heater write as the last status has it.
+  StatusFrameHeaterResponse response_from_status_() const;
+
   // LIN event task only: the last status kept the previous current temperatures.
   bool wake_up_values_skipped_{false};
 };

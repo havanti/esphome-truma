@@ -24,7 +24,7 @@ void TrumaAirconAutoNumber::setup() {
 void TrumaAirconAutoNumber::control(float value) {
   switch (this->type_) {
     case TRUMA_NUMBER_TYPE::AIRCON_AUTO_TEMPERATURE:
-      this->parent_->get_aircon_auto()->action_set_temp(static_cast<uint8_t>(value));
+      this->parent_->get_aircon_auto()->action_set_temp(value);
       break;
     default:
       break;

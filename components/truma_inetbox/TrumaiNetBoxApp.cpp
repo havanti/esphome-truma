@@ -35,10 +35,12 @@ static constexpr uint8_t HEATER_STATUS_LEGACY_ROOM_HIGH = 3;
 static constexpr uint8_t HEATER_STATUS_LEGACY_WATER_LOW = 4;
 static constexpr uint8_t HEATER_STATUS_LEGACY_WATER_HIGH = 5;
 // Room and water a Combi 6 H5.00.00 sends in its first frames after a bus wake-up (31.1/46.2 °C), whatever it measures.
-static constexpr uint16_t HEATER_STATUS_LEGACY_WAKE_UP_ROOM = 0x0BE1;
+// Room is TEMP_CODE_WAKE_UP_ROOM.
 static constexpr uint16_t HEATER_STATUS_LEGACY_WAKE_UP_WATER = 0x0C78;
-// Idle frames carry these instead of a room temperature; their flags say nothing about the supply.
-static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_0AAA = 0x0AAA;
+// The heater status with the wake-up pair follows 0.6-7.2 s after the PID 0x16 wake-up values.
+static constexpr uint32_t HEATER_WAKE_UP_WINDOW_MS = 10 * 1000;
+// Idle frames carry these (and TEMP_CODE_NO_DATA) instead of a room temperature; their flags say nothing about the
+// supply.
 static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_AAAA = 0xAAAA;
 static constexpr uint16_t HEATER_STATUS_LEGACY_IDLE_ZERO = 0x0000;
 // The original box always transfers the full 40-byte buffer (first frame 03 10 29 FA); CP-Plus C3.00.00
@@ -148,16 +150,9 @@ bool TrumaiNetBoxApp::answer_lin_order_(const uint8_t pid) {
   return LinBusProtocol::answer_lin_order_(pid);
 }
 
-bool TrumaiNetBoxApp::heater_wake_up_values_within(uint32_t window_ms) {
-  if (!this->heater_wake_up_values_seen_) {
-    return false;
-  }
-  // Unsigned subtraction is wraparound-safe; forgetting old values keeps a 49-day-old one from looking recent after
-  // the millis() rollover.
-  if (millis() - this->heater_wake_up_values_ms_ > window_ms) {
-    this->heater_wake_up_values_seen_ = false;
-  }
-  return this->heater_wake_up_values_seen_;
+bool TrumaiNetBoxApp::heater_wake_up_values_recent() const {
+  // Unsigned subtraction is wraparound-safe.
+  return this->heater_wake_up_values_seen_ && millis() - this->heater_wake_up_values_ms_ <= HEATER_WAKE_UP_WINDOW_MS;
 }
 
 void TrumaiNetBoxApp::lin_message_received_(const uint8_t pid, const uint8_t *message, uint8_t length) {
@@ -181,11 +176,15 @@ void TrumaiNetBoxApp::lin_message_received_(const uint8_t pid, const uint8_t *me
                                                   (message[HEATER_STATUS_LEGACY_ROOM_HIGH] << 8));
       const uint16_t water = static_cast<uint16_t>(message[HEATER_STATUS_LEGACY_WATER_LOW] |
                                                    (message[HEATER_STATUS_LEGACY_WATER_HIGH] << 8));
-      if (room == HEATER_STATUS_LEGACY_WAKE_UP_ROOM && water == HEATER_STATUS_LEGACY_WAKE_UP_WATER) {
+      if (room == TEMP_CODE_WAKE_UP_ROOM && water == HEATER_STATUS_LEGACY_WAKE_UP_WATER) {
         this->heater_wake_up_values_ms_ = millis();
         this->heater_wake_up_values_seen_ = true;
+      } else if (this->heater_wake_up_values_seen_ &&
+                 millis() - this->heater_wake_up_values_ms_ > HEATER_WAKE_UP_WINDOW_MS) {
+        // Forget old values, so a 49-day-old one cannot look recent after the millis() rollover.
+        this->heater_wake_up_values_seen_ = false;
       }
-      if (room != HEATER_STATUS_LEGACY_IDLE_0AAA && room != HEATER_STATUS_LEGACY_IDLE_AAAA &&
+      if (room != TEMP_CODE_NO_DATA && room != HEATER_STATUS_LEGACY_IDLE_AAAA &&
           room != HEATER_STATUS_LEGACY_IDLE_ZERO) {
         this->heater_flags_raw_.store(message[HEATER_STATUS_LEGACY_FLAGS_BYTE], std::memory_order_relaxed);
         this->heater_flags_updated_.store(true, std::memory_order_release);
@@ -514,8 +513,12 @@ bool TrumaiNetBoxApp::has_update_to_submit_() {
     // Unsigned subtraction is wraparound-safe after the micros() 71-minute rollover.
     return init_request_sent == 0 || micros() - init_request_sent > INIT_RETRY_DELAY_US;
   }
-  return this->airconAuto_.has_update() || this->airconManual_.has_update() || this->clock_.has_update() ||
-         this->heater_.has_update() || this->timer_.has_update();
+  bool update = this->heater_.has_update() || this->timer_.has_update() || this->airconManual_.has_update() ||
+                this->airconAuto_.has_update();
+#ifdef USE_TIME
+  update = update || this->clock_.has_update();
+#endif  // USE_TIME
+  return update;
 }
 
 }  // namespace truma_inetbox
