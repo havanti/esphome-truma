@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Summary
 
-New in 1.0.50: prepared for ESPHome 2026.11 (PR #42 by Marco). Since 1.0.49 the timer can be set from the
+New in 1.0.51: small fixes to the climate automatic, not confirmed on an Aventa yet. Since 1.0.50
+prepared for ESPHome 2026.11 (PR #42 by Marco). Since 1.0.49 the timer can be set from the
 dashboard in the heater examples, according to feedback in issue #39 it works. Since 1.0.48 HA shows the current temperature as unknown instead of 0 °C without data from the
 heater, the Combi 6 spike after a wake-up is filtered out (PR #41 by Marco), according to feedback in issue #37
 both work. Since 1.0.47 the current temperature shows up in HA with tenths, the water also over MQTT (PR #40 by Marco).
@@ -27,6 +28,18 @@ Tested against:
 
 ---
 
+
+## [1.0.51] — 2026-11-04 — Climate automatic fixes
+
+### Changed
+- `truma_inetbox`: `AIRCON_AUTO` rounds the target instead of truncating it. 17.8 °C no longer switches the
+  automatic off. A target set just before is kept when only the mode follows.
+- `truma_inetbox`: Setting the climate automatic sends water, energy mix and power level along as the heater is
+  about to get them. The original iNet Box does the same (issue #32). A water setting changed just before is
+  no longer reset.
+- `truma_inetbox`: `AIRCON_AUTO` shows the current temperature as unknown instead of 0 °C without data from the
+  heater, like `ROOM`.
+- Not confirmed on an Aventa yet.
 
 ## [1.0.50] — 2026-10-29 — Preparing for ESPHome 2026.11
 
