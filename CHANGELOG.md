@@ -12,7 +12,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Zusammenfassung
 
-Neu in 1.0.51: Kleinere Korrekturen an der Klimaautomatik, an einer Aventa noch nicht bestätigt. Seit 1.0.50
+Neu in 1.0.52: Auch `AIRCON` rundet den Sollwert. Seit 1.0.51 kleinere Korrekturen an der Klimaautomatik, beides
+an einer Aventa noch nicht bestätigt. Seit 1.0.50
 vorbereitet auf ESPHome 2026.11 (PR #42 von Marco). Seit 1.0.49 lässt sich der Timer in den
 Heizungs-Beispielen im Dashboard einstellen, laut Rückmeldung aus Issue #39 funktioniert das. Seit 1.0.48 zeigt HA ohne Daten von der Heizung die Ist-Temperatur als „Unbekannt“
 statt 0 °C, den Ausreißer der Combi 6 nach dem Aufwachen filtert die Komponente aus (PR #41 von Marco), laut
@@ -28,6 +29,12 @@ Getestet mit:
 
 ---
 
+
+## [1.0.52] — 2026-11-04 — Sollwert der Klimaanlage gerundet
+
+### Geändert
+- `truma_inetbox`: `AIRCON` rundet den Sollwert, statt ihn abzuschneiden, wie `AIRCON_AUTO`. An einer Aventa
+  noch nicht bestätigt.
 
 ## [1.0.51] — 2026-11-04 — Korrekturen an der Klimaautomatik
 

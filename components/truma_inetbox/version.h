@@ -3,7 +3,7 @@
 namespace esphome {
 namespace truma_inetbox {
 
-static constexpr const char *TRUMA_INETBOX_VERSION = "1.0.51";
+static constexpr const char *TRUMA_INETBOX_VERSION = "1.0.52";
 
 }  // namespace truma_inetbox
 }  // namespace esphome
