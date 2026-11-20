@@ -197,6 +197,18 @@ async def register_uart_device(var, config):
     cg.add(var.set_uart_parent(parent))
 
 
+async def new_uart_component(config, *args):
+    """Create a component on a UART bus: construct, register, attach to the bus.
+
+    Mirrors the helper added to upstream uart in ESPHome 2026.11, which built-in
+    components such as gps now call. Extra args go to the constructor.
+    """
+    var = cg.new_Pvariable(config[CONF_ID], *args)
+    await cg.register_component(var, config)
+    await register_uart_device(var, config)
+    return var
+
+
 @automation.register_action(
     "uart.write",
     UARTWriteAction,
