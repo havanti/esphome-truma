@@ -13,7 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Summary
 
 From ESPHome 2026.11.0 on the `nan` target of a switched-off heater arrives cleanly in HA over MQTT when
-`publish_nan_as_none: true` is set under `mqtt:` (see README, Climate). New in 1.0.52: `AIRCON` rounds the target as well. Since 1.0.51 small fixes to the climate automatic, both not
+`publish_nan_as_none: true` is set under `mqtt:` (see README, Climate). New in 1.0.53: `gps` builds again together
+with the custom `uart` on ESPHome 2026.11 (issue #43), not confirmed yet. Since 1.0.52 `AIRCON` rounds the target
+as well. Since 1.0.51 small fixes to the climate automatic, both not
 confirmed on an Aventa yet. Since 1.0.50
 prepared for ESPHome 2026.11 (PR #42 by Marco). Since 1.0.49 the timer can be set from the
 dashboard in the heater examples, according to feedback in issue #39 it works. Since 1.0.48 HA shows the current temperature as unknown instead of 0 °C without data from the
@@ -30,6 +32,12 @@ Tested against:
 
 ---
 
+
+## [1.0.53] — 2026-11-20 — GPS with ESPHome 2026.11
+
+### Changed
+- `uart`: The built-in `gps` component builds again together with the custom `uart` on ESPHome 2026.11
+  (issue #43). Not confirmed yet.
 
 ## [1.0.52] — 2026-11-04 — Aircon target rounded
 
