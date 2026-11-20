@@ -10,26 +10,24 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Kompatibilitätsstatus
 
-### Zusammenfassung
-
-Ab ESPHome 2026.11.0 kommt der Sollwert `nan` der ausgeschalteten Heizung über MQTT sauber in HA an, wenn unter
-`mqtt:` die Option `publish_nan_as_none: true` gesetzt ist (siehe README, Climate), von Marco
-bestätigt (PR #40). Neu in 1.0.53: `gps` lässt sich
-mit ESPHome 2026.11 wieder zusammen mit der eigenen `uart` bauen (Issue #43), noch nicht bestätigt. Seit 1.0.52
-rundet auch `AIRCON` den Sollwert. Seit 1.0.51 kleinere Korrekturen an der Klimaautomatik, beides
-an einer Aventa noch nicht bestätigt. Seit 1.0.50
-vorbereitet auf ESPHome 2026.11 (PR #42 von Marco). Seit 1.0.49 lässt sich der Timer in den
-Heizungs-Beispielen im Dashboard einstellen, laut Rückmeldung aus Issue #39 funktioniert das. Seit 1.0.48 zeigt HA ohne Daten von der Heizung die Ist-Temperatur als „Unbekannt“
-statt 0 °C, den Ausreißer der Combi 6 nach dem Aufwachen filtert die Komponente aus (PR #41 von Marco), laut
-Rückmeldung aus Issue #37 funktioniert beides. Seit 1.0.47 erscheint die Ist-Temperatur in HA mit Zehnteln, das Wasser auch
-über MQTT (PR #40 von Marco). Seit 1.0.46 lässt sich die Klimaautomatik am CP Plus wieder aus HA setzen, laut Rückmeldung aus
-Issue #32 funktioniert das. Seit 1.0.42 läuft auch die CP Plus C3 (Issue #29, PR #30 von Marco). Die
-Lüfterauswahl an der Combi 6 Gas hat Marco ebenfalls bestätigt. `HEATER_HAS_ERROR` meldet jetzt auch
-Warnungen. Der Landstrom-Sensor der Combi D aus 1.0.39 ist noch nicht bestätigt. AUTO-Anzeige und
-Licht der Aventa sind bestätigt (Issue #28).
-
 Getestet mit:
 - ESPHome **2026.11.0** — ESP-IDF ✅
+
+### Noch nicht bestätigt
+
+- 1.0.53: `gps` zusammen mit der eigenen `uart` (Issue #43)
+- 1.0.51 und 1.0.52: Korrekturen an der Klimaautomatik, gerundeter Sollwert bei `AIRCON` (Aventa)
+- 1.0.39: Landstrom-Sensor der Combi D
+
+### Von Nutzern bestätigt
+
+- MQTT: Sollwert `nan` der ausgeschalteten Heizung, ab ESPHome 2026.11.0 mit `publish_nan_as_none: true`
+  (PR #40, siehe README, Climate)
+- 1.0.49: Timer im Dashboard (Issue #39)
+- 1.0.48: Ist-Temperatur „Unbekannt“ statt 0 °C ohne Daten, Ausreißer der Combi 6 gefiltert (Issue #37, PR #41)
+- 1.0.46: Klimaautomatik am CP Plus aus HA setzen (Issue #32)
+- 1.0.42: CP Plus C3 (Issue #29, PR #30), Lüfterauswahl an der Combi 6 Gas
+- Aventa: AUTO-Anzeige und Licht (Issue #28)
 
 ---
 

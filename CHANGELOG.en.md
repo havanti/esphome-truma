@@ -10,26 +10,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Compatibility Status
 
-### Summary
-
-From ESPHome 2026.11.0 on the `nan` target of a switched-off heater arrives cleanly in HA over MQTT when
-`publish_nan_as_none: true` is set under `mqtt:` (see README, Climate), confirmed by Marco
-(PR #40). New in 1.0.53: `gps` builds again together
-with the custom `uart` on ESPHome 2026.11 (issue #43), not confirmed yet. Since 1.0.52 `AIRCON` rounds the target
-as well. Since 1.0.51 small fixes to the climate automatic, both not
-confirmed on an Aventa yet. Since 1.0.50
-prepared for ESPHome 2026.11 (PR #42 by Marco). Since 1.0.49 the timer can be set from the
-dashboard in the heater examples, according to feedback in issue #39 it works. Since 1.0.48 HA shows the current temperature as unknown instead of 0 °C without data from the
-heater, the Combi 6 spike after a wake-up is filtered out (PR #41 by Marco), according to feedback in issue #37
-both work. Since 1.0.47 the current temperature shows up in HA with tenths, the water also over MQTT (PR #40 by Marco).
-Since 1.0.46 the climate automatic of the CP Plus can be set from HA again, according to feedback in
-issue #32 it works. Since 1.0.42 the CP Plus C3 works as well (issue #29, PR #30 by Marco). Marco
-also confirmed the fan mode select on the Combi 6 Gas. `HEATER_HAS_ERROR` now also reports warnings.
-The shore power sensor of the Combi D from 1.0.39 is not confirmed yet. AUTO display and light of the
-Aventa are confirmed (issue #28).
-
 Tested against:
 - ESPHome **2026.11.0** — ESP-IDF ✅
+
+### Not confirmed yet
+
+- 1.0.53: `gps` together with the custom `uart` (issue #43)
+- 1.0.51 and 1.0.52: fixes to the climate automatic, rounded target for `AIRCON` (Aventa)
+- 1.0.39: shore power sensor of the Combi D
+
+### Confirmed by users
+
+- MQTT: `nan` target of a switched-off heater, from ESPHome 2026.11.0 on with `publish_nan_as_none: true`
+  (PR #40, see README, Climate)
+- 1.0.49: timer in the dashboard (issue #39)
+- 1.0.48: current temperature unknown instead of 0 °C without data, Combi 6 spike filtered out (issue #37, PR #41)
+- 1.0.46: setting the climate automatic of the CP Plus from HA (issue #32)
+- 1.0.42: CP Plus C3 (issue #29, PR #30), fan mode select on the Combi 6 Gas
+- Aventa: AUTO display and light (issue #28)
 
 ---
 
