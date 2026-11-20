@@ -13,7 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Summary
 
 From ESPHome 2026.11.0 on the `nan` target of a switched-off heater arrives cleanly in HA over MQTT when
-`publish_nan_as_none: true` is set under `mqtt:` (see README, Climate). New in 1.0.53: `gps` builds again together
+`publish_nan_as_none: true` is set under `mqtt:` (see README, Climate), confirmed by Marco
+(PR #40). New in 1.0.53: `gps` builds again together
 with the custom `uart` on ESPHome 2026.11 (issue #43), not confirmed yet. Since 1.0.52 `AIRCON` rounds the target
 as well. Since 1.0.51 small fixes to the climate automatic, both not
 confirmed on an Aventa yet. Since 1.0.50

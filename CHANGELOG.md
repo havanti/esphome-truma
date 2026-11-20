@@ -13,7 +13,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Zusammenfassung
 
 Ab ESPHome 2026.11.0 kommt der Sollwert `nan` der ausgeschalteten Heizung über MQTT sauber in HA an, wenn unter
-`mqtt:` die Option `publish_nan_as_none: true` gesetzt ist (siehe README, Climate). Neu in 1.0.53: `gps` lässt sich
+`mqtt:` die Option `publish_nan_as_none: true` gesetzt ist (siehe README, Climate), von Marco
+bestätigt (PR #40). Neu in 1.0.53: `gps` lässt sich
 mit ESPHome 2026.11 wieder zusammen mit der eigenen `uart` bauen (Issue #43), noch nicht bestätigt. Seit 1.0.52
 rundet auch `AIRCON` den Sollwert. Seit 1.0.51 kleinere Korrekturen an der Klimaautomatik, beides
 an einer Aventa noch nicht bestätigt. Seit 1.0.50
