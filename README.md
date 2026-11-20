@@ -398,6 +398,12 @@ sensor:
     type: CURRENT_WATER_TEMPERATURE
 ```
 
+> **Weitere serielle Geräte am selben ESP:** Die Komponente `uart` aus diesem Repo ersetzt die von ESPHome für alle
+> seriellen Anschlüsse des ESP, nicht nur für den LIN-Bus. Sie ist auf die Heizung zugeschnitten und kann weniger als das
+> Original. Wer neben der Heizung ein weiteres serielles Gerät am selben ESP betreibt, kann deshalb Probleme beim Bauen
+> bekommen. `gps` lässt sich ab 1.0.53 bauen (Issue #43), `modbus` funktioniert nicht. Bei anderen Geräten kann das
+> Bauen scheitern.
+
 ## ESPHome-Komponenten
 
 Dieses Projekt enthält die folgenden ESPHome-Komponenten:

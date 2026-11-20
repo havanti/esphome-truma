@@ -398,6 +398,11 @@ sensor:
     type: CURRENT_WATER_TEMPERATURE
 ```
 
+> **Other serial devices on the same ESP:** The `uart` component from this repo replaces the one from ESPHome for all
+> serial ports of the ESP, not only for the LIN bus. It is tailored to the heater and can do less than the original. If
+> you run another serial device on the same ESP next to the heater, you can therefore run into build problems. `gps`
+> builds since 1.0.53 (issue #43), `modbus` does not work. Other devices may fail to build.
+
 ## ESPHome components
 
 This project contains the following ESPHome components:
