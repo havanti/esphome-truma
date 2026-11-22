@@ -537,7 +537,11 @@ The following `type` values are available:
 `OPERATING_STATUS` passes on the operating state the heater itself reports: 0 means off, 1 is a
 warning, 4 shows up during start-up and cool-down. The values above that depend on the model: a
 Combi 4 reports 5 as soon as heating or boiler are switched on, while captures from a Combi D6E
-show 7 with heating set and 6 already at power-on without heating. They do not tell whether the
+show 7 with heating set and 6 already at power-on without heating. On a Combi 6E (issue #44) the
+values followed shore power: without 230 V it showed 0 with room heating off and 5 with it on,
+with 230 V 2 and 7, and briefly 4 or 6 while switching on. The boiler changed nothing there. On
+that unit shore power can therefore be recognised by the values 2, 6 and 7, for other models this
+is not confirmed. They do not tell whether the
 burner is currently working, and the component provides no signal for that so far. The binary
 sensors `HEATER_ROOM` and `HEATER_WATER` are not suitable either, since they only indicate a
 target temperature being set and stay active while the heater has reached its temperature and

@@ -538,7 +538,11 @@ Folgende `type`-Werte sind verfügbar:
 `OPERATING_STATUS` gibt den Betriebszustand weiter, den die Heizung selbst meldet: 0 heißt aus,
 1 ist eine Warnung, 4 kommt beim Anlauf und beim Nachlauf. Die Werte darüber hängen vom Modell ab:
 Bei einer Combi 4 steht 5, sobald Heizung oder Boiler eingeschaltet sind, in Mitschnitten einer
-Combi D6E steht 7 bei eingestellter Heizung und 6 schon beim Einschalten ohne Heizung. Ob der
+Combi D6E steht 7 bei eingestellter Heizung und 6 schon beim Einschalten ohne Heizung. An einer
+Combi 6E (Issue #44) folgten die Werte dem Landstrom: ohne 230 V stand 0 bei ausgeschalteter und 5
+bei eingeschalteter Raumheizung, mit 230 V 2 und 7, beim Einschalten kurz 4 beziehungsweise 6. Der
+Boiler änderte dort nichts. Bei dieser Anlage lässt sich der Landstrom also an den Werten 2, 6 und
+7 erkennen, für andere Modelle ist das nicht bestätigt. Ob der
 Brenner gerade arbeitet, lässt sich daran nicht erkennen, die Komponente liefert dafür bisher kein
 Signal. Die Binärsensoren `HEATER_ROOM` und `HEATER_WATER` taugen dafür ebenfalls nicht, denn sie
 zeigen nur eine gesetzte Solltemperatur an und bleiben auch dann aktiv, wenn die Heizung ihre
