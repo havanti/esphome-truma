@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Compatibility Status
 
 Tested against:
-- ESPHome **2026.11.0** — ESP-IDF ✅
+- ESPHome **2026.11.1** — ESP-IDF ✅
 
 ### Not confirmed yet
 
