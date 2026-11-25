@@ -438,7 +438,7 @@ Folgende `type`-Werte sind verfügbar:
 - `HEATER_ELECTRICITY`
 - `HEATER_HAS_ERROR` — Fehler oder Warnung der Heizung, auch W255 (seit 1.0.42)
 - `HEATING_DEMAND` (experimentell, siehe Sensor)
-- `HEATER_MAINS_POWER` — 230 V Landstrom an der Heizung (experimentell, nur Combi D, siehe Sensor)
+- `HEATER_MAINS_POWER` — 230 V Landstrom an der Heizung (nur Combi D, siehe Sensor)
 - `TIMER_ACTIVE`
 - `TIMER_ROOM`
 - `TIMER_WATER`
@@ -573,11 +573,12 @@ ist eine reine Anzeige, die Lüftung lässt sich darüber nicht einstellen. Komm
 Bus nicht vor, bleibt der Sensor ohne Wert. In den Mitschnitten einer Combi D6 E fehlen die PIDs
 0x20 bis 0x22 ganz. Eine weitere Auswertung dieser PIDs ist nicht geplant.
 
-Experimentell und nur für die Combi D: Der Binärsensor `HEATER_MAINS_POWER` zeigt, ob an der
-Heizung 230 V Landstrom anliegen. Ausgewertet wird Bit 1 von Byte 1 im LIN-Frame 0x16, den die
-Combi D an den CP Plus schickt. Ohne Landstrom ist das Bit gelöscht, das Umschalten beim Einstecken
-ist aber noch nicht bestätigt. Für Automationen ist der Sensor deshalb noch nicht geeignet.
-Rückmeldungen mit einer Combi D gern als Issue.
+Nur für die Combi D: Der Binärsensor `HEATER_MAINS_POWER` zeigt, ob an der Heizung 230 V Landstrom
+anliegen. Ausgewertet wird Bit 1 von Byte 1 im LIN-Frame 0x16, den die Combi D an den CP Plus
+schickt. Am Bus einer Combi D6E folgte das Bit dem Einstecken und Abziehen des Landstroms. Der Wert
+stimmt nur, solange Heizung oder Boiler laufen: Eine ausgeschaltete Combi wiederholt ihre letzte
+Meldung, der Sensor zeigt dann den alten Stand. Ob die Combi das Bit auch im reinen Dieselbetrieb
+setzt, ist nicht gemessen. Rückmeldungen mit einer Combi D gern als Issue.
 
 ### Text Sensor
 

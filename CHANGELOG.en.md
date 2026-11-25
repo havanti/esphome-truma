@@ -16,7 +16,6 @@ Tested against:
 ### Not confirmed yet
 
 - 1.0.51 and 1.0.52: fixes to the climate automatic, rounded target for `AIRCON` (Aventa)
-- 1.0.39: shore power sensor of the Combi D
 
 ### Confirmed by users
 
@@ -27,6 +26,7 @@ Tested against:
 - 1.0.48: current temperature unknown instead of 0 °C without data, Combi 6 spike filtered out (issue #37, PR #41)
 - 1.0.46: setting the climate automatic of the CP Plus from HA (issue #32)
 - 1.0.42: CP Plus C3 (issue #29, PR #30), fan mode select on the Combi 6 Gas
+- 1.0.39: shore power sensor of the Combi D, only while heater or boiler are running
 - Aventa: AUTO display and light (issue #28)
 
 ---
@@ -178,7 +178,7 @@ Tested against:
 
 ### Added
 - `truma_inetbox`: binary sensor `HEATER_MAINS_POWER` (Combi D only) for 230 V shore power at the
-  heater. Experimental, not confirmed yet.
+  heater. Confirmed on a Combi D6E, the value is only right while heater or boiler are running.
 
 ### Changed
 - `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` shows "unknown" instead of 0 °C while AUTO is

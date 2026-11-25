@@ -16,7 +16,6 @@ Getestet mit:
 ### Noch nicht bestätigt
 
 - 1.0.51 und 1.0.52: Korrekturen an der Klimaautomatik, gerundeter Sollwert bei `AIRCON` (Aventa)
-- 1.0.39: Landstrom-Sensor der Combi D
 
 ### Von Nutzern bestätigt
 
@@ -27,6 +26,7 @@ Getestet mit:
 - 1.0.48: Ist-Temperatur „Unbekannt“ statt 0 °C ohne Daten, Ausreißer der Combi 6 gefiltert (Issue #37, PR #41)
 - 1.0.46: Klimaautomatik am CP Plus aus HA setzen (Issue #32)
 - 1.0.42: CP Plus C3 (Issue #29, PR #30), Lüfterauswahl an der Combi 6 Gas
+- 1.0.39: Landstrom-Sensor der Combi D, nur bei laufender Heizung oder laufendem Boiler
 - Aventa: AUTO-Anzeige und Licht (Issue #28)
 
 ---
@@ -179,7 +179,7 @@ Getestet mit:
 
 ### Hinzugefügt
 - `truma_inetbox`: Binärsensor `HEATER_MAINS_POWER` (nur Combi D) für 230 V Landstrom an der
-  Heizung. Experimentell, noch nicht bestätigt.
+  Heizung. An einer Combi D6E bestätigt, der Wert stimmt nur, solange Heizung oder Boiler laufen.
 
 ### Geändert
 - `truma_inetbox`: `AIRCON_AUTO_TARGET_TEMPERATURE` zeigt bei AUTO aus „Unbekannt“ statt 0 °C.

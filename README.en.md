@@ -437,7 +437,7 @@ The following `type` values are available:
 - `HEATER_ELECTRICITY`
 - `HEATER_HAS_ERROR` — error or warning of the heater, also W255 (since 1.0.42)
 - `HEATING_DEMAND` (experimental, see Sensor)
-- `HEATER_MAINS_POWER` — 230 V shore power at the heater (experimental, Combi D only, see Sensor)
+- `HEATER_MAINS_POWER` — 230 V shore power at the heater (Combi D only, see Sensor)
 - `TIMER_ACTIVE`
 - `TIMER_ROOM`
 - `TIMER_WATER`
@@ -571,11 +571,12 @@ ventilation cannot be set through it. If the frame does not appear on the bus, t
 without a value. Captures from a Combi D6 E contain no PIDs 0x20 to 0x22 at all. No further
 analysis of these PIDs is planned.
 
-Experimental and for the Combi D only: the binary sensor `HEATER_MAINS_POWER` shows whether 230 V
-shore power is present at the heater. It evaluates bit 1 of byte 1 in LIN frame 0x16, which the
-Combi D sends to the CP Plus. Without shore power the bit is cleared, but the change when plugging
-in is not confirmed yet, so the sensor is not suitable for automations yet. Feedback from Combi D
-owners is welcome as an issue.
+For the Combi D only: the binary sensor `HEATER_MAINS_POWER` shows whether 230 V shore power is
+present at the heater. It evaluates bit 1 of byte 1 in LIN frame 0x16, which the Combi D sends to
+the CP Plus. On the bus of a Combi D6E the bit followed plugging in and unplugging shore power. The
+value is only right while heater or boiler are running: a Combi that is switched off repeats its
+last message, so the sensor then shows the old state. Whether the Combi also sets the bit when
+running on diesel only has not been measured. Feedback from Combi D owners is welcome as an issue.
 
 ### Text Sensor
 
