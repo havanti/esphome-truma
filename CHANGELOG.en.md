@@ -15,12 +15,12 @@ Tested against:
 
 ### Not confirmed yet
 
-- 1.0.53: `gps` together with the custom `uart` (issue #43)
 - 1.0.51 and 1.0.52: fixes to the climate automatic, rounded target for `AIRCON` (Aventa)
 - 1.0.39: shore power sensor of the Combi D
 
 ### Confirmed by users
 
+- 1.0.53: `gps` together with the custom `uart` (issue #43)
 - MQTT: `nan` target of a switched-off heater, from ESPHome 2026.11.0 on with `publish_nan_as_none: true`
   (PR #40, see README, Climate)
 - 1.0.49: timer in the dashboard (issue #39)
@@ -34,9 +34,9 @@ Tested against:
 
 ## [1.0.53] — 2026-11-20 — GPS with ESPHome 2026.11
 
-### Changed
+### Fixed
 - `uart`: The built-in `gps` component builds again together with the custom `uart` on ESPHome 2026.11
-  (issue #43). Not confirmed yet.
+  (issue #43). According to feedback in the issue it works.
 
 ## [1.0.52] — 2026-11-04 — Aircon target rounded
 

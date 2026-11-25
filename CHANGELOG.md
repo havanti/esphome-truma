@@ -15,12 +15,12 @@ Getestet mit:
 
 ### Noch nicht bestätigt
 
-- 1.0.53: `gps` zusammen mit der eigenen `uart` (Issue #43)
 - 1.0.51 und 1.0.52: Korrekturen an der Klimaautomatik, gerundeter Sollwert bei `AIRCON` (Aventa)
 - 1.0.39: Landstrom-Sensor der Combi D
 
 ### Von Nutzern bestätigt
 
+- 1.0.53: `gps` zusammen mit der eigenen `uart` (Issue #43)
 - MQTT: Sollwert `nan` der ausgeschalteten Heizung, ab ESPHome 2026.11.0 mit `publish_nan_as_none: true`
   (PR #40, siehe README, Climate)
 - 1.0.49: Timer im Dashboard (Issue #39)
@@ -34,9 +34,9 @@ Getestet mit:
 
 ## [1.0.53] — 2026-11-20 — GPS mit ESPHome 2026.11
 
-### Geändert
+### Behoben
 - `uart`: Die eingebaute Komponente `gps` lässt sich mit ESPHome 2026.11 wieder zusammen mit der eigenen `uart`
-  bauen (Issue #43). Noch nicht bestätigt.
+  bauen (Issue #43). Laut Rückmeldung aus dem Issue funktioniert das.
 
 ## [1.0.52] — 2026-11-04 — Sollwert der Klimaanlage gerundet
 
